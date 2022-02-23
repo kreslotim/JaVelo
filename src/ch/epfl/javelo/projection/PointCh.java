@@ -7,7 +7,7 @@ import ch.epfl.javelo.Preconditions;
  * @author Tim Kreslo (310686)
  * @author Wei-En Hsieh (341271)
  */
-// add add2
+// add add2 add3
 public record PointCh(double e, double n) {
     /**
      * Compact PointCh constructor

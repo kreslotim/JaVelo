@@ -1,0 +1,3 @@
+dans PointWebMercator : les meth lon() et lat(), cmt prouver que la valeur retourne qqch en radians ? 
+    1- creer des tests pour verifier
+    2- euhhhh Salim ?

@@ -8,6 +8,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="junit.jupiter" level="project" />
+    <orderEntry type="library" name="MyJunit" level="project" />
   </component>
 </module>

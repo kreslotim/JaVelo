@@ -26,7 +26,7 @@ public final class SwissBounds {
      * @return (boolean) true if East and North coordinates are in bounds of Switzerland
      */
     public static boolean containsEN(double e, double n) {
-        return (e >= MIN_E) && (e <= MAX_E) && (n >= MIN_E) && (n <= MAX_E);
+        return (e >= MIN_E) && (e <= MAX_E) && (n >= MIN_N) && (n <= MAX_N);
     }
 
 }

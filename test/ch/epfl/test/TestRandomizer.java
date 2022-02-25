@@ -1,7 +1,5 @@
 package ch.epfl.test;
 
-import org.junit.jupiter.api.Test;
-
 import java.util.random.RandomGenerator;
 import java.util.random.RandomGeneratorFactory;
 
@@ -14,6 +12,4 @@ public final class TestRandomizer {
     public static RandomGenerator newRandom() {
         return RandomGeneratorFactory.getDefault().create(SEED);
     }
-
-
 }

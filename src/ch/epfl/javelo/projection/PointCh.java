@@ -14,6 +14,7 @@ import ch.epfl.javelo.Preconditions;
  */
 
 public record PointCh(double e, double n) {
+
     /**
      * Compact PointCh constructor
      *

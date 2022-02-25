@@ -1,14 +1,16 @@
 package ch.epfl.javelo.projection;
 
-public class PointWebMercator {
-    private double x; // la coordonnée x du point
-    private double y; // la coordonnée y du point
+import ch.epfl.javelo.Preconditions;
 
-    public PointWebMercator() { // compact constructor
-        if (x < 0 || x > 1 || y < 0 || y > 1) {
-            throw new IllegalArgumentException();
-        }
+// c'est pour un point(x,y) du Map entier aka du WebMercator
+public record PointWebMercator(double x, double y) {
+    // x et y pour le map "normal"
+//    private double x; // la coordonnée x du point du WebMercator
+//    private double y; // la coordonnée y du point du WebMercator
 
+    public PointWebMercator { // compact constructor
+        // utilise les preconditions
+        Preconditions.checkArgument(x < 0 || x > 1 || y < 0 || y > 1);
     }
 
     //public static methods
@@ -16,20 +18,20 @@ public class PointWebMercator {
     /**
      * §2.3
      * retourne le point dont les coordonnées sont x et y au niveau de zoom zoomLeve
+     * càd retourner le pointZoomé à un zoomLevel donné au point sans zoomLevel
      *
      * @param zoomLevel : can be from 0 to 20
      * @param x
      * @param y
      * @return
      */
+
     public static PointWebMercator of(int zoomLevel, double x, double y) {
         // énoncé : la position d'un point = il suffit de multiplier ses coordonnées(lon, lat)
         // par la taille de l'image à ce niveau de zoom
-        double imageSize = (256 * Math.pow(2, zoomLevel)) * (256 * Math.pow(2, zoomLevel)); // the imageSize is a squre at the zoomLevel
-
-        double lon = WebMercator.lon(x) * imageSize;
-        double lat = WebMercator.lat(y) * imageSize;
-        return (lon,lat); // euh retourner deux valeurs ??
+        double lon = WebMercator.lon(x) * Math.scalb(x, -zoomLevel - 8);
+        double lat = WebMercator.lat(y) * Math.scalb(y, -zoomLevel - 8);
+        return new PointWebMercator(lon, lat); // euh retourner deux valeurs ??
     }
 
     /**
@@ -40,8 +42,7 @@ public class PointWebMercator {
      * @return
      */
     public static PointWebMercator ofPointCh(PointCh pointCh) { // dans le code de Tim
-
-
+        return new PointWebMercator(pointCh.e(), pointCh.n());
     }
 
 
@@ -76,9 +77,9 @@ public class PointWebMercator {
      *
      * @return
      */
-    public double lon() {
-
-
+    public double lon() { // c'est la methode lon de WebMercator mais sauf que cette methode fonctionne comme un getter
+        // car y'a deja l'attribut x
+        return WebMercator.lon(x);
     }
 
 
@@ -87,20 +88,21 @@ public class PointWebMercator {
      *
      * @return
      */
-    public double lat() {
-
-
+    public double lat() { // mm idee
+        return WebMercator.lat(y);
     }
 
 
     /**
-     * retourne le point de coordonnées suisses se trouvant à la même position que le récepteur (this) ou null
+     * retourne le point de coordonnées suisses se trouvant à la même position que le récepteur ( aka this) ou null
      * si ce point n'est pas dans les limites de la Suisse définies par SwissBounds
      *
      * @return
      */
     public PointCh toPointCh() {
-
+        // e = Ch1903.e(lon(), lat())
+        // n = Ch1903.n(lon(), lat())
+        return (SwissBounds.containsEN(Ch1903.e(lon(), lat()), Ch1903.n(lon(), lat())) ? new PointCh(Ch1903.e(lon(), lat()), Ch1903.n(lon(), lat())) : null);
     }
 
 

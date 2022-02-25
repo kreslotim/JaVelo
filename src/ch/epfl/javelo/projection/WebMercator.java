@@ -22,7 +22,7 @@ public final class WebMercator {
      * @return
      */
     public static double y(double lat) {
-        return (Math.PI - Math2.arsinh(Math.tan(lat))) / (2 * Math.PI); //la fonction arsinh ??
+        return (Math.PI - Math2.asinh(Math.tan(lat))) / (2 * Math.PI); //la fonction arsinh ??
     }
 
     /**

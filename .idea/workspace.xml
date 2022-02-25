@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="dd63b529-f9c0-48de-9825-f43456202e84" name="Changes" comment="" />
+    <list default="true" id="dd63b529-f9c0-48de-9825-f43456202e84" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/ch/epfl/javelo/Bits.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Javelo.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Javelo.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Javelo/ch/epfl/javelo/A.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Javelo/ch/epfl/javelo/Test.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Javelo/ch/epfl/javelo/projection/SwissBounds.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ch/epfl/javelo/projection/PointCh.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ch/epfl/javelo/projection/PointCh.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ch/epfl/javelo/projection/PointWebMercator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ch/epfl/javelo/projection/PointWebMercator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ch/epfl/javelo/projection/WebMercator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/ch/epfl/javelo/projection/WebMercator.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -17,18 +27,39 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
   <component name="ProjectId" id="25R8mUCbPHEjJKQ08N4VfyQHuqI" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="Downloaded.Files.Path.Enabled" value="false" />
+    <property name="Repository.Attach.Annotations" value="false" />
+    <property name="Repository.Attach.JavaDocs" value="false" />
+    <property name="Repository.Attach.Sources" value="false" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="settings.editor.selected.configurable" value="Settings.JavaScript" />
   </component>
-  <component name="RunManager" selected="Application.Test">
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="ch.epfl.javelo.projection" />
+    </key>
+  </component>
+  <component name="RunManager" selected="JUnit.All in Javelo">
     <configuration name="Javelo" type="Application" factoryName="Application">
       <module name="Javelo" />
       <method v="2">
@@ -42,12 +73,22 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="All in Javelo" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Javelo" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <list>
       <item itemvalue="Application.Javelo" />
       <item itemvalue="Application.Test" />
+      <item itemvalue="JUnit.All in Javelo" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.All in Javelo" />
         <item itemvalue="Application.Test" />
       </list>
     </recent_temporary>
@@ -60,11 +101,20 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1645619497858</updated>
-      <workItem from="1645619499128" duration="363000" />
+      <workItem from="1645619499128" duration="495000" />
+      <workItem from="1645622769617" duration="1860000" />
+      <workItem from="1645655154823" duration="606000" />
+      <workItem from="1645705917023" duration="601000" />
+      <workItem from="1645721366610" duration="20000" />
+      <workItem from="1645789444550" duration="7684000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

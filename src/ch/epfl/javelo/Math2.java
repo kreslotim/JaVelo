@@ -48,7 +48,9 @@ public final class Math2 {
      */
     public static int clamp(int min, int v, int max) {
         Preconditions.checkArgument(max > min);
-        return (v > max) ? max : Math.min(v,max);           // Must stay on one single line !
+        if (v < min) return min;                    // Must stay on one single line !
+        if (v > max) return max;
+        else return v;
     }
 
     /**

@@ -57,8 +57,8 @@ public final class Ch1903 {
      * @return (double) longitude
      */
     public static double lon(double e, double n) {
-        double x = 10e-6 * (e-2600000);
-        double y = 10e-6 * (n-1200000);
+        double x = 1e-6 * (e-2600000);
+        double y = 1e-6 * (n-1200000);
 
         double lambda0 = 2.6779094
                 + 4.728982 * x
@@ -77,8 +77,8 @@ public final class Ch1903 {
      * @return (double) latitude
      */
     public static double lat(double e, double n) {
-        double x = 10e-6 * (e-2600000);
-        double y = 10e-6 * (n-1200000);
+        double x = 1e-6 * (e-2600000);
+        double y = 1e-6 * (n-1200000);
 
         double phi0 = 16.9023892
                 + 3.238272 * y

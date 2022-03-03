@@ -1,6 +1,9 @@
 • dans PointWebMercator : les meth lon() et lat(), cmt prouver que la valeur retourne qqch en radians ? 
     1- creer des tests pour verifier
     2- euhhhh Salim ?
-• à checker si besoin de coder la partie en bleu dans applyAsDouble(...) de Sampled(...) https://discord.com/channels/@me/903660344025690162/947919921042567209
 • toutes les methodes où on a utilisé scalb(...) doivent caster en double
-
+• lon lat sert à quoi ?
+• tests de PointWeb retourne des erreurs
+• Q28.4 le test pour le cas extrême ne passe pas
+• applyAsDouble() code bizarre car retourner pas de bon résultat
+• applyAsDouble() 

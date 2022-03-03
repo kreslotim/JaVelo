@@ -6,4 +6,4 @@
 • Q28.4 le test pour le cas extrême ne passe pas
 
  step3 ------------------------------------------------
-• a NESTED record is necessarily private since it's nested in (i.e. only useful for) the class ?
+• a NESTED record is necessarily private since it's nested in (i.e. only useful for) the class ? means Sector

@@ -2,8 +2,5 @@
     1- creer des tests pour verifier
     2- euhhhh Salim ?
 • toutes les methodes où on a utilisé scalb(...) doivent caster en double
-• lon lat sert à quoi ?
 • tests de PointWeb retourne des erreurs
 • Q28.4 le test pour le cas extrême ne passe pas
-• applyAsDouble() code bizarre car retourner pas de bon résultat
-• applyAsDouble() 

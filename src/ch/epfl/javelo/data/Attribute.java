@@ -2,7 +2,7 @@ package ch.epfl.javelo.data;
 
 import java.util.List;
 
-public enum Attribute implements CharSequence {
+public enum Attribute {
     // See https://wiki.openstreetmap.org/wiki/Map_features
     // and https://taginfo.openstreetmap.ch/
 

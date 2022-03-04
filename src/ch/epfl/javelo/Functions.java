@@ -38,7 +38,7 @@ public final class Functions {
     /**
      * Recorded class that returns a Constant object
      */
-    private static record Constant(double y) implements DoubleUnaryOperator {
+    private static record Constant(double c) implements DoubleUnaryOperator {
 
         /**
          * Constant function
@@ -48,7 +48,7 @@ public final class Functions {
          */
         @Override
         public double applyAsDouble(double y) {
-            return this.y;
+            return c;
         }
     }
 

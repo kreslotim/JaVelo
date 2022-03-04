@@ -1,9 +1,5 @@
-• dans PointWebMercator : les meth lon() et lat(), cmt prouver que la valeur retourne qqch en radians ? 
-    1- creer des tests pour verifier
-    2- euhhhh Salim ?
+
 • toutes les methodes où on a utilisé scalb(...) doivent caster en double
-• tests de PointWeb retourne des erreurs
-• Q28.4 le test pour le cas extrême ne passe pas
 
  step3 ------------------------------------------------
 • a NESTED record is necessarily private since it's nested in (i.e. only useful for) the class ? means Sector

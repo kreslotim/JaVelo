@@ -10,7 +10,7 @@ public record PointWebMercator(double x, double y) {
 
     public PointWebMercator { // compact constructor
         // utilise les preconditions
-        Preconditions.checkArgument(x < 0 || x > 1 || y < 0 || y > 1);
+        Preconditions.checkArgument(0 <= x && x <= 1 && 0 <= y && y <= 1);
     }
 
     //public static methods
@@ -94,7 +94,7 @@ public record PointWebMercator(double x, double y) {
 
 
     /**
-     * retourne le point de coordonnées suisses se trouvant à la même position que le récepteur ( aka this) ou null
+     * retourne le point de coordonnées suisses se trouvant à la même position que le récepteur (aka this) ou null
      * si ce point n'est pas dans les limites de la Suisse définies par SwissBounds
      *
      * @return
@@ -104,6 +104,4 @@ public record PointWebMercator(double x, double y) {
         // n = Ch1903.n(lon(), lat())
         return (SwissBounds.containsEN(Ch1903.e(lon(), lat()), Ch1903.n(lon(), lat())) ? new PointCh(Ch1903.e(lon(), lat()), Ch1903.n(lon(), lat())) : null);
     }
-
-
 }

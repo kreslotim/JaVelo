@@ -5,6 +5,7 @@ import ch.epfl.javelo.Math2;
 /* classe utilitaire : convertir entre les coordonnées WGS 84 et les coordonnées Web Mercator */
 public final class WebMercator {
 
+    private WebMercator(){}
     /**
      * retourne la coordonnée x de la projection d'un point se trouvant à la longitude lon, donnée en radians
      *

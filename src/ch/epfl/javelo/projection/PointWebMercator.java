@@ -1,86 +1,92 @@
 package ch.epfl.javelo.projection;
+
 import ch.epfl.javelo.Preconditions;
 
-/**
- * Representation of a point in Web Mercator system
- *
- * @author Tim Kreslo (310686)
- * @author Wei-En Hsieh (341271)
- */
+// c'est pour un point(x,y) du Map entier aka du WebMercator
 public record PointWebMercator(double x, double y) {
+    // x et y pour le map "normal"
+//    private double x; // la coordonnée x du point du WebMercator
+//    private double y; // la coordonnée y du point du WebMercator
 
-    /**
-     * Compact PointWebMercator constructor
-     *
-     * @param x Horizontal component X of a point (must be between 0 & 1)
-     * @param y Vertical component Y of a point (must be between 0 & 1)
-     */
     public PointWebMercator { // compact constructor
-        Preconditions.checkArgument(x >= 0 && x <= 1 && y >= 0 && y <= 1);
+        // utilise les preconditions
+        Preconditions.checkArgument(0 <= x && x <= 1 && 0 <= y && y <= 1);
     }
 
+    //public static methods
+
     /**
-     * Returns a Web Mercator point (between 0 & 1), using X and Y at a certain Zoom level.
+     * §2.3
+     * retourne le point dont les coordonnées sont x et y au niveau de zoom zoomLeve
+     * càd retourner le pointZoomé à un zoomLevel donné au point sans zoomLevel
      *
-     * @param zoomLevel : Level zoom taking values from 0 to 19 ~ 20 (or negative)
-     * @param x Horizontal component x zoomed at a certain level
-     * @param y Vertical component y zoomed at a certain level
-     * @return Web Mercator point (between 0 & 1)
+     * @param zoomLevel : can be from 0 to 20
+     * @param x
+     * @param y
+     * @return
      */
+
     public static PointWebMercator of(int zoomLevel, double x, double y) {
-
-        double X =  Math.scalb(x, -zoomLevel - 8);
-        double Y =  Math.scalb(y, -zoomLevel - 8);
-        return new PointWebMercator(X, Y);
+        // énoncé : la position d'un point = il suffit de multiplier ses coordonnées(lon, lat)
+        // par la taille de l'image à ce niveau de zoom
+        double lon = WebMercator.lon(x) * Math.scalb(x, -zoomLevel - 8);
+        double lat = WebMercator.lat(y) * Math.scalb(y, -zoomLevel - 8);
+        return new PointWebMercator(lon, lat); // euh retourner deux valeurs ??
     }
 
     /**
-     * Returns a Web Mercator point (between 0 & 1) corresponding to a point in Swiss earth's parameters (East & North)
+     * §2.3.1
+     * retourne le point Web Mercator correspondant au point du système de coordonnées suisse(E, N) donné
      *
-     * @param pointCh point in Swiss earth's parameters (East & North)
-     * @return Web Mercator point (between 0 & 1)
+     * @param pointCh
+     * @return
      */
-    public static PointWebMercator ofPointCh(PointCh pointCh) {
-        return new PointWebMercator(WebMercator.x(pointCh.lon()), WebMercator.y(pointCh.lat()));
+    public static PointWebMercator ofPointCh(PointCh pointCh) { // dans le code de Tim
+        return new PointWebMercator(pointCh.e(), pointCh.n());
     }
 
 
+    //public methods
+
+    // une multiplication par une puissance de deux entière, qui dépend du niveau de zoom
+
     /**
-     * Returns X coordinate zoomed at a certain level
+     * retourne la coordonnée x au niveau de zoom donné
      *
-     * @param zoomLevel Level of zoom
-     * @return X coordinate zoomed at zoomLevel
+     * @param zoomLevel
+     * @return
      */
     public double xAtZoomLevel(int zoomLevel) {
-        return (float)Math.scalb(x, 8 + zoomLevel);
+        return Math.scalb(x, 8 + zoomLevel); // = x * Math.pow(2, 8 + zoomLevel);
     }
 
 
     /**
-     * Returns Y coordinate zoomed at a certain level
+     * retourne la coordonnée y au niveau de zoom donné
      *
-     * @param zoomLevel Level of zoom
-     * @return Y coordinate zoomed at zoomLevel
+     * @param zoomLevel
+     * @return
      */
     public double yAtZoomLevel(int zoomLevel) {
-        return Math.scalb(y, 8 + zoomLevel);
+        return Math.scalb(y, 8 + zoomLevel); // = y * Math.pow(2, 8 + zoomLevel);
     }
 
 
     /**
-     * Returns longitude (in Radians) of this point
+     * retourne la longitude du point, en radians
      *
-     * @return longitude (in Radians) of this point
+     * @return
      */
-    public double lon() {
+    public double lon() { // c'est la methode lon de WebMercator mais sauf que cette methode fonctionne comme un getter
+        // car y'a deja l'attribut x
         return WebMercator.lon(x);
     }
 
 
     /**
-     * Returns latitude (in Radians) of this point
+     * retourne la latitude du point, en radians
      *
-     * @return latitude (in Radians) of this point
+     * @return
      */
     public double lat() { // mm idee
         return WebMercator.lat(y);
@@ -88,14 +94,14 @@ public record PointWebMercator(double x, double y) {
 
 
     /**
-     * Returns a point in Swiss earth's parameters (East & North), positioned at the same location that this point.
+     * retourne le point de coordonnées suisses se trouvant à la même position que le récepteur (aka this) ou null
+     * si ce point n'est pas dans les limites de la Suisse définies par SwissBounds
      *
-     * @return a point in Swiss earth's parameters (East & North), positioned at the same location that this point.
+     * @return
      */
     public PointCh toPointCh() {
-        return (SwissBounds.containsEN(Ch1903.e(lon(), lat()), Ch1903.n(lon(), lat())) ?
-                new PointCh(Ch1903.e(lon(), lat()), Ch1903.n(lon(), lat())) : null);
+        // e = Ch1903.e(lon(), lat())
+        // n = Ch1903.n(lon(), lat())
+        return (SwissBounds.containsEN(Ch1903.e(lon(), lat()), Ch1903.n(lon(), lat())) ? new PointCh(Ch1903.e(lon(), lat()), Ch1903.n(lon(), lat())) : null);
     }
-
-
 }

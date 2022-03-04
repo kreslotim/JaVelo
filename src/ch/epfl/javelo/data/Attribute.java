@@ -2,12 +2,11 @@ package ch.epfl.javelo.data;
 
 import java.util.List;
 
-public enum Attribute {
+public enum Attribute implements CharSequence {
     // See https://wiki.openstreetmap.org/wiki/Map_features
     // and https://taginfo.openstreetmap.ch/
 
     // Highways (https://wiki.openstreetmap.org/wiki/Highways)
-
     HIGHWAY_SERVICE("highway", "service"),
     HIGHWAY_TRACK("highway", "track"),
     HIGHWAY_RESIDENTIAL("highway", "residential"),
@@ -19,7 +18,7 @@ public enum Attribute {
     HIGHWAY_STEPS("highway", "steps"),
     HIGHWAY_PRIMARY("highway", "primary"),
     HIGHWAY_CYCLEWAY("highway", "cycleway"),
-    HIGHWAY_MOTORWAY("highway","motorway"),
+    HIGHWAY_MOTORWAY("highway", "motorway"),
     HIGHWAY_PEDESTRIAN("highway", "pedestrian"),
     HIGHWAY_TRUNK("highway", "trunk"),
     HIGHWAY_LIVING_STREET("highway", "living_street"),
@@ -89,7 +88,7 @@ public enum Attribute {
     RCN_YES("rcn", "yes"),
     LCN_YES("lcn", "yes");
 
-    public static final List<Attribute> ALL = List.of(values());
+        public static final List<Attribute> ALL = List.of(values());
     public static final int COUNT = ALL.size();
 
     private final String key;

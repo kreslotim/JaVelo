@@ -19,10 +19,10 @@ public final class Q28_4 {
      * @return bit sequence in Q28.4 representation, corresponding to the given Integer
      */
     public static int ofInt(int i) {
-        // i must be bigger than or equal to :-134217728 and smaller than or equal to :134217727 // must check !
-        Preconditions.checkArgument( i >= 0b11111000000000000000000000000000 && i <= 0b00000111111111111111111111111111);
+        // i must be bigger than or equal to :-134217728 and smaller than or equal to :134217727 // otherwise we lose information!
+        //Preconditions.checkArgument( i >= 0b11111000000000000000000000000000 && i <= 0b00000111111111111111111111111111);
 
-        if (i < 0) return (i << 4) | 0b10000000000000000000000000000000;
+        //if (i < 0) return (i << 4) | 0b10000000000000000000000000000000;
         return i << 4;
     }
 

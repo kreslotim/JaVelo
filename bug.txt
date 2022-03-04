@@ -7,4 +7,4 @@
 
  step3 ------------------------------------------------
 • a NESTED record is necessarily private since it's nested in (i.e. only useful for) the class ? means Sector
-•  les nœuds (nodeId) et arêtes (edgeId) du graphe JaVelo sont identifiés propres à JaVelo par des entiers POSITIFS; tous les nodeId et edgeId sont propres à JaVelo.
+•  les nœuds (nodeId) et arêtes (edgeId) du graphe JaVelo sont identifiés propres à JaVelo par des entiers POSITIFS; tous les nodeId et edgeId sont propres à JaVelo. (§2.2.1)

@@ -1,51 +1,48 @@
 package ch.epfl.javelo.projection;
+
 import ch.epfl.javelo.Math2;
 
-/**
- * Converter of parameters x & y, and longitude & latitude, between WGS 84 and Web Mercator coordinates
- *
- * @author Tim Kreslo (310686)
- * @author Wei-En Hsieh (341271)
- */
+/* classe utilitaire : convertir entre les coordonnées WGS 84 et les coordonnées Web Mercator */
 public final class WebMercator {
 
+    private WebMercator(){}
     /**
-     * Converts longitude (given in Radians) to horizontal component x, of a Point
+     * retourne la coordonnée x de la projection d'un point se trouvant à la longitude lon, donnée en radians
      *
-     * @param lon longitude (given in Radians)
-     * @return coordinate X (between 0 & 1)
+     * @param lon
+     * @return
      */
     public static double x(double lon) {
         return (lon + Math.PI) / (2 * Math.PI);
     }
 
     /**
-     * Converts latitude (given in Radians) to vertical component y, of a point
+     * retourne la coordonnée y de la projection d'un point se trouvant à la latitude lat, donnée en radians
      *
-     * @param lat (latitude) (given in Radians)
-     * @return coordinate Y (between 0 & 1)
+     * @param lat
+     * @return
      */
     public static double y(double lat) {
-        return (Math.PI - Math2.asinh(Math.tan(lat))) / (2 * Math.PI);
+        return (Math.PI - Math2.asinh(Math.tan(lat))) / (2 * Math.PI); //la fonction arsinh ??
     }
 
     /**
-     * Converts the horizontal component X of a Web Mercator point, to longitude
+     * retourne la longitude, en radians, d'un point dont la projection se trouve à la coordonnée x donnée
      *
-     * @param x (Projection X of a Web Mercator point)
-     * @return longitude (given in Radians)
+     * @param x
+     * @return
      */
     public static double lon(double x) {
-        return ((2 * Math.PI * x) - Math.PI);
+        return (2 * Math.PI * x) - Math.PI;
     }
 
     /**
-     * Converts the vertical component Y of a Web Mercator point, to latitude
+     * retourne la latitude, en radians, d'un point dont la projection se trouve à la coordonnée y donnée
      *
-     * @param y ()Projection Y of a Web Mercator point
-     * @return latitude (given in Radians)
+     * @param y
+     * @return
      */
     public static double lat(double y) {
-        return (Math.atan(Math.sinh(Math.PI - 2 * Math.PI * y)));
+        return Math.atan(Math.sinh(Math.PI - 2 * Math.PI * y));
     }
 }

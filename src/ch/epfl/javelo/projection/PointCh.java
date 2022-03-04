@@ -4,6 +4,8 @@ import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.Preconditions;
 
 
+// c'est pour un point(east,nord) du Map de la Suisse aka du Ch
+
 /**
  * Recorded class that measures distance between two points
  *
@@ -41,7 +43,7 @@ public record PointCh(double e, double n) {
      * @return (double) distance between received and target point on the map
      */
     public double distanceTo(PointCh that) {
-        //return Math.hypot(that.e - this.e, that.n - this.n); // returns hypothenus length
+        //return Math.hypot(that.e - this.e, that.n - this.n); // returns hypothesis length
         return Math2.norm(that.e - this.e, that.n - this.n); // usage of Math2
     }
 

@@ -7,7 +7,7 @@ package ch.epfl.javelo;
  */
 public final class Math2 {
     /**
-     * Default (not instantiable) Math2 constructor
+     * Default Math2 constructor
      */
     private Math2() {}
 
@@ -34,7 +34,7 @@ public final class Math2 {
      * @return y (double) coordinate positionned on the line (y1 - y0)*x + y0
      */
     public static double interpolate(double y0, double y1, double x) {
-        return Math.fma((y1 - y0), x, y0); // Must be able to work with any X !
+        return Math.fma((y1 - y0), x, y0); // Must be able to work with any x !
     }
 
     /**

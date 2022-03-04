@@ -7,7 +7,7 @@ package ch.epfl.javelo.projection;
  */
 public final class Ch1903 {
     /**
-     * Default (not instantiable) Ch1903 constructor
+     * Default Ch1903 constructor
      */
     private Ch1903() {}
 

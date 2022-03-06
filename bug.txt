@@ -4,3 +4,5 @@
  step3 ------------------------------------------------
 • a NESTED record is necessarily private since it's nested in (i.e. only useful for) the class ? means Sector public i.e. it depends
 •  les nœuds (nodeId) et arêtes (edgeId) du graphe JaVelo sont identifiés propres à JaVelo par des entiers POSITIFS; tous les nodeId et edgeId sont propres à JaVelo. (§2.2.1)
+• dans length(int edgeId) de la classe GraphEdges, la position i = edgeId ???? perplexe... car https://discord.com/channels/862366799545499648/941392941690277978/950101734615830568
+        Il y q une seule arête ou TOUTES les arêtes sont dans edgesBuffer ? 

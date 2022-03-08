@@ -11,3 +11,5 @@
         // le nombre d'échantillons du profil de l'arête en fonction de sa longueur :
         int l = edgesBuffer.getShort(edgeId * EDGEBUFFER_INITIATION + OFFSET_INIT); // l is a short, so l is an int with 16 0s in the 
         est-ce que l'indice (edgeId * EDGEBUFFER_INITIATION + OFFSET_INIT) est correct ?
+
+• length en metre ou en km ?

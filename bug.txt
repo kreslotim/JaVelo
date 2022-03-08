@@ -7,3 +7,12 @@
 • dans length(int edgeId) de la classe GraphEdges, la position i = edgeId ???? perplexe... car https://discord.com/channels/862366799545499648/941392941690277978/950101734615830568
         Il y q une seule arête ou TOUTES les arêtes sont dans edgesBuffer ? 
 • pk Flo a utilise extractSigned de la classe Bits pour la methode targetNodeId(int edgeId) de la classe GraphEdges ? besoin ? car si le vecteur d'int est 1#...#, alors ~(1#...#) = 0#...# > 0
+• meth profileSamples(...) : cf "bizarre, car si longueur = 4.5, c'est un double mais pas un int !! mais les meths de Q28.4 ne prennent que int en param"
+        // le nombre d'échantillons du profil de l'arête en fonction de sa longueur :
+        int l = edgesBuffer.getShort(edgeId * EDGEBUFFER_INITIATION + OFFSET_INIT); // l is a short, so l is an int with 16 0s in the heighest weight
+
+        // \because l format = 12.4 (short) \therefore format = 28.4 (int)
+        // make the int in format Q28.4 :
+        l = Q28_4.ofInt(l); // bizarre, car si longueur = 4.5, c'est un double mais pas un int !! mais les meths de Q28.4 ne prennent que int en param
+        // must convert twice in format Q28.4, i.e.  Q28_4 (→  Q28_4) → mètre, because Q28.4
+        int echantillonNb = 1 + Math2.ceilDiv(Q28_4.ofInt(l), Q28_4.ofInt(2));

@@ -10,12 +10,4 @@
 • meth profileSamples(...) :
        type1 interprete deja en Q28.4 ou faut faire comme les types 2 et 3 ?
 • length en metre ou en km ?
-
-    // bugs case3 :
-    // • OutOfBoundsException
-    // • pk pas les mm valeurs que Schinz's values des le debut ?
-    // • indiceChelou indexProfileType3
-    // • la condition indexProfileType3 <= echantillonNb de if(...) est correcte ou pas ?
-    // • creer methode pour case type 2
-    // • type3 des bugs a cause de Q0.4 ?
-// • retourn quoi pour cette methode ?
+• dans classe GraphEdges : a 3 todo a demander aux TAs

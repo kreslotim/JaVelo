@@ -25,7 +25,7 @@ public final class Functions {
 
     /**
      * Function obtained by linear interpolation between samples, separated by constant intervals, from 0 to xMax
-     *
+     * @throws IllegalArgumentException (samples.length < 2 || xMax <= 0)
      * @param samples
      * @param xMax
      * @return

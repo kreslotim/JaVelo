@@ -2,12 +2,4 @@
 • toutes les methodes où on a utilisé scalb(...) doivent caster en double
 
  step3 ------------------------------------------------
-• a NESTED record is necessarily private since it's nested in (i.e. only useful for) the class ? means Sector public i.e. it depends
-•  les nœuds (nodeId) et arêtes (edgeId) du graphe JaVelo sont identifiés propres à JaVelo par des entiers POSITIFS; tous les nodeId et edgeId sont propres à JaVelo. (§2.2.1)
-• dans length(int edgeId) de la classe GraphEdges, la position i = edgeId ???? perplexe... car https://discord.com/channels/862366799545499648/941392941690277978/950101734615830568
-        Il y q une seule arête ou TOUTES les arêtes sont dans edgesBuffer ? 
-• pk Flo a utilise extractSigned de la classe Bits pour la methode targetNodeId(int edgeId) de la classe GraphEdges ? besoin ? car si le vecteur d'int est 1#...#, alors ~(1#...#) = 0#...# > 0
-• meth profileSamples(...) :
-       type1 interprete deja en Q28.4 ou faut faire comme les types 2 et 3 ?
-• length en metre ou en km ?
-• dans classe GraphEdges : a 3 todo a demander aux TAs
+• a NESTED record is necessarily private since it's nested in (i.e. only useful for) the class ? means Sector public i.e. it depends. It can be public or private depending on how I wanna use.

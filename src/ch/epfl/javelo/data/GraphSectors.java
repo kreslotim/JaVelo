@@ -1,14 +1,9 @@
 package ch.epfl.javelo.data;
 
-import ch.epfl.javelo.Math2;
-import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.projection.PointCh;
-import ch.epfl.javelo.projection.SwissBounds;
 
 import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -18,62 +13,51 @@ import java.util.List;
  * @author Wei-En Hsieh (341271)
  */
 
+// buffer = un tableau contenant la valeur des attributs de tous les secteurs (ยง2.2.3)
 public record GraphSectors(ByteBuffer buffer) {
 
-    private final static int OFFSET_SECTOR = Short.BYTES + Integer.BYTES;
-    private final static int OFFSET_SECTORS_PER_LINE = 128;
-    private final static double sectorX = SwissBounds.WIDTH / 128.; // Horizontal component of a sector's dimensions
-    private final static double sectorY = SwissBounds.HEIGHT / 128.; // Vertical component of a sector's dimensions
-
+    private static int OFFSET_SECTOR = Short.BYTES + Integer.BYTES;
 
 
     /**
-     * Returns a list of sectors that intersect with the square centered at a given Swiss point.
-     *
-     * @param center   (PointCh with east and north coordinate)
-     * @param distance (distance equals half of the square. Can be interpreted as a radius)
-     * @return list of all sectors having an intersection with the square centered at the given point and with
+     * @param center   (PointCh)
+     * @param distance (distance)
+     * @return the list of all sectors having an intersection with the square centered at the given point and with
      * a side equal to twice (!) the given distance
      */
-    public List<Sector> sectorsInArea(PointCh center, double distance) {
+    public ArrayList<Sector> sectorsInArea(PointCh center, double distance) {
+        ArrayList<Sector> sectorsInZone = new ArrayList();
 
-        ArrayList<Sector> sectorsInZone = new ArrayList<>();
+        PointCh PointChDownLeft = new PointCh(center.e() - (distance / 2), center.n() - (distance / 2));
+        PointCh PointChUpLeft = new PointCh(center.e() + (distance / 2), center.n() + (distance / 2));
 
-        /**
-         * Bounds of the square centered on the given point, set to the bounds of Switzerland (maximum square's dimensions)
-         */
-        double minE = Math2.clamp(SwissBounds.MIN_E, center.e() - distance, SwissBounds.MAX_E);
-        double maxE = Math2.clamp(SwissBounds.MIN_E, center.e() + distance, SwissBounds.MAX_E);
-        double minN = Math2.clamp(SwissBounds.MIN_N, center.n() - distance, SwissBounds.MAX_N);
-        double maxN = Math2.clamp(SwissBounds.MIN_N, center.n() + distance, SwissBounds.MAX_N);
+        int xMin = (int) Math.floor(PointChDownLeft.e() / 2.73); // distances in metres
+        int xMax = (int) Math.floor(PointChDownLeft.n() / 2.73);
+        int yMin = (int) Math.floor(PointChUpLeft.e() / 1.73);
+        int yMax = (int) Math.floor(PointChUpLeft.n() / 1.73);
 
-        /**
-         * Bounds of the given GraphSector buffer, set between 0 and 127 (number of sectors per line/column -1, for reaching ID)
-         */
-        int xMin = Math2.clamp(0, (int) Math.floor((minE - SwissBounds.MIN_E) / sectorX), 127); // distances in meters
-        int xMax = Math2.clamp(0, (int) Math.floor((maxE - SwissBounds.MIN_E) / sectorX), 127);
-        int yMin = Math2.clamp(0, (int) Math.floor((minN - SwissBounds.MIN_N) / sectorY), 127);
-        int yMax = Math2.clamp(0, (int) Math.floor((maxN - SwissBounds.MIN_N) / sectorY), 127);
+        for (int x = xMin; x <= xMax; x++) {
+            for (int y = yMin; y <= yMax; y++) {
 
-        for (int y = yMin; y <= yMax  ; y++) {
-            for (int x = xMin ; x <= xMax; x++) {
+                int sectorId = y * 128 + x;
 
-                int sectorId = y * OFFSET_SECTORS_PER_LINE + x;
+                int firstNodeId = buffer().getInt(sectorId * OFFSET_SECTOR);
+                int numberNodes = Short.toUnsignedInt(buffer().getShort(sectorId * OFFSET_SECTOR + Integer.BYTES));
+                int lastNodeId = firstNodeId + numberNodes - 1;
 
-                int firstNodeId = buffer.getInt(sectorId * OFFSET_SECTOR);
-                int numberNodes = Short.toUnsignedInt(buffer.getShort(sectorId * OFFSET_SECTOR + Integer.BYTES));
-                int lastNodeId = firstNodeId + numberNodes;
+                Sector sector = new Sector(firstNodeId, Short.toUnsignedInt(buffer.getShort(sectorId * OFFSET_SECTOR + Integer.BYTES)) + firstNodeId);
 
-                Sector sector = new Sector(firstNodeId, lastNodeId);
+                Sector s = new Sector(firstNodeId, lastNodeId);
 
-                sectorsInZone.add(sector);
+
+                sectorsInZone.add(s);
             }
         }
         return sectorsInZone;
     }
 
     /**
-     * Recorded class representing a sector, built with starting nodeID and ending nodeID
+     * represents a sector
      */
     public record Sector(int startNodeId, int endNodeId) {
     }

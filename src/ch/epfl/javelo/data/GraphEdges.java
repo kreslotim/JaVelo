@@ -2,12 +2,12 @@ package ch.epfl.javelo.data;
 
 import ch.epfl.javelo.Bits;
 import ch.epfl.javelo.Math2;
+import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.Q28_4;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
-import java.util.List;
 
 /**
  * Recorded class representing the array of all edges of the JaVelo graph
@@ -17,63 +17,65 @@ import java.util.List;
  */
 public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuffer elevations) {
 
-    private static final int EDGE_PITCH = 10;
-    private static final int OFFSET_LENGTH = 4;
-    private static final short OFFSET_ELEVATION_GAIN = OFFSET_LENGTH + Short.BYTES;
-    private static final short OFFSET_OSM_ATTRIBUTES = OFFSET_ELEVATION_GAIN + Short.BYTES;
+    private static final int EDGEBUFFER_INITIATION = 10;
+    private static final int OFFSET_INIT = 4;
+    private static final short OFFSET_LENGTH = 2;
+    private static final short OFFSET_ELEVATIONGAIN = 2;
 
     /* four kinds of profileType in the switch */
-
-    public enum ProfileType {NONEXISTENT_PROFILE, UNCOMPRESSED_PROFILE, COMPRESSED_PROFILE_Q0_4, COMPRESSED_PROFILE_Q4_4}
-    private static final List<ProfileType> PROFILES = List.of(ProfileType.values());
+    private static final int NONEXISTENT_PROFILE = 0;
+    private static final int UNCOMPRESSED_PROFILE = 1;
+    private static final int COMPRESSED_PROFILE_Q4_4 = 2;
+    private static final int COMPRESSED_PROFILE_Q0_4 = 3;
 
 
     /**
-     * Determines whether the edge with the given identity goes in the opposite direction of the OSM way,
-     * from where it comes from
+     * Determine whether the edge with the given identity goes in the opposite direction to the OSM channel it comes from
      *
      * @param edgeId Edge's Identity
-     * @return true iff edgeId goes in the opposite direction of the OSM edge
+     * @return true iff edgeId goes in the opposite direction to the OSM edge it comes from
      */
-    public boolean isInverted(int edgeId) {
-        return edgesBuffer.getInt(edgeId * EDGE_PITCH) < 0;
+    public boolean isInverted(int edgeId) { //todo : longueur est UQ... donc Short.toUnsignedInt(s) ?
+        return edgesBuffer.getInt(edgeId * EDGEBUFFER_INITIATION) < 0;
     }
 
     /**
-     * Returns the identity of the target node of the given identity edge
+     * Return the identity of the destination node of the given identity edge
      *
      * @param edgeId Edge's Identity
-     * @return the identity of the target node of the given identity edge
+     * @return the identity of the destination node of the given identity edge
      */
-    public int targetNodeId(int edgeId) {
-        return (isInverted(edgeId) ? ~(edgesBuffer.getInt(edgeId * EDGE_PITCH)) :
-                edgesBuffer.getInt(edgeId * EDGE_PITCH));
+    public int targetNodeId(int edgeId) {//todo : longueur est UQ... donc Short.toUnsignedInt(s) ?
+        return (isInverted(edgeId) ? ~(edgesBuffer.getInt(edgeId * EDGEBUFFER_INITIATION)) :
+                edgesBuffer.getInt(edgeId * EDGEBUFFER_INITIATION));
     }
 
     /**
-     * Returns the length, in meters, of the given identity edge
+     * Return the length, in meters, of the given identity edge
      *
      * @param edgeId Edge's Identity
      * @return the length (in meters) of the given identity edge
      */
     public double length(int edgeId) {
-        short s = edgesBuffer.getShort(edgeId * EDGE_PITCH + OFFSET_LENGTH);
+        short s = edgesBuffer.getShort(edgeId * EDGEBUFFER_INITIATION + OFFSET_INIT);
         return Q28_4.asDouble(Short.toUnsignedInt(s));
     }
 
     /**
-     * Returns the positive elevation, in meters, of the edge with the given identity
+     * Return the positive elevation, in meters, of the edge with the given identity
      *
      * @param edgeId Edge's Identity
      * @return the elevation gain, in meters, of the edge with the given identity
      */
+    //todo : return 0 if negative value ? idk donc cree une Preconditions pour l'instant
     public double elevationGain(int edgeId) {
-        short s = edgesBuffer.getShort(edgeId * EDGE_PITCH + OFFSET_ELEVATION_GAIN);
+        Preconditions.checkArgument(edgeId >= 0);
+        short s = edgesBuffer.getShort(edgeId * EDGEBUFFER_INITIATION + (OFFSET_INIT + OFFSET_LENGTH));
         return Q28_4.asDouble(Short.toUnsignedInt(s));
     }
 
     /**
-     * Determines whether the given identity edge has a profile
+     * Determine whether the given identity edge has a profile
      *
      * @param edgeId Edge's Identity
      * @return true iff the given identity edge has a profile
@@ -84,78 +86,79 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     }
 
     /**
-     * Returns the array of samples of the profile of the given identity edge
+     * Return the array of samples of the profile of the given identity edge
      *
      * @param edgeId Edge's Identity
      * @return the array of samples of the profile of the edge with the given identity, which is empty if the edge does
      * not have a profile
      */
     public float[] profileSamples(int edgeId) {
-
-        int profileType = Bits.extractUnsigned(profileIds.get(edgeId), 30, 2);
-        ProfileType type = PROFILES.get(profileType);
+        Preconditions.checkArgument(edgeId >= 0);
 
         int sampleNb = computeSampleNb(edgeId);
+        int profileType = Bits.extractUnsigned(profileIds.get(edgeId), 30, 2);
         int firstIndex = Bits.extractUnsigned(profileIds.get(edgeId), 0, 30);
         float currentAltitude = 0; // initialize at 0 to prevent NullPointerException
-        float[] samples = new float[sampleNb];
 
-        switch (type) {
+        switch (profileType) {
             case NONEXISTENT_PROFILE:
-                return new float[]{};
+                return new float[0];
 
             case UNCOMPRESSED_PROFILE:
+                float[] profileType1 = new float[sampleNb];
                 for (int i = 0; i < sampleNb; ++i) {
-                    samples[i] = Q28_4.asFloat(elevations.get(firstIndex + i));
+                    profileType1[i] = Q28_4.asFloat(elevations.get(firstIndex + i));
                 }
-                break;
+                return (isInverted(edgeId) ? flip(sampleNb, profileType1) : profileType1);
 
-            case COMPRESSED_PROFILE_Q0_4:
-                samples[0] = Q28_4.asFloat(elevations.get(firstIndex));
-                currentAltitude = samples[0];
+            case COMPRESSED_PROFILE_Q4_4:
+                float[] profileType2 = new float[sampleNb];
+                profileType2[0] = Q28_4.asFloat(elevations.get(firstIndex));
+                currentAltitude = profileType2[0];
                 for (int i = 1; i <= Math.ceil((sampleNb - 1) / 2.0); ++i) {
                     for (int j = 1; j >= 0; --j) {
                         if (2 * i - j < sampleNb) {
-                            currentAltitude += Q28_4.asFloat(Bits.extractSigned(elevations.get(firstIndex + i),
-                                    8 * j, 8));
-                            samples[2 * i - j] = currentAltitude;
-
-
+                            currentAltitude += Q28_4.asFloat(Bits.extractSigned(elevations.get(firstIndex + i), 8 * j,
+                                    8));
+                            profileType2[2 * i - j] = currentAltitude;
                         }
                     }
                 }
-                break;
+                return (isInverted(edgeId) ? flip(sampleNb, profileType2) : profileType2);
 
-            case COMPRESSED_PROFILE_Q4_4:
-                samples[0] = Q28_4.asFloat(elevations.get(firstIndex));
-                currentAltitude = samples[0];
+            case COMPRESSED_PROFILE_Q0_4:
+                float[] profileType3 = new float[sampleNb];
+                profileType3[0] = Q28_4.asFloat(elevations.get(firstIndex));
+                currentAltitude = profileType3[0];
                 for (int i = 1; i <= Math.ceil((sampleNb - 1) / 4.0); ++i) {
                     for (int j = 3; j >= 0; --j) {
                         if ((4 * i - j) < sampleNb) {
                             currentAltitude += Q28_4.asFloat(Bits.extractSigned(elevations.get(firstIndex + i),
                                     4 * j, 4));
-                            samples[4 * i - j] = currentAltitude;
+                            profileType3[4 * i - j] = currentAltitude;
                         }
                     }
                 }
-                break;
+                return (isInverted(edgeId) ? flip(sampleNb, profileType3) : profileType3);
         }
-        return (isInverted(edgeId) ? flip(sampleNb, samples) : samples);
+        return null;
     }
 
     /**
-     * Computes the number of samples of the profile of the edge according to its length
+     * Compute the number of samples of the profile of the edge according to its length
      *
      * @param edgeId Edge's Identity
      * @return the number of samples
      */
     private int computeSampleNb(int edgeId) {
-        int l = Short.toUnsignedInt(edgesBuffer.getShort(edgeId * EDGE_PITCH + OFFSET_LENGTH));
+        //todo : besoin de Short.toUnsignedInt(...) pour l ?
+        int l = Short.toUnsignedInt(edgesBuffer.getShort(edgeId * EDGEBUFFER_INITIATION + OFFSET_INIT));
+//        int l = edgesBuffer.getShort(edgeId * EDGEBUFFER_INITIATION + OFFSET_INIT); // l is a short, so l is an int with 16 0s in the heighest weight
         return 1 + Math2.ceilDiv(l, Q28_4.ofInt(2)); // the formula to compute the sample number
     }
 
     /**
-     * Flips the order of elements of the given array
+     * Flip the order of elements of the given array
      *
      * @param sampleNb    the number of samples
      * @param profileType the array before flipping the order of elements
@@ -169,7 +172,10 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
             profileType[profileType.length - i - 1] = tmp;
         }
 
+        // todo @Tim : la raison pour laquelle j'ai cree ce for loop = c pas necessaire, mais qd on lit le code, on aime pas return tabAyantLeMmNomQueCeluiQuiEstDansLaListeDesParams;
+        // to copy the values of the array :
         float[] tabInverted = new float[profileType.length];
+        //todo : change the for loop to         System.arraycopy(profileType, 0, tabInverted, 0, profileType.length);      ?
         for (int i = 0; i < profileType.length; ++i) {
             tabInverted[i] = profileType[i];
         }
@@ -177,13 +183,14 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     }
 
     /**
-     * Returns the index of an attribute set attached to the given edge's ID
+     * Return the identity of the attribute set attached to the given identity edge
      *
      * @param edgeId Edge's Identity
-     * @return the identity of the attribute set attached to the given edge's ID
+     * @return the identity of the attribute set attached to the given identity edge
      */
     public int attributesIndex(int edgeId) {
-        short s = edgesBuffer.getShort(edgeId * EDGE_PITCH + (OFFSET_OSM_ATTRIBUTES));
+        short s = edgesBuffer.getShort(edgeId * EDGEBUFFER_INITIATION + (OFFSET_INIT + OFFSET_LENGTH
+                + OFFSET_ELEVATIONGAIN));
         return Short.toUnsignedInt(s);
     }
 }

@@ -2,6 +2,7 @@
 • toutes les methodes où on a utilisé scalb(...) doivent caster en double
 
  step3 ------------------------------------------------
-• a NESTED record is necessarily private since it's nested in (i.e. only useful for) the class ? means Sector
-•  les nœuds (nodeId) et arêtes (edgeId) du graphe JaVelo sont identifiés propres à JaVelo par des entiers POSITIFS; tous les nodeId et edgeId sont propres à JaVelo. (§2.2.1)
-• f je comprends tjs pas le record GraphNodes https://t.me/c/1594013511/41871
+• a NESTED record is necessarily private since it's nested in (i.e. only useful for) the class ? means Sector public i.e. it depends. It can be public or private depending on how I wanna use.
+• dans GraphEdges, les methodes private doivent etre static ? Et la for loop pour copier le tableau, demande a qn pour optimiser SANS SE TROMPER DANS LES INDICES.
+• code ressemblant COMPRESSED_PROFILE_Q0_4, aka type2, COMPRESSED_PROFILE_Q4_4, aka type3, de profileSamples(...) dans GraphEdges : Optimisation := cree une methode pour modulariser et donc reduire la taille de profileSamples(...).
+• methode private flip(...) change to System.Copy.Arrays... pour l'optimisation du code qd on copie les valeurs d'un tableau.

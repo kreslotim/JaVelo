@@ -65,9 +65,9 @@ public final class Functions {
          */
         @Override
         public double applyAsDouble(double x) {
-            if (x < 0) {
+            if (x <= 0) {
                 return samples[0];
-            } else if (x > xMax) {
+            } else if (x >= xMax) {
                 return samples[samples.length-1];
             } else {
                 double interval = xMax / (samples.length-1);
@@ -76,6 +76,4 @@ public final class Functions {
             }
         }
     }
-
-
 }

@@ -3,9 +3,6 @@ package ch.epfl.javelo.projection;
 import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.Preconditions;
 
-
-// c'est pour un point(east,nord) du Map de la Suisse aka du Ch
-
 /**
  * Recorded class that measures distance between two points
  *

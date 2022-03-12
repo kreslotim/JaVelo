@@ -7,7 +7,7 @@ package ch.epfl.javelo.projection;
  */
 public final class Ch1903 {
     /**
-     * Default Ch1903 constructor
+     * Default private Ch1903 constructor
      */
     private Ch1903() {}
 

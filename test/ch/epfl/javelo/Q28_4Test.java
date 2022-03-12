@@ -2,61 +2,47 @@ package ch.epfl.javelo;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static ch.epfl.test.TestRandomizer.RANDOM_ITERATIONS;
+import static ch.epfl.test.TestRandomizer.newRandom;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class Q28_4Test {
-    public static final double DELTA = 1e-7;
-
-    /**
     @Test
-    void ofIntThrowsOnInvalidInteger() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            Q28_4.ofInt(-134217729);
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            Q28_4.ofInt(134217728);
-        });
-    }
-     */
-
-    @Test
-    void ofIntWorksOnKnownValues() {
-        var actual1 = Q28_4.ofInt(0b10011100); // 156
-        var expected1 = 0b100111000000; // 2496
-        assertEquals(expected1, actual1);
-
-        var actual2 = Q28_4.ofInt(134217727); // biggest Integer in Q28.4
-        var expected2 = 0b01111111111111111111111111110000;
-        assertEquals(expected2, actual2);
-
-        var actual3 = Q28_4.ofInt(-134217727);
-        var expected3 = 0b10000000000000000000000000010000;
-        assertEquals(expected3, actual3);
-
-
-        var actual4 = Q28_4.ofInt(-134217728); // smallest Integer in Q28.4
-        var expected4 = Integer.MIN_VALUE;
-        assertEquals(expected4, actual4);
-
+    void q28_4OfIntWorksWithRandomValues() {
+        var rng = newRandom();
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            var n = rng.nextInt(1 << 28);
+            assertEquals(n, Q28_4.ofInt(n) >>> 4);
+        }
     }
 
     @Test
-    void asDoubleWorksOnKnownValue() {
-        var actual1 = Q28_4.asDouble(1);
-        var expected1 = 0.0625;
-        assertEquals(expected1, actual1, DELTA);
-
-        double actual2 = Q28_4.asDouble(0b01111111111111111111111111110000); // biggest Integer in Q28.4
-        double expected2 = 134217727.0;
-        assertEquals(expected2, actual2, DELTA);
+    void q28_4AsDoubleWorksOnKnownValues() {
+        assertEquals(1.0, Q28_4.asDouble(0b1_0000));
+        assertEquals(1.5, Q28_4.asDouble(0b1_1000));
+        assertEquals(1.25, Q28_4.asDouble(0b1_0100));
+        assertEquals(1.125, Q28_4.asDouble(0b1_0010));
+        assertEquals(1.0625, Q28_4.asDouble(0b1_0001));
+        assertEquals(1.9375, Q28_4.asDouble(0b1_1111));
     }
 
     @Test
-    void asFloatWorksOnKnownValue() {
-        var actual1 = Q28_4.asDouble(1);
-        var expected1 = 0.0625;
-        assertEquals(expected1, actual1, DELTA);
+    void q28_4AsFloatWorksOnKnownValues() {
+        assertEquals(1.0f, Q28_4.asFloat(0b1_0000));
+        assertEquals(1.5f, Q28_4.asFloat(0b1_1000));
+        assertEquals(1.25f, Q28_4.asFloat(0b1_0100));
+        assertEquals(1.125f, Q28_4.asFloat(0b1_0010));
+        assertEquals(1.0625f, Q28_4.asFloat(0b1_0001));
+        assertEquals(1.9375f, Q28_4.asFloat(0b1_1111));
     }
 
-
+    @Test
+    void q28_4ofIntAndAsFloatDoubleAreInverse() {
+        var rng = newRandom();
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            var n = rng.nextInt(1 << 24);
+            assertEquals(n, Q28_4.asFloat(Q28_4.ofInt(n)));
+            assertEquals(n, Q28_4.asDouble(Q28_4.ofInt(n)));
+        }
+    }
 }

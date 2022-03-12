@@ -18,7 +18,7 @@ import java.util.List;
 
 public record GraphSectors(ByteBuffer buffer) {
 
-    private final static int OFFSET_PITCH = Short.BYTES + Integer.BYTES;
+    private final static int SECTOR_PITCH = Short.BYTES + Integer.BYTES;
     private final static int OFFSET_SECTORS_PER_LINE = 128;
     private final static double sectorX = SwissBounds.WIDTH / 128.; // Horizontal component of a sector's dimensions
     private final static double sectorY = SwissBounds.HEIGHT / 128.; // Vertical component of a sector's dimensions
@@ -58,8 +58,8 @@ public record GraphSectors(ByteBuffer buffer) {
 
                 int sectorId = y * OFFSET_SECTORS_PER_LINE + x;
 
-                int firstNodeId = buffer.getInt(sectorId * OFFSET_PITCH);
-                int numberNodes = Short.toUnsignedInt(buffer.getShort(sectorId * OFFSET_PITCH + Integer.BYTES));
+                int firstNodeId = buffer.getInt(sectorId * SECTOR_PITCH);
+                int numberNodes = Short.toUnsignedInt(buffer.getShort(sectorId * SECTOR_PITCH + Integer.BYTES));
                 int lastNodeId = firstNodeId + numberNodes;
 
                 Sector sector = new Sector(firstNodeId, lastNodeId);

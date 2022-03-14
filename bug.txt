@@ -13,4 +13,5 @@ step4 ------------------------------------------------
 • dans ElevationProfile, les attributs que j'ai cree doivent etre final ou pas ? vu que la classe est immuable.
 • dans ElevationProfile, mon concept de la for loop est correct ? Et si y'a une valeur negative ?
 • cmt initialiser le profile dans le constructeur pour elevationAt ?
+• le elevationAt dans Edge, euh ? Math2.interpolate()
 • la methode pointAt de la classe Edge : c'est bien ca qu'il faut retourner ? Je vois pas pk on a fromPoint.e(), toPoint.e(), position; et dans le second argument, position encore une fois. 

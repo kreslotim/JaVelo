@@ -2,16 +2,12 @@
 • toutes les methodes où on a utilisé scalb(...) doivent caster en double
 
  step3 ------------------------------------------------
-• a NESTED record is necessarily private since it's nested in (i.e. only useful for) the class ? means Sector public i.e. it depends. It can be public or private depending on how I wanna use.
-• dans GraphEdges, les methodes private doivent etre static ? Et la for loop pour copier le tableau, demande a qn pour optimiser SANS SE TROMPER DANS LES INDICES.
 • code ressemblant COMPRESSED_PROFILE_Q0_4, aka type2, COMPRESSED_PROFILE_Q4_4, aka type3, de profileSamples(...) dans GraphEdges : Optimisation := cree une methode pour modulariser et donc reduire la taille de profileSamples(...).
 • methode private flip(...) change to System.Copy.Arrays... pour l'optimisation du code qd on copie les valeurs d'un tableau.
 
 
 step4 ------------------------------------------------
-• les methodes de RoutePoint doivent etre public or private ?
-• dans ElevationProfile, les attributs que j'ai cree doivent etre final ou pas ? vu que la classe est immuable.
-• dans ElevationProfile, mon concept de la for loop est correct ? Et si y'a une valeur negative ?
-• cmt initialiser le profile dans le constructeur pour elevationAt ?
-• le elevationAt dans Edge, euh ? Math2.interpolate()
-• la methode pointAt de la classe Edge : c'est bien ca qu'il faut retourner ? Je vois pas pk on a fromPoint.e(), toPoint.e(), position; et dans le second argument, position encore une fois. 
+• les methodes de RoutePoint doivent etre public or private ? it can be public or final depending on what u wanna do with them.
+• dans ElevationProfile, si y'a une valeur negative ?
+
+

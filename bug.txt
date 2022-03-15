@@ -5,6 +5,6 @@ step3 ------------------------------------------------
 
 step4 ------------------------------------------------
 • les methodes de RoutePoint doivent etre public or private ? it can be public or final depending on what u wanna do with them.
-• dans ElevationProfile, si y'a une valeur negative ?
+• dans ElevationProfile, si y'a une valeur negative ? piazza
 
 

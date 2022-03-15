@@ -1,7 +1,4 @@
-
-• toutes les methodes où on a utilisé scalb(...) doivent caster en double
-
- step3 ------------------------------------------------
+step3 ------------------------------------------------
 • code ressemblant COMPRESSED_PROFILE_Q0_4, aka type2, COMPRESSED_PROFILE_Q4_4, aka type3, de profileSamples(...) dans GraphEdges : Optimisation := cree une methode pour modulariser et donc reduire la taille de profileSamples(...).
 • methode private flip(...) change to System.Copy.Arrays... pour l'optimisation du code qd on copie les valeurs d'un tableau.
 

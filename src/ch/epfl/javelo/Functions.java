@@ -57,6 +57,7 @@ public final class Functions {
      */
     private static record Sampled(float[] samples, double xMax) implements DoubleUnaryOperator {
 
+
         /**
          * Function returning y(x) obtained by linear interpolation between a list of samples
          *

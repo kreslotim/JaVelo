@@ -1,135 +1,100 @@
 package ch.epfl.javelo;
 
-import ch.epfl.test.TestRandomizer;
 import org.junit.jupiter.api.Test;
 
-import java.util.function.DoubleUnaryOperator;
-
+import static ch.epfl.test.TestRandomizer.RANDOM_ITERATIONS;
 import static ch.epfl.test.TestRandomizer.newRandom;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunctionsTest {
-    public final static double DELTA = 0.2;
-
     @Test
-    void constant() {
-        assertEquals(2, Functions.constant(2).applyAsDouble(2));
-    }
-
-    @Test
-    void sampledWeiEn() {
-        assertEquals(3.25, Functions.sampled(new float[]{4,2,3,2,4,1}, 10).applyAsDouble(8.5));
-    }
-
-    @Test
-    void sampledFlorian() {
-        assertEquals(0.65, Functions.sampled(new float[]{0,1}, 1).applyAsDouble(0.65));
-    }
-
-    @Test
-    void sampledHanaAndLuna() {
-        assertEquals(2.4, Functions.sampled(new float[]{0,1,3,2,1}, 2).applyAsDouble(1.3));
-    }
-
-    @Test
-    void sampled() {
-        assertEquals(8.55, Functions.sampled(new float[]{10, 8 ,6, 9, 11, 12}, 10).applyAsDouble(5.7));
-    }
-
-    @Test
-    void workOnMultipleKnowValueSampled(){
-        float [] test = new float[]{10,2,5,7,8,9,1};
-        DoubleUnaryOperator result =  Functions.sampled(test,2*(test.length-1));
-        double actual = result.applyAsDouble(9);
-        double expected = 8.5;
-        assertEquals(expected,actual);
-    }
-
-
-
-
-    @Test
-    void constantTest(){
-        DoubleUnaryOperator c = Functions.constant(4);
-        assertEquals(4, c.applyAsDouble(7));
-    }
-
-
-    @Test
-    void sampledWeiEn2() {
-        assertEquals(5.4, Functions.sampled(new float[]{7,0,7,4,6,5}, 5).applyAsDouble(1.75),DELTA);
-    }
-
-
-
-    @Test
-    void sampledExceptionsTest(){
-        assertThrows(IllegalArgumentException.class, () -> {
-            float[] samples = {0};
-            DoubleUnaryOperator test1 = Functions.sampled(samples, 4);
-        });
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            float[] samples = {3,5};
-            DoubleUnaryOperator test1 = Functions.sampled(samples, -3);
-        });
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            float[] samples = {3,5};
-            DoubleUnaryOperator test1 = Functions.sampled(samples, 0);
-        });
-    }
-
-    @Test
-    void constantWorksCorrectly() {
-        DoubleUnaryOperator cst = Functions.constant(37.98);
+    void functionsConstantIsConstant() {
         var rng = newRandom();
-        for (var i = 0; i < TestRandomizer.RANDOM_ITERATIONS; i += 1) {
-            var x = rng.nextInt(1000);
-            assertEquals(37.98, cst.applyAsDouble(x));
+        for (var y : new double[]{Double.NEGATIVE_INFINITY, -20.22, 0, 20.22}) {
+            var f = Functions.constant(y);
+            for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+                var x = rng.nextDouble(-100_000, 100_000);
+                assertEquals(y, f.applyAsDouble(x));
+            }
         }
     }
 
     @Test
-    void sampledThrowsExceptionForLength(){
-        float[] samples = {1};
-        assertThrows(IllegalArgumentException.class, () ->{
-            Functions.sampled(samples,5);
+    void functionsSampledThrowsWithLessThanTwoSamples() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            Functions.sampled(new float[]{}, 1);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            Functions.sampled(new float[]{0}, 1);
         });
     }
 
-
     @Test
-    void sampledThrowsExceptionForMax(){
-        float[] samples = {1,2,3};
+    void functionsSampledWorksWhenEvaluatedCloseToXMax() {
         var rng = newRandom();
-        for (var i = 0; i < TestRandomizer.RANDOM_ITERATIONS; i += 1) {
-//            var xMax = rng.nextInt(1000);
-//            xMax = xMax - 1000;
-            assertThrows(IllegalArgumentException.class, () ->{
-                Functions.sampled(samples,-7);
+        var halfWidth = 5000;
+        for (int l = 2; l < 40; l += 1) {
+            var samples = new float[l];
+            for (int i = 0; i < samples.length; i += 1)
+                samples[i] = rng.nextFloat(-halfWidth, halfWidth);
+            var xMax = rng.nextDouble(l, 4 * l);
+            var f = Functions.sampled(samples, xMax);
+
+            assertDoesNotThrow(() -> {
+                var xL = xMax;
+                var xH = xMax;
+                for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+                    var yL = f.applyAsDouble(xL);
+                    var yH = f.applyAsDouble(xH);
+                    xL = Math.nextDown(xL);
+                    xH = Math.nextUp(xH);
+                }
             });
         }
     }
 
     @Test
-    void sampledWorksFor2ValuesInSamples(){
-        //Linear
-        float[] samples = {0,2,(float)5.1};
-        //var rng = newRandom();
-        DoubleUnaryOperator linear = Functions.sampled(samples,2);
-        //for (var i = 0; i < RANDOM_ITERATIONS; i += 1){
-        //var testValue = rng.nextDouble(0, 2);
-        assertEquals(4.7,linear.applyAsDouble(1.889),DELTA);
+    void functionsSampledIsConstantLeftAndRightOfSamples() {
+        var rng = newRandom();
+        var halfWidth = 5000;
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            var sampleCount = rng.nextInt(2, 20);
+            var samples = new float[sampleCount];
+            for (int j = 0; j < sampleCount; j += 1)
+                samples[j] = rng.nextFloat(-halfWidth, halfWidth);
+            var xMax = rng.nextDouble(Math.nextUp(0), 100);
+            var f = Functions.sampled(samples, xMax);
+            assertEquals(samples[0], f.applyAsDouble(Math.nextDown(0)));
+            assertEquals(samples[0], f.applyAsDouble(-1000));
+            assertEquals(samples[sampleCount - 1], f.applyAsDouble(Math.nextUp(xMax)));
+            assertEquals(samples[sampleCount - 1], f.applyAsDouble(xMax + 1000));
+        }
     }
-    //}
-
 
     @Test
-    void sampledWorksForAHugeArray(){
-        float[] samples = {2, 0, 5, 6, 0, 0.5f, 7};
-        float[] samplesTest = {2,0, 5};
-        DoubleUnaryOperator fct = Functions.sampled(samples, 6);
-        assertEquals(3.85,fct.applyAsDouble(1.77));
+    void functionsSampledInterpolatesBetweenSamples() {
+        var rng = newRandom();
+        var halfWidth = 5000;
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            var sampleCount = rng.nextInt(2, 20);
+            var samples = new float[sampleCount];
+            for (int j = 0; j < sampleCount; j += 1)
+                samples[j] = rng.nextFloat(-halfWidth, halfWidth);
+            var xMax = rng.nextDouble(50, 100);
+            var f = Functions.sampled(samples, xMax);
+            var interSampleDistance = xMax / (sampleCount - 1);
+            var minDeltaX = interSampleDistance / 4;
+            for (int j = 1; j < sampleCount; j += 1) {
+                var xL = (j - 1) * interSampleDistance;
+                var yL = samples[j - 1];
+                var xR = j * interSampleDistance;
+                var yR = samples[j];
+                var x = rng.nextDouble(xL + minDeltaX, xR - minDeltaX);
+                var y = f.applyAsDouble(x);
+                var expectedSlope = (yR - yL) / interSampleDistance;
+                var actualSlope = (y - yL) / (x - xL);
+                assertEquals(expectedSlope, actualSlope, 1e-3);
+            }
+        }
     }
 }

@@ -1,121 +1,107 @@
 package ch.epfl.javelo.data;
 
 import org.junit.jupiter.api.Test;
-import org.w3c.dom.Attr;
 
-import static ch.epfl.javelo.data.Attribute.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Random;
+
+import static ch.epfl.test.TestRandomizer.RANDOM_ITERATIONS;
+import static ch.epfl.test.TestRandomizer.newRandom;
 import static org.junit.jupiter.api.Assertions.*;
 
-/**
- *
- *
- */
 class AttributeSetTest {
+    private static final int ATTRIBUTES_COUNT = 62;
 
     @Test
-    void bits() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            AttributeSet test = new AttributeSet(0b0111111111111111111111111111111111000000000000000000000000000000L);
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            AttributeSet test = new AttributeSet(0b1111111111111111111111111111111111000000000000000000000000000000L);
-        });
-        assertThrows(IllegalArgumentException.class, () -> {
-            AttributeSet test = new AttributeSet(0b1011111111111111111111111111111111000000000000000000000000000000L);
+    void attributeSetConstructorWorksWithAllBitsSet() {
+        assertDoesNotThrow(() -> {
+            var allValidBits = (1L << ATTRIBUTES_COUNT) - 1;
+            new AttributeSet(allValidBits);
         });
     }
 
     @Test
-    void containsWorksOnKnownValue() {
-        AttributeSet test = AttributeSet.of(TRACKTYPE_GRADE1, HIGHWAY_TRACK);
-        assertEquals(true, test.contains(HIGHWAY_TRACK));
-        assertEquals(false, test.contains(TRACKTYPE_GRADE3));
+    void attributeSetConstructorThrowsWithInvalidBitsSet() {
+        for (int i = ATTRIBUTES_COUNT; i < Long.SIZE; i += 1) {
+            var invalidBits = 1L << i;
+            assertThrows(IllegalArgumentException.class, () -> {
+                new AttributeSet(invalidBits);
+            });
+        }
     }
 
     @Test
-    void toStringWorksOnKnownValue() {
-        AttributeSet set = AttributeSet.of(TRACKTYPE_GRADE1, HIGHWAY_TRACK);
-        assertEquals("{highway=track,tracktype=grade1}", set.toString());
+    void attributeSetOfWorksForEmptySet() {
+        assertEquals(0L, AttributeSet.of().bits());
     }
 
     @Test
-    void intersectWorksOnKnownValue() {
-        AttributeSet set1 = AttributeSet.of(TRACKTYPE_GRADE1, HIGHWAY_TRACK);
-        AttributeSet set2 = AttributeSet.of(TRACKTYPE_GRADE1, HIGHWAY_LIVING_STREET, HIGHWAY_TRUNK);
-        AttributeSet set3 = AttributeSet.of(HIGHWAY_ROAD);
-        assertEquals(true, set1.intersects(set2));
-        assertEquals(false, set1.intersects(set3));
+    void attributeSetOfWorksForFullSet() {
+        var allAttributes = AttributeSet.of(Attribute.values());
+        assertEquals((1L << ATTRIBUTES_COUNT) - 1, allAttributes.bits());
+        assertEquals(ATTRIBUTES_COUNT, Long.bitCount(allAttributes.bits()));
     }
 
     @Test
-    void testConstructorFunction() {
-        //should pass
-        new AttributeSet(1000000000000000000L);
-        AttributeSet.of(Attribute.LCN_YES);
-
-        //binary representation length is 63, bits at index 62 is 0 -> it is okay
-        new AttributeSet(0b001000000000000000000000100000000000000000001010000000000000000L);
-
-        //binary representation length is 64, bits at index 62 and 63 are 0 -> it is okay
-        new AttributeSet(0b0001000000000000000000000100000000000000000001010000000000000000L);
-
-        //binary representation length is 62, bits at index 61 is 1 -> it is okay
-        assertThrows(IllegalArgumentException.class, () -> {
-            new AttributeSet(0b111000000000000000000000100000000000000000001010000000000000000L);
-        });
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            //binary representation length is 64, bits at index 63 is 1 -> should fail
-            new AttributeSet(0b1001000000000000000000000100000000000000000001010000000000000000L);
-        });
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            //binary representation length is 63, bits at index 62 is 1 -> should fail.
-            new AttributeSet(0b101000000000000000000000100000000000000000001010000000000000000L);
-        });
+    void attributeSetContainsWorksOnRandomSets() {
+        var allAttributes = Attribute.values();
+        assert allAttributes.length == ATTRIBUTES_COUNT;
+        var rng = newRandom();
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            Collections.shuffle(Arrays.asList(allAttributes), new Random(rng.nextLong()));
+            var count = rng.nextInt(ATTRIBUTES_COUNT + 1);
+            var attributes = Arrays.copyOf(allAttributes, count);
+            var attributeSet = AttributeSet.of(attributes);
+            assertEquals(count, Long.bitCount(attributeSet.bits()));
+            for (int j = 0; j < count; j += 1)
+                assertTrue(attributeSet.contains(allAttributes[j]));
+            for (int j = count; j < ATTRIBUTES_COUNT; j += 1)
+                assertFalse(attributeSet.contains(allAttributes[j]));
+        }
     }
 
     @Test
-    void testToStringFunction() {
+    void attributeSetIntersectsWorksOnRandomSets() {
+        var allAttributes = Attribute.values();
+        assert allAttributes.length == ATTRIBUTES_COUNT;
+        var rng = newRandom();
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            Collections.shuffle(Arrays.asList(allAttributes), new Random(rng.nextLong()));
+            var count = rng.nextInt(1, ATTRIBUTES_COUNT + 1);
+            var attributes = Arrays.copyOf(allAttributes, count);
+            var attributeSet = AttributeSet.of(attributes);
+            var attributeSet1 = AttributeSet.of(attributes[0]);
+            assertTrue(attributeSet.intersects(attributeSet1));
+            assertTrue(attributeSet1.intersects(attributeSet));
+        }
+    }
+
+    @Test
+    void attributeSetIntersectsWorksOnComplementarySets() {
+        var rng = newRandom();
+        var validBitsMask = (1L << ATTRIBUTES_COUNT) - 1;
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            var bits = rng.nextLong();
+            var set = new AttributeSet(bits & validBitsMask);
+            var setComplement = new AttributeSet(~bits & validBitsMask);
+            assertFalse(set.intersects(setComplement));
+            assertFalse(setComplement.intersects(set));
+            assertTrue(set.intersects(set));
+            assertTrue(setComplement.intersects(setComplement));
+        }
+    }
+
+    @Test
+    void attributeSetToStringWorksOnKnownValues() {
+        assertEquals("{}", new AttributeSet(0).toString());
+
+        for (var attribute : Attribute.values()) {
+            var expected = "{" + attribute + "}";
+            assertEquals(expected, AttributeSet.of(attribute).toString());
+        }
+
         AttributeSet set = AttributeSet.of(Attribute.TRACKTYPE_GRADE1, Attribute.HIGHWAY_TRACK);
         assertEquals("{highway=track,tracktype=grade1}", set.toString());
-
-        AttributeSet set2 = AttributeSet.of(Attribute.HIGHWAY_UNCLASSIFIED, Attribute.HIGHWAY_TRACK, Attribute.HIGHWAY_CYCLEWAY, Attribute.LCN_YES);
-        assertEquals("{highway=track,highway=unclassified,highway=cycleway,lcn=yes}", set2.toString());
-
-        AttributeSet set3 = AttributeSet.of(Attribute.MOTORROAD_YES, Attribute.TRACKTYPE_GRADE2, Attribute.RCN_YES, Attribute.ONEWAY_YES);
-        assertEquals("{motorroad=yes,tracktype=grade2,oneway=yes,rcn=yes}", set3.toString());
     }
-
-    @Test
-    void testContainsFunction() {
-        AttributeSet set = AttributeSet.of(Attribute.TRACKTYPE_GRADE2, Attribute.HIGHWAY_TRACK);
-        //testing the before and after bit
-        assertEquals(false, set.contains(Attribute.TRACKTYPE_GRADE1));
-        assertEquals(false, set.contains(Attribute.TRACKTYPE_GRADE3));
-        assertEquals(true, set.contains(Attribute.TRACKTYPE_GRADE2));
-
-        //testing the before and after bit
-        assertEquals(false, set.contains(Attribute.HIGHWAY_CYCLEWAY));
-        assertEquals(false, set.contains(Attribute.HIGHWAY_SERVICE));
-        assertEquals(true, set.contains(Attribute.HIGHWAY_TRACK));
-    }
-
-    @Test
-    void testAttributes() {
-        AttributeSet set = AttributeSet.of(TRACKTYPE_GRADE1, HIGHWAY_TRACK);
-        assertEquals("{highway=track,tracktype=grade1}", set.toString());
-    }
-
-    @Test
-    void testIntersectFunction() {
-        AttributeSet set1 = AttributeSet.of(Attribute.TRACKTYPE_GRADE1, Attribute.HIGHWAY_TRACK);
-        AttributeSet set2 = AttributeSet.of(Attribute.TRACKTYPE_GRADE2, Attribute.HIGHWAY_CYCLEWAY);
-        AttributeSet set3 = AttributeSet.of(Attribute.TRACKTYPE_GRADE1, Attribute.HIGHWAY_CYCLEWAY);
-
-        assertEquals(false, set1.intersects(set2));
-        assertEquals(true, set2.intersects(set3));
-        assertEquals(true, set1.intersects(set3));
-    }
-
 }

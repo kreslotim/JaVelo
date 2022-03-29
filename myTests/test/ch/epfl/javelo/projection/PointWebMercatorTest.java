@@ -1,102 +1,146 @@
 package ch.epfl.javelo.projection;
 
+import ch.epfl.test.TestRandomizer;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
+import static ch.epfl.test.TestRandomizer.RANDOM_ITERATIONS;
+import static ch.epfl.test.TestRandomizer.newRandom;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PointWebMercatorTest {
-    public static final double DELTA = 2;
+    private static final double DELTA = 1e-7;
 
     @Test
-    void ofWorksOnKnownValues() {
-        var actual1 = PointWebMercator.of(19,0.518275214444, 0.353664894749).x();
-        var expected1 = 3.861451256603003E-9;
-        assertEquals(expected1, actual1);
-
-        var actual2 = PointWebMercator.of(19,0.518275214444, 0.353664894749).y();
-        var expected2 = 2.635008802630007E-9;
-        assertEquals(expected2, actual2);
-
+    void pointWebMercatorThrowsOnInvalidCoordinates() {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new PointWebMercator(Math.nextDown(0), 0.5));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new PointWebMercator(Math.nextUp(1), 0.5));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new PointWebMercator(0.5, Math.nextDown(0)));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> new PointWebMercator(0.5, Math.nextUp(1)));
     }
 
     @Test
-    void pointWebMercatorOfHanaAndLuna() {
-        var p = new PointWebMercator(3.662109375E-5, 6.103515625E-5);
-        assertEquals(p, PointWebMercator.of(5, 0.3, 0.5));
+    void pointWebMercatorDoesNotThrowOnValidCoordinates() {
+        var rng = newRandom();
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            var x = rng.nextDouble();
+            var y = rng.nextDouble();
+            assertDoesNotThrow(() -> new PointWebMercator(x, y));
+        }
+        assertDoesNotThrow(() -> new PointWebMercator(0, 0));
+        assertDoesNotThrow(() -> new PointWebMercator(1, 1));
     }
 
-
     @Test
-    void ofPointChTest(){
-        PointCh a = new PointCh(2695000,1175000);
-        assertTrue(new PointWebMercator((WebMercator.x(Ch1903.lon(2695000, 1175000))), WebMercator.y(Ch1903.lat(2695000, 1175000))).equals(PointWebMercator.ofPointCh(a)));
+    void pointWebMercatorOfAndXYAtZoomLevelAreInverse() {
+        var rng = newRandom();
+        for (int i = 0; i < RANDOM_ITERATIONS; i += 1) {
+            var z = rng.nextInt(20);
+            var maxXY = Math.scalb(1d, z + 8);
+            var x = rng.nextDouble(maxXY);
+            var y = rng.nextDouble(maxXY);
+            var p = PointWebMercator.of(z, x, y);
+            assertEquals(x, p.xAtZoomLevel(z), 1e-8);
+            assertEquals(y, p.yAtZoomLevel(z), 1e-8);
+        }
     }
 
+    @Test
+    void pointWebMercatorOfPointChWorksOnKnownValues() {
+        var p1 = PointWebMercator
+                .ofPointCh(new PointCh(2_600_000, 1_200_000));
+        var actualX1 = p1.x();
+        var actualY1 = p1.y();
+        var expectedX1 = 0.5206628811728395;
+        var expectedY1 = 0.3519253787614047;
+        assertEquals(expectedX1, actualX1, DELTA);
+        assertEquals(expectedY1, actualY1, DELTA);
+
+        var p2 = PointWebMercator
+                .ofPointCh(new PointCh(2_533_132, 1_152_206));
+        var actualX2 = p2.x();
+        var actualY2 = p2.y();
+        var expectedX2 = 0.5182423951719917;
+        var expectedY2 = 0.3536813812215855;
+        assertEquals(expectedX2, actualX2, DELTA);
+        assertEquals(expectedY2, actualY2, DELTA);
+    }
 
     @Test
-    void xAtZoomLevelWorksOnKnownValues() {
-        PointWebMercator test = new PointWebMercator(0.518275214444, 0.353664894749);
-        var actual1 = test.xAtZoomLevel(19);
-        var expected1 = 69561722;
+    void pointWebMercatorLonWorksOnKnownValues() {
+        var actual1 = new PointWebMercator(0, 0).lon();
+        var expected1 = -3.141592653589793;
         assertEquals(expected1, actual1, DELTA);
+
+        var actual2 = new PointWebMercator(0.25, 0.25).lon();
+        var expected2 = -1.5707963267948966;
+        assertEquals(expected2, actual2, DELTA);
+
+        var actual3 = new PointWebMercator(0.5, 0.5).lon();
+        var expected3 = 0.0;
+        assertEquals(expected3, actual3, DELTA);
+
+        var actual4 = new PointWebMercator(0.75, 0.75).lon();
+        var expected4 = 1.5707963267948966;
+        assertEquals(expected4, actual4, DELTA);
+
+        var actual5 = new PointWebMercator(1, 1).lon();
+        var expected5 = 3.141592653589793;
+        assertEquals(expected5, actual5, DELTA);
     }
 
     @Test
-    void yAtZoomLevelWorksOnKnownValues() {
-        PointWebMercator test = new PointWebMercator(0.518275214444, 0.353664894749);
-        var actual1 = test.yAtZoomLevel(19);
-        var expected1 = 47468099;
+    void pointWebMercatorLatWorksOnKnownValues() {
+        var actual1 = new PointWebMercator(0, 0).lat();
+        var expected1 = 1.4844222297453324;
         assertEquals(expected1, actual1, DELTA);
+
+        var actual2 = new PointWebMercator(0.25, 0.25).lat();
+        var expected2 = 1.1608753909688045;
+        assertEquals(expected2, actual2, DELTA);
+
+        var actual3 = new PointWebMercator(0.5, 0.5).lat();
+        var expected3 = 0.0;
+        assertEquals(expected3, actual3, DELTA);
+
+        var actual4 = new PointWebMercator(0.75, 0.75).lat();
+        var expected4 = -1.1608753909688045;
+        assertEquals(expected4, actual4, DELTA);
+
+        var actual5 = new PointWebMercator(1, 1).lat();
+        var expected5 = -1.4844222297453324;
+        assertEquals(expected5, actual5, DELTA);
     }
 
     @Test
-    void lonWorksOnKnownValues() {
-        PointWebMercator test = new PointWebMercator(0.518275214444, 0.353664894749);
-        var actual1 = test.lon();
-        var expected1 = Math.toRadians(6.5790772);
-        assertEquals(expected1, actual1, DELTA);
-    }
+    void pointWebMercatorToPointChWorksOnKnownValues() {
+        var p1 = new PointWebMercator(0.5206628811728395, 0.3519253787614047)
+                .toPointCh();
+        var actualE1 = p1.e();
+        var actualN1 = p1.n();
+        var expectedE1 = 2600000.346333851;
+        var expectedN1 = 1199999.8308213386;
+        assertEquals(expectedE1, actualE1, DELTA);
+        assertEquals(expectedN1, actualN1, DELTA);
 
-    @Test
-    void latWorksOnKnownValues() {
-        PointWebMercator test = new PointWebMercator(0.518275214444, 0.353664894749);
-        var actual1 = test.lat();
-        var expected1 = Math.toRadians(46.5218976);
-        assertEquals(expected1, actual1, DELTA);
-    }
-
-
-    @Test
-    void cannotCreateWithoutGoodCoordinates() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            PointWebMercator lolilol = new PointWebMercator(2, 4);
-        });
-    }
-
-
-    // x_{19} = 69561722, y_{19} = 47468099
-    @Test
-    void xAtZoomLevel() {
-        PointWebMercator test = new PointWebMercator(0.518275214444,0.353664894749);
-        var expected = 69561722;
-        var actual = Math.round(test.xAtZoomLevel(19));
-        assertEquals(expected, actual, DELTA);
-    }
-
-    /**
-    @Test
-    void pointChVsPointWebMercatorOwnTransformTest(){
-        // Accuracy test who will always fail.
-        assertEquals(new PointCh(2600000,1200000), PointWebMercator.ofPointCh(new PointCh(2600000,1200000)).toPointCh());
-    }
-     */
-
-    @Test
-    void toPointCh() {
-        PointWebMercator test = new PointWebMercator(0.518275214444,0.353664894749);
-        PointCh converted = test.toPointCh();
-        PointCh expected = new PointCh(Ch1903.e((test.lon()), (test.lat())), Ch1903.n((test.lon()), (test.lat())));
-
-        assertEquals(expected, converted);
+        var p2 = new PointWebMercator(0.5182423951719917, 0.3536813812215855)
+                .toPointCh();
+        var actualE2 = p2.e();
+        var actualN2 = p2.n();
+        var expectedE2 = 2533131.6362025095;
+        var expectedN2 = 1152206.8789113415;
+        assertEquals(expectedE2, actualE2, DELTA);
+        assertEquals(expectedN2, actualN2, DELTA);
     }
 }

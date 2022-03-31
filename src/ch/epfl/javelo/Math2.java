@@ -35,6 +35,7 @@ public final class Math2 {
      */
     public static double interpolate(double y0, double y1, double x) {
         return Math.fma((y1 - y0), x, y0); // Must be able to work with any x !
+        // returns y * x + y0
     }
 
     /**

@@ -4,7 +4,7 @@ import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.Preconditions;
 
 /**
- * Recorded class that measures distance between two points
+ * Recorded class that measures distance between two points in meters
  *
  * @author Tim Kreslo (310686)
  * @author Wei-En Hsieh (341271)

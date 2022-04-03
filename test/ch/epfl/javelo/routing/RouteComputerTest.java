@@ -94,7 +94,8 @@ class RouteComputerTest {
         CityBikeCF costFunction = new CityBikeCF(GRAPH);
         RouteComputer routeComputer = new RouteComputer(GRAPH, costFunction);
 
-        assertEquals(singleRoute, routeComputer.bestRouteBetween(nodeA, nodeF));
+        assertEquals(null, routeComputer.bestRouteBetween(nodeA, nodeF));
+        //assertThrows(NullPointerException.class, () -> {routeComputer.bestRouteBetween(nodeA, nodeF);});
     }
 
 

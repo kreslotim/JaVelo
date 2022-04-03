@@ -3,6 +3,8 @@ package ch.epfl.javelo;
 import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.SwissBounds;
 import ch.epfl.javelo.routing.Edge;
+import ch.epfl.javelo.routing.Route;
+import ch.epfl.javelo.routing.RoutePoint;
 import ch.epfl.javelo.routing.SingleRoute;
 
 import java.util.ArrayList;
@@ -25,6 +27,27 @@ public class Test {
 
 class A {
 
+    public RoutePoint pointClosestTo(PointCh point) {
 
+        List<Route> segments = new ArrayList<>();
+
+        RoutePoint currentRoutePoint;
+        RoutePoint nearestRoutePoint = segments.get(0).pointClosestTo(point);
+        double lengthTotal = 0;
+
+        for (int i = 1; i < segments.size(); i++) {
+            lengthTotal += segments.get(i-1).length();
+            currentRoutePoint = segments.get(i).pointClosestTo(point);
+            nearestRoutePoint = nearestRoutePoint.min(currentRoutePoint);
+
+            if (nearestRoutePoint != currentRoutePoint) {
+                //lengthTotal += segments.get(i-1).length();
+                nearestRoutePoint = nearestRoutePoint.min(currentRoutePoint);
+            }
+            else nearestRoutePoint = nearestRoutePoint.withPositionShiftedBy(lengthTotal);
+        }
+
+        return nearestRoutePoint;
+    }
 
 }

@@ -4,7 +4,7 @@ package ch.epfl.javelo.routing;
 import ch.epfl.javelo.projection.PointCh;
 
 /**
- * Recorded class representing a point on a route, closest to a given reference point which is near the route.
+ * Recorded class representing a point on a route, that is the closest to a given reference point, near the route.
  *
  * @author Timofey Kreslo (310686)
  * @author Wei-En Hsieh (341271)

@@ -7,7 +7,7 @@ import ch.epfl.javelo.projection.PointCh;
 import java.util.function.DoubleUnaryOperator;
 
 /**
- * An edge of a route
+ * Recorded class representing an edge of a route.
  *
  * @author Tim Kreslo (310686)
  * @author Wei-En Hsieh (341271)
@@ -17,7 +17,7 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
 
 
     /**
-     * Facilite the construction of an instance of type Edge
+     * Provides the construction of an instance of type Edge
      *
      * @param graph      the graph (Graph)
      * @param edgeId     the identity edge
@@ -36,7 +36,6 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
      *
      * @param point the point P as an argument
      * @return the position along the edge, in meters, that is closest to the given point
-     * // La valeur à retourner est celle nommée l sur la Figure4 de la step1
      */
     public double positionClosestTo(PointCh point) {
         return Math2.projectionLength(fromPoint.e(), fromPoint.n(), toPoint.e(), toPoint.n(), point.e(), point.n());
@@ -49,8 +48,6 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
      * @return the point at the given position on the edge, expressed in meters
      */
     public PointCh pointAt(double position) {
-        // la logique du code ressemble a celle de Sampled applyAsDouble
-        // faut utiliser fromPoint et toPoint
         return new PointCh(Math2.interpolate(fromPoint.e(), toPoint.e(), position / length),
                 // divide by length because we want to bring x between 0 and 1, where length is the length of a single edge.
                 Math2.interpolate(fromPoint.n(), toPoint.n(), position / length));

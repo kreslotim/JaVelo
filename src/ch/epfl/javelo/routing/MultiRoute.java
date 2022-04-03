@@ -8,29 +8,37 @@ import ch.epfl.javelo.projection.SwissBounds;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Immutable class representing a Multiroute (multiple routes) composed of segments,
+ * that can be either Multiroutes or Singleroutes,
+ * linking starting and ending points, and may have intermediate waypoints.
+ *
+ * @author Tim Kreslo (310686)
+ * @author Wei-En Hsieh (341271)
+ */
 public final class MultiRoute implements Route {
     private final List<Route> segments;
 
     public MultiRoute(List<Route> segments) {
         Preconditions.checkArgument(!segments.isEmpty());
         this.segments = List.copyOf(segments);
-
     }
 
     /**
-     * Returns the index of the segment on the route, containing the given position
+     * Returns the index of the segment on the route, containing the given position along the route
      *
-     * @param position on the segment
-     * @return the index of the segment
+     * @param position on the entire route (in meters)
+     * @return the index of the segment on the route
      */
     @Override
     public int indexOfSegmentAt(double position) {
         double pos = Math2.clamp(0, position, length());
         int indexOfSegment = 0;
         double lengthTotal = 0;
-        for (Route segment : segments) {
+        for (Route segment : segments) { // Use of recursion throughout each segment
+                                         // that can be either a Multiroute or a Singleroute
             indexOfSegment = (pos > lengthTotal + segment.length())
-                    ? indexOfSegment + indexOfSegmentAt(segment.length()) + 1
+                    ? indexOfSegment + segment.indexOfSegmentAt(segment.length()) + 1
                     : indexOfSegment + segment.indexOfSegmentAt(pos - lengthTotal);
             lengthTotal += segment.length();
         }
@@ -38,7 +46,7 @@ public final class MultiRoute implements Route {
     }
 
     /**
-     * Returns the length of the route, in meters
+     * Returns the length of the entire route, in meters
      *
      * @return the length of the route, in meters
      */
@@ -50,23 +58,21 @@ public final class MultiRoute implements Route {
     }
 
     /**
-     * Returns all the edges of the route
+     * Returns all the edges of the entire route
      *
      * @return all the edges of the route
      */
     @Override
     public List<Edge> edges() {
         List<Edge> allEdgesOnRoute = new ArrayList<>();
-        for (Route segment : segments) {
-            allEdgesOnRoute.addAll(segment.edges());
-        }
+        for (Route segment : segments) allEdgesOnRoute.addAll(segment.edges());
         return allEdgesOnRoute;
     }
 
     /**
      * Returns all the points located at the extremities of each edge on the route
      *
-     * @return all the points located at the extremities of each edge on the route
+     * @return all the points on the route
      */
     @Override
     public List<PointCh> points() {
@@ -83,10 +89,10 @@ public final class MultiRoute implements Route {
     }
 
     /**
-     * Returns the point at the given position along the route
+     * Returns the point (Swiss point) at the given position along the entire route
      *
-     * @param position on the route, in meters
-     * @return
+     * @param position on the entire route (in meters)
+     * @return the point at the given position, along the entire route
      */
     @Override
     public PointCh pointAt(double position) {
@@ -94,22 +100,18 @@ public final class MultiRoute implements Route {
         double lengthTotal = 0;
 
         for (Route segment : segments) {
-            if (pos > lengthTotal + segment.length()) {
-                lengthTotal += segment.length();
-            }
-            else {
-                return segment.pointAt(pos - lengthTotal);
-            }
+            if (pos <= lengthTotal + segment.length()) return segment.pointAt(pos - lengthTotal);
+            lengthTotal += segment.length();
         }
-        return null;
+        return null; // Unreachable case, but must have a return statement
     }
 
     /**
      * Returns the altitude at the given position along the route,
      * which can be NaN if the edge containing this position has no profile
      *
-     * @param position on the route, in meters
-     * @return altitude at the given position along the route
+     * @param position on the route (in meters)
+     * @return altitude at the given position, along the route
      */
     @Override
     public double elevationAt(double position) {
@@ -117,20 +119,16 @@ public final class MultiRoute implements Route {
         double lengthTotal = 0;
 
         for (Route segment : segments) {
-            if (pos > lengthTotal + segment.length()) {
-                lengthTotal += segment.length();
-            }
-            else {
-                return segment.elevationAt(pos - lengthTotal);
-            }
+            if (pos <= lengthTotal + segment.length()) return segment.elevationAt(pos - lengthTotal);
+            lengthTotal += segment.length();
         }
-        return 0;
+        return 0; // Unreachable case, but must have a return statement
     }
 
     /**
-     * Returns the identity of the node that belongs to the route and is the closest to the given position
+     * Returns the identity of the node that belongs to the route, and is the closest to the given position
      *
-     * @param position on the route, in meters
+     * @param position on the route (in meters)
      * @return nodeId of the node that belongs to the route, and is the closest to the given position
      */
     @Override
@@ -138,39 +136,29 @@ public final class MultiRoute implements Route {
         double pos = Math2.clamp(0, position, length());
         double lengthTotal = 0;
         for (Route segment : segments) {
-            if (pos > lengthTotal + segment.length()) {
-                lengthTotal += segment.length();
-            }
-            else {
-                return segment.nodeClosestTo(pos - lengthTotal);
-            }
+            if (pos <= lengthTotal + segment.length()) return segment.nodeClosestTo(pos - lengthTotal);
+            lengthTotal += segment.length();
         }
-        return 0;
+        return 0; // Unreachable case, but must have a return statement
     }
 
     /**
-     * Returns the closest route point to the given reference point
+     * Returns the point on the route (a RoutePoint), that is the closest to the given reference point
      *
-     * @param point A reference point with Swiss coordinates (anywhere on the map)
+     * @param point a reference point with Swiss coordinates (anywhere on the map)
      * @return the closest point on the route, to the given reference point
      */
     @Override
     public RoutePoint pointClosestTo(PointCh point) {
 
         RoutePoint currentRoutePoint;
-        RoutePoint nearestRoutePoint = segments.get(0).pointClosestTo(point);
+        RoutePoint nearestRoutePoint = RoutePoint.NONE; // may add segments.get(0).pointClosestTo();
         double lengthTotal = 0;
 
-        for (int i = 1; i < segments.size(); i++) {
-            lengthTotal += segments.get(i-1).length();
-            currentRoutePoint = segments.get(i).pointClosestTo(point);
-            nearestRoutePoint = nearestRoutePoint.min(currentRoutePoint);
-
-            if (nearestRoutePoint != currentRoutePoint) {
-                //lengthTotal += segments.get(i-1).length();
-                nearestRoutePoint = nearestRoutePoint.min(currentRoutePoint);
-            }
-            else nearestRoutePoint = nearestRoutePoint.withPositionShiftedBy(lengthTotal);
+        for (Route segment : segments) {
+            currentRoutePoint = segment.pointClosestTo(point);
+            nearestRoutePoint = nearestRoutePoint.min(currentRoutePoint.withPositionShiftedBy(lengthTotal));
+            lengthTotal += segment.length();
         }
 
         return nearestRoutePoint;

@@ -49,7 +49,7 @@ public final class RouteComputer {
 
         int currentNode = 0; //index of the current Node
         int edge = 0; //index of the current Edge
-        int Ntemp = 0; // index of a temporary Node
+        int nTemp = 0; // index of a temporary Node
         double totalDistance = 0; // total distance through visited Nodes
 
         Arrays.fill(distance, 0, distance.length, Float.POSITIVE_INFINITY);
@@ -62,29 +62,37 @@ public final class RouteComputer {
         while (!Visiting.isEmpty()) { // do currentNode = Visiting.remove while !Visiting.isEmpty() && distance[currentNode] == Float.NEGATIVE_INFINITY
             currentNode = Visiting.remove().nodeId; // for which distance[N] is minimal
 
-            if (currentNode == endNodeId) return computeRoute(startNodeId, endNodeId, predecessor); //TODO give predecessor ?
+            if (currentNode == endNodeId) return computeRoute(startNodeId, endNodeId, predecessor);
 
             if (distance[currentNode] != Float.NEGATIVE_INFINITY) {
                 for (int E = 0; E < graph.nodeOutDegree(currentNode); E++) {
                     edge = graph.nodeOutEdgeId(currentNode, E); // considering current edge
-                    Ntemp = graph.edgeTargetNodeId(edge);
+                    nTemp = graph.edgeTargetNodeId(edge);
 
                     totalDistance = distance[currentNode] + costFunction.costFactor(currentNode, edge) * graph.edgeLength(edge);
 
-                    if (totalDistance < distance[Ntemp]) {
-                        distance[Ntemp] = (float) totalDistance;
-                        predecessor[Ntemp] = currentNode;
-                        Visiting.add(new WeightedNode(Ntemp, distance[Ntemp]));
+                    if (totalDistance < distance[nTemp]) {
+                        distance[nTemp] = (float) totalDistance;
+                        predecessor[nTemp] = currentNode;
+                        Visiting.add(new WeightedNode(nTemp, distance[nTemp] + (float)graph.nodePoint(nTemp).distanceTo(graph.nodePoint(endNodeId))));
                     }
                 }
-                distance[currentNode] = Float.NEGATIVE_INFINITY; // TODO where to implement Negative Infinity ?
+                distance[currentNode] = Float.NEGATIVE_INFINITY;
             }
         }
         return null;
     }
 
-
-
+    /**
+     * Auxiliary (private) method, that computes the final route
+     * (using starting node index, ending node index and the array of predecessors), and returns a Route,
+     * providing it a list of edges, composing the route.
+     *
+     * @param startNodeId Starting node index
+     * @param endNodeId   Ending node index
+     * @param predecessor Array of preceding nodes
+     * @return Route, composed of a list of edges
+     */
     private SingleRoute computeRoute(int startNodeId, int endNodeId, int[] predecessor) {
         List<Edge> edgesOfTheRoute = new ArrayList<>();
 
@@ -105,10 +113,11 @@ public final class RouteComputer {
             nodeId = predecessor[nodeId];
         }
 
-        Collections.reverse(edgesOfTheRoute);
+        Collections.reverse(edgesOfTheRoute); // The list contains inverted edges, in the reverse order
 
         SingleRoute finalRoute = new SingleRoute(edgesOfTheRoute);
-        System.out.println("Route's length: "+finalRoute.length());
+        System.out.println("Route's length: "+finalRoute.length()+" m");
+        System.out.println("Number of edges: "+edgesOfTheRoute.size());
         return finalRoute;
     }
 }

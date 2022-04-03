@@ -24,7 +24,7 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
      * @param fromNodeId the identity of the start node of the edge
      * @param toNodeId   the identity of the arrival node of the edge,
      * @return an instance of Edge whose attributes fromNodeId and toNodeId are those given, the others being those of
-     * the identity edge edgeId in the graph Graph
+     * the identity edge edgeId in the graph Graph.
      */
     public static Edge of(Graph graph, int edgeId, int fromNodeId, int toNodeId) {
         return new Edge(fromNodeId, toNodeId, graph.nodePoint(fromNodeId), graph.nodePoint(toNodeId),
@@ -32,20 +32,22 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
     }
 
     /**
-     * Return the position along the edge, in meters, that is closest to the given reference point
+     * Return the position (in meters) along the edge,
+     * that is the closest to the given reference point (anywhere on the map),
+     * using orthogonal projection on the current edge.
      *
-     * @param point the point P as an argument
-     * @return the position along the edge, in meters, that is closest to the given point
+     * @param point the point (Swisspoint) that is anywhere on the map
+     * @return the position (in meters) along the edge, that is the closest to the given point
      */
     public double positionClosestTo(PointCh point) {
         return Math2.projectionLength(fromPoint.e(), fromPoint.n(), toPoint.e(), toPoint.n(), point.e(), point.n());
     }
 
     /**
-     * Return the point at the given position on the edge, expressed in meters
+     * Return the point (Swisspoint) at the given position (in meters), on the edge.
      *
-     * @param position the given position
-     * @return the point at the given position on the edge, expressed in meters
+     * @param position the given position (in meters) on the edge
+     * @return the point at the given position on the edge.
      */
     public PointCh pointAt(double position) {
         return new PointCh(Math2.interpolate(fromPoint.e(), toPoint.e(), position / length),
@@ -54,7 +56,7 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
     }
 
     /**
-     * Return the altitude, in meters, at the given position on the ridge
+     * Return the altitude, in meters, at the given position (in meters), on the edge.
      *
      * @param position the given position
      * @return the altitude, in meters, at the given position on the ridge

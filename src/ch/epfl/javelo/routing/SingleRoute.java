@@ -28,7 +28,7 @@ public final class SingleRoute implements Route {
         Preconditions.checkArgument(!edges.isEmpty());
         this.edges = List.copyOf(edges);
         positionsTab = new double[edges.size()+1];
-        //must shift the entire tab right, for inserting position 0 at the first index.
+        //Must shift the entire tab right, for inserting position 0 at the first index.
 
         //first position set to .0 automatically
         for (int i = 1; i <= edges.size(); i++) {
@@ -50,7 +50,7 @@ public final class SingleRoute implements Route {
 
 
     /**
-     * Returns the length of the route, in meters
+     * Returns the length of the (simple) route, in meters
      *
      * @return
      */
@@ -114,7 +114,6 @@ public final class SingleRoute implements Route {
         double pos = Math2.clamp(0, position, length());
 
         int edgeId = edgeId(pos);
-        edgeId = (edgeId < edges.size()) ? edgeId : edgeId + 1;
 
         double positionOnEdge = pos - positionsTab[edgeId];
         Edge rightEdge = edges.get(edgeId);
@@ -181,9 +180,9 @@ public final class SingleRoute implements Route {
     private int edgeId(double pos) {
         int insertionPoint = Arrays.binarySearch(positionsTab, pos);
         int edgeIndex;
-        //might be exactly the edge -> Severance of cases
+        //might be exactly the edge's position -> Severance of cases
         edgeIndex = (insertionPoint < 0) ? -insertionPoint - 2 : insertionPoint;
-        //return edgeIndex;
+        //return edge's index;
         return (edgeIndex < edges.size()) ? edgeIndex : edgeIndex-1;
     }
 

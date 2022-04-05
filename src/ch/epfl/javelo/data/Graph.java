@@ -56,8 +56,8 @@ public final class Graph {
         LongBuffer attributesChannel = fileName(basePath, "attributes.bin").asLongBuffer();
         ByteBuffer edgesChannel = fileName(basePath, "edges.bin");
         ShortBuffer elevationsChannel = fileName(basePath, "elevations.bin").asShortBuffer();
-        IntBuffer nodesChannel = fileName(basePath, "nodes.bin").asIntBuffer();// graphNodes
-        IntBuffer nodesOsmidChannel = fileName(basePath, "nodes_osmid.bin").asIntBuffer(); // cet objet pour plus tard
+        IntBuffer nodesChannel = fileName(basePath, "nodes.bin").asIntBuffer();
+        IntBuffer nodesOsmidChannel = fileName(basePath, "nodes_osmid.bin").asIntBuffer();
         IntBuffer profileIdsChannel = fileName(basePath, "profile_ids.bin").asIntBuffer();
         ByteBuffer sectorsChannel = fileName(basePath, "sectors.bin");
 
@@ -67,7 +67,7 @@ public final class Graph {
         }
 
         return new Graph(new GraphNodes(nodesChannel), new GraphSectors(sectorsChannel),
-                new GraphEdges(edgesChannel, profileIdsChannel, elevationsChannel), attributeSets); //attributsSets  pas si simple xd
+                new GraphEdges(edgesChannel, profileIdsChannel, elevationsChannel), attributeSets);
 
 
     }
@@ -227,7 +227,5 @@ public final class Graph {
         return (edges.hasProfile(edgeId) ? Functions.sampled(edges.profileSamples(edgeId), edgeLength(edgeId)) :
                 Functions.constant(Double.NaN));
     }
-
-    //methodes pas encore utilisees : profileSamples et hasProfile de GraphEdges
-
+    
 }

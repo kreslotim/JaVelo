@@ -18,7 +18,6 @@ import java.util.List;
  */
 public final class MultiRoute implements Route {
     private final List<Route> segments;
-
     public MultiRoute(List<Route> segments) {
         Preconditions.checkArgument(!segments.isEmpty());
         this.segments = List.copyOf(segments);
@@ -98,12 +97,13 @@ public final class MultiRoute implements Route {
     public PointCh pointAt(double position) {
         double pos = Math2.clamp(0, position, length());
         double lengthTotal = 0;
-
         for (Route segment : segments) {
             if (pos <= lengthTotal + segment.length()) return segment.pointAt(pos - lengthTotal);
             lengthTotal += segment.length();
         }
-        return null; // Unreachable case, but must have a return statement
+        //Unreachable case for correct data -> should never be executed.
+        //However, if the condition is never satisfied, return result of the last position
+        return segments.get(segments.size()-1).pointAt(lengthTotal);
     }
 
     /**
@@ -117,12 +117,13 @@ public final class MultiRoute implements Route {
     public double elevationAt(double position) {
         double pos = Math2.clamp(0, position, length());
         double lengthTotal = 0;
-
         for (Route segment : segments) {
             if (pos <= lengthTotal + segment.length()) return segment.elevationAt(pos - lengthTotal);
             lengthTotal += segment.length();
         }
-        return 0; // Unreachable case, but must have a return statement
+        //Unreachable case for correct data -> should never be executed.
+        //However, if the condition is never satisfied, return result of the last position
+        return segments.get(segments.size()-1).elevationAt(lengthTotal);
     }
 
     /**
@@ -139,7 +140,9 @@ public final class MultiRoute implements Route {
             if (pos <= lengthTotal + segment.length()) return segment.nodeClosestTo(pos - lengthTotal);
             lengthTotal += segment.length();
         }
-        return 0; // Unreachable case, but must have a return statement
+        //Unreachable case for correct data -> should never be executed.
+        //However, if the condition is never satisfied, return result of the last position
+        return segments.get(segments.size()-1).nodeClosestTo(lengthTotal);
     }
 
     /**
@@ -152,7 +155,7 @@ public final class MultiRoute implements Route {
     public RoutePoint pointClosestTo(PointCh point) {
 
         RoutePoint currentRoutePoint;
-        RoutePoint nearestRoutePoint = RoutePoint.NONE; // may add segments.get(0).pointClosestTo();
+        RoutePoint nearestRoutePoint = segments.get(0).pointClosestTo(point); // Closest RoutePoint on first segment
         double lengthTotal = 0;
 
         for (Route segment : segments) {

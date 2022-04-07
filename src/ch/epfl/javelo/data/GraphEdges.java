@@ -21,16 +21,11 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     private static final int OFFSET_LENGTH = Integer.BYTES;
     private static final short OFFSET_ELEVATION_GAIN = OFFSET_LENGTH + Short.BYTES;
     private static final short OFFSET_OSM_ATTRIBUTES = OFFSET_ELEVATION_GAIN + Short.BYTES;
-
-    /* four kinds of profileType in the switch */
-
-    public enum ProfileType {NONEXISTENT_PROFILE, UNCOMPRESSED_PROFILE, COMPRESSED_PROFILE_Q0_4, COMPRESSED_PROFILE_Q4_4}
     private static final List<ProfileType> PROFILES = List.of(ProfileType.values());
-
 
     /**
      * Determines whether the edge with the given identity goes in the opposite direction of the OSM way,
-     * from where it comes from
+     * from where it comes from.
      *
      * @param edgeId Edge's Identity
      * @return true iff edgeId goes in the opposite direction of the OSM edge
@@ -76,7 +71,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * Determines whether the given identity edge has a profile
      *
      * @param edgeId Edge's Identity
-     * @return true iff the given identity edge has a profile
+     * @return a boolean value : true if and only if the given identity edge has a profile
      */
     public boolean hasProfile(int edgeId) {
         int slice = profileIds.get(edgeId);
@@ -84,20 +79,17 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     }
 
     /**
-     * Returns the array of samples of the profile of the given identity edge
+     * Returns the array of the given identity edge's profile's samples
      *
      * @param edgeId Edge's Identity
-     * @return the array of samples of the profile of the edge with the given identity, which is empty if the edge does
-     * not have a profile
+     * @return the edge profile samples array with the given identity
      */
     public float[] profileSamples(int edgeId) {
-
         int profileType = Bits.extractUnsigned(profileIds.get(edgeId), 30, 2);
         ProfileType type = PROFILES.get(profileType);
-
         int sampleNb = computeSampleNb(edgeId);
         int firstIndex = Bits.extractUnsigned(profileIds.get(edgeId), 0, 30);
-        float currentAltitude = 0; // initialize at 0 to prevent NullPointerException
+        float currentAltitude;
         float[] samples = new float[sampleNb];
 
         switch (type) {
@@ -119,8 +111,6 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
                             currentAltitude += Q28_4.asFloat(Bits.extractSigned(elevations.get(firstIndex + i),
                                     8 * j, 8));
                             samples[2 * i - j] = currentAltitude;
-
-
                         }
                     }
                 }
@@ -144,7 +134,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     }
 
     /**
-     * Computes the number of samples of the profile of the edge according to its length
+     * Computes the number of samples of the edge profile according to its length
      *
      * @param edgeId Edge's Identity
      * @return the number of samples
@@ -155,7 +145,8 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
     }
 
     /**
-     * Flips the order of elements of the given array
+     * Auxiliary (private) method that flips the order of elements inside given array of profile types,
+     * if the edge is inverted.
      *
      * @param sampleNb    the number of samples
      * @param profileType the array before flipping the order of elements
@@ -163,6 +154,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      */
     private float[] flip(int sampleNb, float[] profileType) {
         // to flip the array :
+
         for (int i = 0; i < sampleNb / 2; ++i) {
             float tmp = profileType[i];
             profileType[i] = profileType[profileType.length - i - 1];
@@ -170,20 +162,24 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         }
 
         float[] tabInverted = new float[profileType.length];
-        for (int i = 0; i < profileType.length; ++i) {
-            tabInverted[i] = profileType[i];
-        }
+        System.arraycopy(profileType, 0, tabInverted, 0, profileType.length);
         return tabInverted;
     }
 
     /**
-     * Returns the index of an attribute set attached to the given edge's ID
+     * Returns the index of an attribute set attached to the given edge's identity
      *
      * @param edgeId Edge's Identity
-     * @return the identity of the attribute set attached to the given edge's ID
+     * @return the identity of the attribute set attached to the given edge's identity
      */
     public int attributesIndex(int edgeId) {
         short s = edgesBuffer.getShort(edgeId * EDGE_PITCH + OFFSET_OSM_ATTRIBUTES);
         return Short.toUnsignedInt(s);
     }
+
+
+    /**
+     * Four profile types that can be used for the given edge's identity profile samples
+     */
+    private enum ProfileType {NONEXISTENT_PROFILE, UNCOMPRESSED_PROFILE, COMPRESSED_PROFILE_Q0_4, COMPRESSED_PROFILE_Q4_4}
 }

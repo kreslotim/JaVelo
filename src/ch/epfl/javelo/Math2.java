@@ -1,4 +1,5 @@
 package ch.epfl.javelo;
+
 /**
  * Math upgrade
  *
@@ -17,12 +18,12 @@ public final class Math2 {
      *
      * @param x numerator
      * @param y denominator
-     * @throws IllegalArgumentException if x or y negative, or y is null
      * @return (int) ceiling division of x by y
+     * @throws IllegalArgumentException if x or y negative, or y is null
      */
     public static int ceilDiv(int x, int y) {
-        Preconditions.checkArgument(!(x < 0 || y <= 0));     // Use Preconditions for IllegalExceptions
-        return (x+y-1)/y;
+        Preconditions.checkArgument(!(x < 0 || y <= 0));
+        return (x + y - 1) / y;
     }
 
     /**
@@ -30,11 +31,11 @@ public final class Math2 {
      *
      * @param y0 Vertical component of point 0
      * @param y1 Vertical component of point 1
-     * @param x Horizontal component of middle point
-     * @return y (double) coordinate positionned on the line (y1 - y0)*x + y0
+     * @param x  Horizontal component of middle point
+     * @return y (double) coordinate positioned on the line (y1 - y0)*x + y0
      */
     public static double interpolate(double y0, double y1, double x) {
-        return Math.fma((y1 - y0), x, y0); // Must be able to work with any x !
+        return Math.fma((y1 - y0), x, y0); // Work with any value of x
         // returns y * x + y0
     }
 
@@ -42,32 +43,30 @@ public final class Math2 {
      * clamp of value v
      *
      * @param min minimal value
-     * @param v value
+     * @param v   value
      * @param max maximal value
-     * @throws IllegalArgumentException if maximal value is smaller than minimal value
      * @return v (int) limited to bounds
+     * @throws IllegalArgumentException if maximal value is smaller than minimal value
      */
     public static int clamp(int min, int v, int max) {
         Preconditions.checkArgument(max > min);
-        if (v < min) return min;                    // Must stay on one single line !
-        if (v > max) return max;
-        else return v;
+        if (v < min) return min;
+        return Math.min(v, max);
     }
 
     /**
-     * clamp of value v
+     * Clamp of given value v
      *
      * @param min minimal value
-     * @param v value
+     * @param v   value
      * @param max maximal value
-     * @throws IllegalArgumentException if maximal value is smaller than minimal value
      * @return v (double) limited to bounds
+     * @throws IllegalArgumentException if maximal value is smaller than minimal value
      */
     public static double clamp(double min, double v, double max) {
         Preconditions.checkArgument(max > min);
-        if (v < min) return min;                    // Must stay on one single line !
-        if (v > max) return max;
-        else return v;
+        if (v < min) return min;
+        return Math.min(v, max);
     }
 
     /**
@@ -77,7 +76,7 @@ public final class Math2 {
      * @return (double) hyperbolic arcsine of x
      */
     public static double asinh(double x) {
-        return Math.log(x + Math.sqrt(1+x*x));
+        return Math.log(x + Math.sqrt(1 + x * x));
     }
 
     /**
@@ -90,7 +89,7 @@ public final class Math2 {
      * @return (double) dot product of U and V
      */
     public static double dotProduct(double uX, double uY, double vX, double vY) {
-        return uX*vX+uY*vY;
+        return uX * vX + uY * vY;
     }
 
     /**
@@ -101,7 +100,7 @@ public final class Math2 {
      * @return (double) squared norm of vector U
      */
     public static double squaredNorm(double uX, double uY) {
-        return uX*uX+uY*uY;
+        return uX * uX + uY * uY;
     }
 
     /**
@@ -112,7 +111,7 @@ public final class Math2 {
      * @return (double) norm of vector U
      */
     public static double norm(double uX, double uY) {
-        return Math.sqrt(squaredNorm(uX,uY));
+        return Math.sqrt(squaredNorm(uX, uY));
     }
 
     /**
@@ -127,14 +126,13 @@ public final class Math2 {
      * @return (double) length of projection of vector from A to P on vector from A to B
      */
     public static double projectionLength(double aX, double aY, double bX, double bY, double pX, double pY) {
-        double uX = (pX-aX);
-        double uY = (pY-aY);
-        double vX = (bX-aX);
-        double vY = (bY-aY);
+        double uX = (pX - aX);
+        double uY = (pY - aY);
+        double vX = (bX - aX);
+        double vY = (bY - aY);
 
-        return (uX*vX+uY*vY)/norm(vX,vY);
+        return (uX * vX + uY * vY) / norm(vX, vY);
     }
-
 
 
 }

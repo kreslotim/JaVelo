@@ -1,7 +1,6 @@
 package ch.epfl.javelo.data;
 
 import ch.epfl.javelo.Bits;
-import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.Q28_4;
 
 import java.nio.IntBuffer;
@@ -28,47 +27,51 @@ public record GraphNodes(IntBuffer buffer) {
         return (buffer.capacity()) / 3;
     }
 
+
     /**
-     * Returns the east coordinate of the given node
+     * Returns the east coordinate of the given node of the graph
      *
-     * @param nodeId Node's identity
-     * @return the E coordinate of the given identity node
+     * @param nodeId node's identity
+     * @return the E (east) coordinate of the given node's identity
      */
     public double nodeE(int nodeId) {
         return Q28_4.asDouble(buffer.get(nodeId * NODE_INTS + OFFSET_E));
     }
 
+
     /**
-     * Returns the north coordinate of the given node
+     * Returns the north coordinate of the given node of the graph
      *
-     * @param nodeId Node's identity
-     * @return the N coordinate of the given identity node
+     * @param nodeId node's identity
+     * @return the N (north) coordinate of the given node's identity
      */
     public double nodeN(int nodeId) {
         return Q28_4.asDouble(buffer.get(nodeId * NODE_INTS + OFFSET_N));
     }
 
+
     /**
-     * Returns the number of edges outgoing of the given node
+     * Returns the number of edges outgoing of the given node of the graph
      *
-     * @param nodeId Node's identity
-     * @return the number of edges exiting the given identity node
+     * @param nodeId node's identity
+     * @return the number of edges exiting the given node's identity
      */
     public int outDegree(int nodeId) {
         int slice = buffer.get(nodeId * NODE_INTS + OFFSET_OUT_EDGES);
         return Bits.extractUnsigned(slice, 28, 4);
     }
 
+
     /**
-     * Returns the identity of the edgeIndex-th edge that exits the given node
+     * Returns the identity of the edgeIndex-th edge that exits the given node's identity of the graph
      *
-     * @param nodeId Node's identity
-     * @param edgeIndex Edge's index
+     * @param nodeId    node's identity
+     * @param edgeIndex edge's index
      * @return the identity of the edgeIndex-th edge that exits the given node
      */
     public int edgeId(int nodeId, int edgeIndex) {
         assert 0 <= edgeIndex && edgeIndex < outDegree(nodeId);
-        int slice = buffer.get(nodeId*NODE_INTS + OFFSET_OUT_EDGES);
+        int slice = buffer.get(nodeId * NODE_INTS + OFFSET_OUT_EDGES);
         return Bits.extractUnsigned(slice, 0, 28) + edgeIndex;
     }
 }

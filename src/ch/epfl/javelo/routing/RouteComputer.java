@@ -13,7 +13,7 @@ public final class RouteComputer {
     /**
      * Default RouteComputer constructor
      *
-     * @param graph the whole JaVelo graph
+     * @param graph        the whole JaVelo graph
      * @param costFunction cost factor, for bike Routes.
      */
     public RouteComputer(Graph graph, CostFunction costFunction) {
@@ -24,16 +24,24 @@ public final class RouteComputer {
 
     /**
      * Returns the minimum total cost route from startNodeId to endNodeId,
-     * in the graph passed to the constructor, or null if no route exists.
-     * If the start and end node are the same, throws IllegalArgumentException.
+     * in the graph given to the constructor, or null if no route exists.
      *
      * @param startNodeId starting Node identity
-     * @param endNodeId ending Node identity
+     * @param endNodeId   ending Node identity
      * @return the ideal route between two given nodes
+     * @throws IllegalArgumentException if startNodeId and endNodeId are identical (no route exists)
+     * @throws NullPointerException     if the route couldn't be built with provided data
      */
     public Route bestRouteBetween(int startNodeId, int endNodeId) {
         Preconditions.checkArgument(startNodeId != endNodeId);
 
+        /*
+          Nested recorded class representing a node, which is compared to a given node,
+          by its distance to target node.
+
+          @param nodeId node's identity
+          @param distance between this and target node
+         */
         record WeightedNode(int nodeId, float distance)
                 implements Comparable<WeightedNode> {
             @Override
@@ -47,10 +55,10 @@ public final class RouteComputer {
         float[] distance = new float[graph.nodeCount()];
         int[] predecessor = new int[graph.nodeCount()];
 
-        int currentNode = 0; //index of the current Node
-        int edge = 0; //index of the current Edge
-        int nTemp = 0; // index of a temporary Node
-        double totalDistance = 0; // total distance through visited Nodes
+        int currentNode;      //index of the current Node
+        int edge;             //index of the current Edge
+        int nTemp;            // index of a temporary Node
+        double totalDistance; // total distance through visited Nodes
 
         Arrays.fill(distance, 0, distance.length, Float.POSITIVE_INFINITY);
         Arrays.fill(predecessor, 0, predecessor.length, 0);
@@ -58,8 +66,7 @@ public final class RouteComputer {
         distance[startNodeId] = 0f;
         Visiting.add(new WeightedNode(startNodeId, distance[startNodeId]));
 
-
-        while (!Visiting.isEmpty()) { // do currentNode = Visiting.remove while !Visiting.isEmpty() && distance[currentNode] == Float.NEGATIVE_INFINITY
+        while (!Visiting.isEmpty()) {
             currentNode = Visiting.remove().nodeId; // for which distance[N] is minimal
 
             if (currentNode == endNodeId) return computeRoute(startNodeId, endNodeId, predecessor);
@@ -69,17 +76,21 @@ public final class RouteComputer {
                     edge = graph.nodeOutEdgeId(currentNode, E); // considering current edge
                     nTemp = graph.edgeTargetNodeId(edge);
 
-                    totalDistance = distance[currentNode] + costFunction.costFactor(currentNode, edge) * graph.edgeLength(edge);
+                    totalDistance = distance[currentNode]
+                                  + costFunction.costFactor(currentNode, edge) * graph.edgeLength(edge);
 
                     if (totalDistance < distance[nTemp]) {
                         distance[nTemp] = (float) totalDistance;
                         predecessor[nTemp] = currentNode;
-                        Visiting.add(new WeightedNode(nTemp, distance[nTemp] + (float)graph.nodePoint(nTemp).distanceTo(graph.nodePoint(endNodeId))));
+                        Visiting.add(new WeightedNode(nTemp, distance[nTemp]
+                                + (float) graph.nodePoint(nTemp).distanceTo(graph.nodePoint(endNodeId))));
                     }
                 }
                 distance[currentNode] = Float.NEGATIVE_INFINITY;
             }
         }
+        //case reached only if the route couldn't be build with provided data
+        // -> should never be executed with correct data.
         return null;
     }
 
@@ -113,11 +124,12 @@ public final class RouteComputer {
             nodeId = predecessor[nodeId];
         }
 
-        Collections.reverse(edgesOfTheRoute); // The list contains inverted edges, in the reverse order
+        //The list contains inverted edges, in the reverse order -> order must be reversed for building path.
+        Collections.reverse(edgesOfTheRoute);
 
         SingleRoute finalRoute = new SingleRoute(edgesOfTheRoute);
-        System.out.println("Route's length: "+finalRoute.length()+" m");
-        System.out.println("Number of edges: "+edgesOfTheRoute.size());
+        System.out.println("Route's length: " + finalRoute.length() + " m");
+        System.out.println("Number of edges: " + edgesOfTheRoute.size());
         return finalRoute;
     }
 }

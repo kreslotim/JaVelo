@@ -18,6 +18,6 @@ public final class Preconditions {
      * @throws IllegalArgumentException if the argument is false
      */
     public static void checkArgument(boolean shouldBeTrue) {
-        if (!shouldBeTrue) throw new IllegalArgumentException("Illegal input");
+        if (!shouldBeTrue) throw new IllegalArgumentException();
     }
 }

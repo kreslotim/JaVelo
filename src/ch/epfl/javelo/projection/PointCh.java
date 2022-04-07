@@ -4,7 +4,7 @@ import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.Preconditions;
 
 /**
- * Recorded class that measures distance between two points in meters
+ * Recorded class that measures distance between two points (PointCh) in meters
  *
  * @author Tim Kreslo (310686)
  * @author Wei-En Hsieh (341271)
@@ -17,8 +17,9 @@ public record PointCh(double e, double n) {
      *
      * @param e East coordinate
      * @param n North coordinate
+     * @throws IllegalArgumentException if the given coordinates are outside Switzerland's bounds
      */
-    public PointCh { // compact constructor
+    public PointCh {
         Preconditions.checkArgument(SwissBounds.containsEN(e, n));
     }
 
@@ -61,6 +62,5 @@ public record PointCh(double e, double n) {
     public double lat() {
         return Ch1903.lat(e, n);
     }
-
 
 }

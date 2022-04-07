@@ -7,10 +7,11 @@ package ch.epfl.javelo.projection;
  */
 public final class SwissBounds {
     /**
-     * Default SwissBounds constructor
+     * Default (not instantiable) SwissBounds constructor
      */
     private SwissBounds() {}
 
+    /* Switzerland's bounds defined with swiss parameters E (east) & N (north) coordinates */
     public static final double MIN_E = 2485000;
     public static final double MAX_E = 2834000;
     public static final double MIN_N = 1075000;
@@ -19,7 +20,7 @@ public final class SwissBounds {
     public static final double HEIGHT = MAX_N - MIN_N;
 
     /**
-     * Checks if East and North coordinates are inside Switzerland
+     * Checks if E (east) and N (north) coordinates are inside Switzerland's bounds
      *
      * @param e East coordinate
      * @param n North coordinate

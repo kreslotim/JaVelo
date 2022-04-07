@@ -1,6 +1,5 @@
 package ch.epfl.javelo.routing;
 
-
 import ch.epfl.javelo.Functions;
 import ch.epfl.javelo.Preconditions;
 
@@ -15,9 +14,8 @@ import java.util.function.DoubleUnaryOperator;
  */
 public final class ElevationProfile {
     private final double length;
-    private final float[] elevationSamples;
     private final double minElevation;
-    private final double maxElevation; // total ascent decent
+    private final double maxElevation;
     private final double totalAscent;
     private final double totalDescent;
     private final DoubleUnaryOperator profile;
@@ -28,25 +26,24 @@ public final class ElevationProfile {
      *
      * @param length           length in meters
      * @param elevationSamples the elevation samples, evenly distributed along the route, are contained in
-     *                         elevationSamples
-     * @throws IllegalArgumentException ((length <= 0) || (elevationSamples.length < 2))
+     *                         the elevation samples elevationSamples
+     * @throws IllegalArgumentException if the length (in meters) is less or equal to 0
+     *                                  or the length of the the elevation samples is strictly less than 2
      */
     public ElevationProfile(double length, float[] elevationSamples) {
         Preconditions.checkArgument((length > 0) && (elevationSamples.length >= 2));
 
         this.length = length;
-        this.elevationSamples = elevationSamples;
 
         DoubleSummaryStatistics s = new DoubleSummaryStatistics();
         for (float elevationSample : elevationSamples) {
             s.accept(elevationSample);
         }
         minElevation = s.getMin();
-        maxElevation = s.getMax(); //initialize in the constructor
+        maxElevation = s.getMax();
 
         double tmpTotalAscent = 0.0;
         double tmpTotalDescent = 0.0;
-
         for (int i = 1; i < elevationSamples.length; ++i) {// elevationSamples = 0 1 2 3 4 length = 5
             if (elevationSamples[i] > elevationSamples[i - 1]) {
                 tmpTotalAscent += (elevationSamples[i] - elevationSamples[i - 1]);
@@ -56,21 +53,13 @@ public final class ElevationProfile {
         }
         totalAscent = tmpTotalAscent;
         totalDescent = tmpTotalDescent;
-        // Explication : https://piazza.com/class/kzifjghz6po4se?cid=405
-        // 10 20 30 => totalAscent = 20 car de 10 à 20, j'ai +10, et de 20 à 30, j'ai +10. Donc
-        // 10 20 30 => totalDescent = 0
-        // 30 20 40 => totalAscent = 20 car 40-20 = 20
-        // 30 20 40 => totalDescent = 10 car valeur absolue (20 - 30) = 10
 
         profile = Functions.sampled(elevationSamples, length());
-
     }
 
 
-    // les methodes publiques :
-
     /**
-     * Return the profile length (in meters)
+     * Return the profile length along the whole profile (in meters)
      *
      * @return the profile length (in meters)
      */
@@ -78,28 +67,52 @@ public final class ElevationProfile {
         return length;
     }
 
+    /**
+     * Return the minimum altitude of the profile along the whole profile (in meters)
+     *
+     * @return the minimum altitude of the profile, in meters
+     */
     public double minElevation() {
         return minElevation;
     }
 
+    /**
+     * Return the maximum altitude of the profile along the whole profile (in meters)
+     *
+     * @return the maximum altitude of the profile, in meters
+     */
     public double maxElevation() {
         return maxElevation;
     }
 
+    /**
+     * Return the total elevation gain of the profile along the whole profile (in meters)
+     *
+     * @return the total elevation gain of the profile
+     */
     public double totalAscent() {
         return totalAscent;
     }
 
+    /**
+     * Return the total elevation loss of the profile along the whole profile (in meters)
+     *
+     * @return the total elevation loss of the profile
+     */
     public double totalDescent() {
         return totalDescent;
     }
 
     /**
-     * @param position
-     * @return profile altitude at the given position
+     * Returns the altitude of the profile at the given position,
+     * which is not necessarily between 0 and the length of the profile;
+     * the first sample is returned when the position is negative, the last when it is greater than the length
+     *
+     * @param position the given position on the route
+     * @return the profile's altitude at the given position
      */
     public double elevationAt(double position) {
-        return profile.applyAsDouble(position);// return the corresponding y
+        return profile.applyAsDouble(position);
     }
 
 }

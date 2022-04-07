@@ -1,6 +1,5 @@
 package ch.epfl.javelo.data;
 
-
 import ch.epfl.javelo.Functions;
 import ch.epfl.javelo.projection.PointCh;
 
@@ -28,35 +27,35 @@ public final class Graph {
     private final GraphEdges edges;
     private final List<AttributeSet> attributeSets;
 
+
     /**
      * Default Graph constructor
      *
-     * @param nodes
-     * @param sectors
-     * @param edges
-     * @param attributeSets
+     * @param nodes         the graph nodes
+     * @param sectors       the graph sectors
+     * @param edges         the graph edges
+     * @param attributeSets the graph's attribute sets
      */
     public Graph(GraphNodes nodes, GraphSectors sectors, GraphEdges edges, List<AttributeSet> attributeSets) {
         this.nodes = nodes;
         this.sectors = sectors;
         this.edges = edges;
         this.attributeSets = List.copyOf(attributeSets);
-
     }
 
 
     /**
-     * Returns Javelo Graph, given through basePath
+     * Returns Javelo graph (Graph), obtained from the files located in the given directory
      *
-     * @param basePath
-     * @return Javelo Graph
+     * @param  basePath path to given directory (Path)
+     * @return Javelo graph (Graph)
      * @throws IOException if the expected file does not exist
      */
-    public static Graph loadFrom(Path basePath) throws IOException { // basePath = fichier lausanne
+    public static Graph loadFrom(Path basePath) throws IOException { // basePath = file lausanne
         LongBuffer attributesChannel = fileName(basePath, "attributes.bin").asLongBuffer();
         ByteBuffer edgesChannel = fileName(basePath, "edges.bin");
         ShortBuffer elevationsChannel = fileName(basePath, "elevations.bin").asShortBuffer();
-        IntBuffer nodesChannel = fileName(basePath, "nodes.bin").asIntBuffer();
+        IntBuffer nodesChannel = fileName(basePath, "nodes.bin").asIntBuffer();// from graphNodes
         IntBuffer nodesOsmidChannel = fileName(basePath, "nodes_osmid.bin").asIntBuffer();
         IntBuffer profileIdsChannel = fileName(basePath, "profile_ids.bin").asIntBuffer();
         ByteBuffer sectorsChannel = fileName(basePath, "sectors.bin");
@@ -65,24 +64,26 @@ public final class Graph {
         for (int i = 0; i < attributesChannel.capacity(); ++i) {
             attributeSets.add(new AttributeSet(attributesChannel.get(i)));
         }
-
         return new Graph(new GraphNodes(nodesChannel), new GraphSectors(sectorsChannel),
                 new GraphEdges(edgesChannel, profileIdsChannel, elevationsChannel), attributeSets);
-
-
     }
 
 
     /**
-     * cree une methode pour eviter la repetition
+     * Auxiliary (private) method that opens the given fileName,
+     * gets the path to the file containing the nodes,
+     * and creates a buffer (ByteBuffer) with the needed information.
      *
-     * @return
-     */// je peux convertir Filechannel en intBuffer, floatB,
-    private static ByteBuffer fileName(Path basePath, String file) throws IOException {// static pour dire que j'utilise rien de la classe
+     * @param basePath (Path) path to given file
+     * @param fileName (String) name of the file to load from
+     * @return buffer (ByteBuffer) containing the nodes
+     * @throws IOException if the expected file does not exist
+     */
+    private static ByteBuffer fileName(Path basePath, String fileName) throws IOException {
         // open the file :
-        try (FileChannel nodesChannel = FileChannel.open(basePath.resolve(file))) {
+        try (FileChannel nodesChannel = FileChannel.open(basePath.resolve(fileName))) {
             return nodesChannel.map(FileChannel.MapMode.READ_ONLY, 0, nodesChannel.size());
-        } // pas besoin de catch car a throws ... deja
+        }
     }
 
 
@@ -97,9 +98,10 @@ public final class Graph {
 
 
     /**
-     * Returns point (Swiss point) of a given node
-     * @param nodeId
-     * @return given node's position
+     * Returns the point (PointCh) of a given node
+     *
+     * @param nodeId node's identity
+     * @return point (PointCh) at the node's position
      */
     public PointCh nodePoint(int nodeId) {
         return new PointCh(nodes.nodeE(nodeId), nodes.nodeN(nodeId));
@@ -107,10 +109,10 @@ public final class Graph {
 
 
     /**
-     * Returns the number of outgoing edges, out of the given node
+     * Returns the number of outgoing edges, out of the given node's identity
      *
-     * @param nodeId
-     * @return
+     * @param nodeId node's identity
+     * @return number of outgoing edges
      */
     public int nodeOutDegree(int nodeId) {
         return nodes.outDegree(nodeId);
@@ -120,8 +122,8 @@ public final class Graph {
     /**
      * Returns the identity of the edgeIndex-th edge that leaves the given node
      *
-     * @param nodeId
-     * @param edgeIndex
+     * @param nodeId node's identity
+     * @param edgeIndex edge's index
      * @return the identity of the edgeIndex-th edge that leaves the given node
      */
     public int nodeOutEdgeId(int nodeId, int edgeIndex) {
@@ -130,11 +132,11 @@ public final class Graph {
 
 
     /**
-     * Returns closest node (nodeId) to the given Swiss point
+     * Returns closest node's identity (nodeId) to the given point (PointCh), anywhere on the map.
      *
-     * @param point
-     * @param searchDistance
-     * @return
+     * @param point (PointCh) anywhere on the map
+     * @param searchDistance distance to search around
+     * @return closest node's identity
      */
     public int nodeClosestTo(PointCh point, double searchDistance) {
 
@@ -151,7 +153,7 @@ public final class Graph {
 
                 actualDistance = point.squaredDistanceTo(targetPoint);
 
-                if (actualDistance < minDistance && actualDistance <= Math.pow(searchDistance,2)) {
+                if (actualDistance < minDistance && actualDistance <= Math.pow(searchDistance, 2)) {
                     minDistance = actualDistance;
                     nearestNodeId = nodeId;
                 }
@@ -163,9 +165,9 @@ public final class Graph {
 
 
     /**
-     * Returns target node's ID, of the given edge
+     * Returns node's identity, which is at the end of the given edge
      *
-     * @param edgeId
+     * @param edgeId edge's identity
      * @return target node's ID, of the given edge
      */
     public int edgeTargetNodeId(int edgeId) {
@@ -176,7 +178,7 @@ public final class Graph {
     /**
      * Returns true if the given edge goes in the opposite direction of the OSM way, from where it comes
      *
-     * @param edgeId
+     * @param edgeId edge's identity
      * @return (boolean) true if the given edge goes in the opposite direction of the OSM way
      */
     public boolean edgeIsInverted(int edgeId) {
@@ -185,10 +187,10 @@ public final class Graph {
 
 
     /**
-     * Return the set of OSM attributes attached to the given identity edge
+     * Return the set of OSM attributes attached to the given edge's identity
      *
-     * @param edgeId Edge's Identity
-     * @return the set(aka the list) of OSM attributes attached to the given identity edge
+     * @param edgeId edge's Identity
+     * @return the set (aka the list) of OSM attributes attached to the given identity edge
      */
     public AttributeSet edgeAttributes(int edgeId) {
         return attributeSets.get(edges.attributesIndex(edgeId));
@@ -196,9 +198,9 @@ public final class Graph {
 
 
     /**
-     * Return the length, in meters, of the given identity edge
+     * Return the length, in meters, of the given edge's identity
      *
-     * @param edgeId Edge's Identity
+     * @param edgeId edge's identity
      * @return the length (in meters) of the given identity edge
      */
     public double edgeLength(int edgeId) {
@@ -207,10 +209,10 @@ public final class Graph {
 
 
     /**
-     * Return the positive elevation, in meters, of the edge with the given identity
+     * Return the positive elevation gain (in meters) of the edge with the given identity
      *
-     * @param edgeId Edge's Identity
-     * @return the elevation gain, in meters, of the edge with the given identity
+     * @param edgeId edge's identity
+     * @return the elevation gain of the edge
      */
     public double edgeElevationGain(int edgeId) {
         return edges.elevationGain(edgeId);
@@ -218,14 +220,13 @@ public final class Graph {
 
 
     /**
-     * Return  the profile along the given identity edge, as a function
+     * Return the profile along the given edge's identity, as a function
      *
-     * @param edgeId Edge's Identity
-     * @return
+     * @param edgeId edge's identity
+     * @return the profile along the given edge
      */
     public DoubleUnaryOperator edgeProfile(int edgeId) {
         return (edges.hasProfile(edgeId) ? Functions.sampled(edges.profileSamples(edgeId), edgeLength(edgeId)) :
                 Functions.constant(Double.NaN));
     }
-    
 }

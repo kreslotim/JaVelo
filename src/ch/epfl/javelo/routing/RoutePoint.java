@@ -4,15 +4,13 @@ package ch.epfl.javelo.routing;
 import ch.epfl.javelo.projection.PointCh;
 
 /**
- * Recorded class representing a point on a route, that is the closest to a given reference point, near the route.
+ * Recorded class representing a point on the route, that is the closest to a given reference point (near the route).
  *
  * @author Timofey Kreslo (310686)
  * @author Wei-En Hsieh (341271)
  */
 public record RoutePoint(PointCh point, double position, double distanceToReference) {
-    /**
-     * point, position are a point on the Route
-     */
+    /* point and position are a chosen on the Route */
 
     /**
      * Non-existent point on a route
@@ -30,7 +28,7 @@ public record RoutePoint(PointCh point, double position, double distanceToRefere
     }
 
     /**
-     * Returns the nearest (with minimal distance) RoutePoint to the reference point
+     * Returns the nearest (with minimal distance to reference) RoutePoint to the reference point
      *
      * @param that another point on the route
      * @return the nearest RoutePoint to the reference
@@ -42,12 +40,12 @@ public record RoutePoint(PointCh point, double position, double distanceToRefere
 
     /**
      * Overload of the previous min() method, that returns the route point
-     * of the minimal distance to the reference point
+     * with the minimal distance to the reference point
      *
      * @param thatPoint another point on the route
      * @param thatPosition another's route point's position
      * @param thatDistanceToReference another route point's distance to reference
-     * @return the nearest (with minimal distance) RoutePoint to the reference point
+     * @return the nearest (with minimal distance to reference) RoutePoint to the reference point
      */
     public RoutePoint min(PointCh thatPoint, double thatPosition, double thatDistanceToReference) {
         return (distanceToReference <= thatDistanceToReference) ?

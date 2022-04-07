@@ -3,7 +3,6 @@ package ch.epfl.javelo.routing;
 import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.projection.PointCh;
-import ch.epfl.javelo.projection.SwissBounds;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +17,13 @@ import java.util.List;
  */
 public final class MultiRoute implements Route {
     private final List<Route> segments;
+
+    /**
+     * Default MultiRoute constructor
+     *
+     * @param segments list of routes (either SingleRoute or MultiRoute)
+     * @throws IllegalArgumentException if the list of segments is empty
+     */
     public MultiRoute(List<Route> segments) {
         Preconditions.checkArgument(!segments.isEmpty());
         this.segments = List.copyOf(segments);
@@ -76,19 +82,21 @@ public final class MultiRoute implements Route {
     @Override
     public List<PointCh> points() {
         List<PointCh> allPointsOnRoute = new ArrayList<>();
+
         for (Route segment : segments) {
             allPointsOnRoute.addAll(segment.points());
-            allPointsOnRoute.remove(allPointsOnRoute.size()-1);
+            allPointsOnRoute.remove(allPointsOnRoute.size() - 1);
         }
-        Route lastRoute = segments.get(segments.size()-1);
-        Edge lastEdge = lastRoute.edges().get(lastRoute.edges().size()-1);
+
+        Route lastRoute = segments.get(segments.size() - 1);
+        Edge lastEdge = lastRoute.edges().get(lastRoute.edges().size() - 1);
         PointCh lastPoint = lastEdge.toPoint();
         allPointsOnRoute.add(lastPoint);
         return allPointsOnRoute;
     }
 
     /**
-     * Returns the point (Swiss point) at the given position along the entire route
+     * Returns the point (PointCh) at the given position along the entire route
      *
      * @param position on the entire route (in meters)
      * @return the point at the given position, along the entire route
@@ -97,13 +105,14 @@ public final class MultiRoute implements Route {
     public PointCh pointAt(double position) {
         double pos = Math2.clamp(0, position, length());
         double lengthTotal = 0;
+
         for (Route segment : segments) {
             if (pos <= lengthTotal + segment.length()) return segment.pointAt(pos - lengthTotal);
             lengthTotal += segment.length();
         }
         //Unreachable case for correct data -> should never be executed.
         //However, if the condition is never satisfied, return result of the last position
-        return segments.get(segments.size()-1).pointAt(lengthTotal);
+        return segments.get(segments.size() - 1).pointAt(lengthTotal);
     }
 
     /**
@@ -123,7 +132,7 @@ public final class MultiRoute implements Route {
         }
         //Unreachable case for correct data -> should never be executed.
         //However, if the condition is never satisfied, return result of the last position
-        return segments.get(segments.size()-1).elevationAt(lengthTotal);
+        return segments.get(segments.size() - 1).elevationAt(lengthTotal);
     }
 
     /**
@@ -142,11 +151,11 @@ public final class MultiRoute implements Route {
         }
         //Unreachable case for correct data -> should never be executed.
         //However, if the condition is never satisfied, return result of the last position
-        return segments.get(segments.size()-1).nodeClosestTo(lengthTotal);
+        return segments.get(segments.size() - 1).nodeClosestTo(lengthTotal);
     }
 
     /**
-     * Returns the point on the route (a RoutePoint), that is the closest to the given reference point
+     * Returns the point on the route (RoutePoint), that is the closest to the given reference point
      *
      * @param point a reference point with Swiss coordinates (anywhere on the map)
      * @return the closest point on the route, to the given reference point

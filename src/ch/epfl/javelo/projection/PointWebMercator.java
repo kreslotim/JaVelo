@@ -14,8 +14,9 @@ public record PointWebMercator(double x, double y) {
      *
      * @param x Horizontal component X of a point (must be between 0 & 1)
      * @param y Vertical component Y of a point (must be between 0 & 1)
+     * @throws IllegalArgumentException if given components x & y are not valid (not between 0 & 1)
      */
-    public PointWebMercator { // compact constructor
+    public PointWebMercator {
         Preconditions.checkArgument(x >= 0 && x <= 1 && y >= 0 && y <= 1);
     }
 
@@ -68,9 +69,9 @@ public record PointWebMercator(double x, double y) {
 
 
     /**
-     * Returns longitude (in Radians) of this point
+     * Returns longitude (in radians) of this point's horizontal component
      *
-     * @return longitude (in Radians) of this point
+     * @return longitude of this point
      */
     public double lon() {
         return WebMercator.lon(x);
@@ -78,9 +79,9 @@ public record PointWebMercator(double x, double y) {
 
 
     /**
-     * Returns latitude (in Radians) of this point
+     * Returns latitude (in radians) of this point's vertical component
      *
-     * @return latitude (in Radians) of this point
+     * @return latitude of this point
      */
     public double lat() { // mm idee
         return WebMercator.lat(y);
@@ -88,9 +89,10 @@ public record PointWebMercator(double x, double y) {
 
 
     /**
-     * Returns a point in Swiss earth's parameters (East & North), positioned at the same location that this point.
+     * Returns a point (PointCh) in Swiss earth's parameters (East & North),
+     * positioned at the same location that this point.
      *
-     * @return a point in Swiss earth's parameters (East & North), positioned at the same location that this point.
+     * @return a point located at the same location that this point
      */
     public PointCh toPointCh() {
         return (SwissBounds.containsEN(Ch1903.e(lon(), lat()), Ch1903.n(lon(), lat())) ?

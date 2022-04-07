@@ -10,9 +10,9 @@ import ch.epfl.javelo.Math2;
 public final class WebMercator {
 
     /**
-     * Converts longitude (given in Radians) to horizontal component x, of a Point
+     * Converts longitude (given in radians) to horizontal component x, of a point
      *
-     * @param lon longitude (given in Radians)
+     * @param lon longitude (given in radians)
      * @return coordinate X (between 0 & 1)
      */
     public static double x(double lon) {
@@ -20,7 +20,7 @@ public final class WebMercator {
     }
 
     /**
-     * Converts latitude (given in Radians) to vertical component y, of a point
+     * Converts latitude (given in radians) to vertical component y, of a point
      *
      * @param lat (latitude) (given in Radians)
      * @return coordinate Y (between 0 & 1)
@@ -32,8 +32,8 @@ public final class WebMercator {
     /**
      * Converts the horizontal component X of a Web Mercator point, to longitude
      *
-     * @param x (Projection X of a Web Mercator point)
-     * @return longitude (given in Radians)
+     * @param x projection X of a Web Mercator point
+     * @return longitude (given in radians)
      */
     public static double lon(double x) {
         return ((2 * Math.PI * x) - Math.PI);
@@ -42,8 +42,8 @@ public final class WebMercator {
     /**
      * Converts the vertical component Y of a Web Mercator point, to latitude
      *
-     * @param y ()Projection Y of a Web Mercator point
-     * @return latitude (given in Radians)
+     * @param y projection Y of a Web Mercator point
+     * @return latitude (given in radians)
      */
     public static double lat(double y) {
         return (Math.atan(Math.sinh(Math.PI - 2 * Math.PI * y)));

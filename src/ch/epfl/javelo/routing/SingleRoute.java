@@ -1,6 +1,5 @@
 package ch.epfl.javelo.routing;
 
-
 import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.Preconditions;
 import ch.epfl.javelo.projection.PointCh;
@@ -23,16 +22,19 @@ public final class SingleRoute implements Route {
 
     /**
      * Default SingleRoute constructor
+     *
+     * @param edges list of edges
+     * @throws IllegalArgumentException if the list of edges is empty
      */
     public SingleRoute(List<Edge> edges) {
         Preconditions.checkArgument(!edges.isEmpty());
         this.edges = List.copyOf(edges);
-        positionsTab = new double[edges.size()+1];
+        positionsTab = new double[edges.size() + 1];
         //Must shift the entire tab right, for inserting position 0 at the first index.
 
         //first position set to .0 automatically
         for (int i = 1; i <= edges.size(); i++) {
-            positionsTab[i] = positionsTab[i-1] + edges.get(i-1).length();
+            positionsTab[i] = positionsTab[i - 1] + edges.get(i - 1).length();
         }
     }
 
@@ -52,11 +54,12 @@ public final class SingleRoute implements Route {
     /**
      * Returns the length of the (simple) route, in meters
      *
-     * @return
+     * @return (simple) route's length
      */
     @Override
     public double length() {
         double lenghtOfEdge = 0;
+
         for (Edge edge : edges) lenghtOfEdge += edge.length();
         return lenghtOfEdge;
     }
@@ -68,7 +71,9 @@ public final class SingleRoute implements Route {
      * @return all edges of the route
      */
     @Override
-    public List<Edge> edges() { return edges;}
+    public List<Edge> edges() {
+        return edges;
+    }
 
 
     /**
@@ -79,13 +84,15 @@ public final class SingleRoute implements Route {
     @Override
     public List<PointCh> points() {
         List<PointCh> pointChList = new ArrayList<>();
+
         for (Edge edge : edges) pointChList.add(edge.fromPoint());
-        pointChList.add(edges.get(edges.size()-1).toPoint());
+        pointChList.add(edges.get(edges.size() - 1).toPoint());
         return pointChList;
     }
 
+
     /**
-     * Returns the point (Swiss point) at the given position along the (simple) route
+     * Returns the point (PointCh) at the given position along the (simple) route
      *
      * @param position on the route (in meters)
      * @return the point at the given position
@@ -120,6 +127,7 @@ public final class SingleRoute implements Route {
         return rightEdge.elevationAt(positionOnEdge);
     }
 
+
     /**
      * Returns the identity of the node that belongs to the route and is the closest to the given position
      *
@@ -134,7 +142,7 @@ public final class SingleRoute implements Route {
 
         double positionOnEdge = pos - positionsTab[edgeId];
         Edge rightEdge = edges.get(edgeId);
-        return (positionOnEdge <= rightEdge.length()/2.) ? rightEdge.fromNodeId() : rightEdge.toNodeId();
+        return (positionOnEdge <= rightEdge.length() / 2.) ? rightEdge.fromNodeId() : rightEdge.toNodeId();
     }
 
 
@@ -156,7 +164,7 @@ public final class SingleRoute implements Route {
         for (int i = 0; i < edges.size(); i++) {
 
             posClosestToPoint = Math2.clamp(0, edges.get(i).positionClosestTo(point), edges.get(i).length());
-            PointCh pointOnEdgeTemp =  edges.get(i).pointAt(posClosestToPoint);
+            PointCh pointOnEdgeTemp = edges.get(i).pointAt(posClosestToPoint);
             distanceToReference = pointOnEdgeTemp.distanceTo(point);
 
             if (distanceToReference <= minDistance) { //minimizing distance to reference
@@ -170,12 +178,13 @@ public final class SingleRoute implements Route {
         return nearestRoutePoint;
     }
 
+
     /**
      * Auxiliary (private) method, that computes (using binary search) the index of the edge,
      * to be searched in the array of positions.
      *
      * @param pos position clamped between 0 and the length of the (simple) route
-     * @return index of the edge, to be searched in the array
+     * @return index of the edge, to be searched in the positions array
      */
     private int edgeId(double pos) {
         int insertionPoint = Arrays.binarySearch(positionsTab, pos);
@@ -183,7 +192,7 @@ public final class SingleRoute implements Route {
         //might be exactly the edge's position -> Severance of cases
         edgeIndex = (insertionPoint < 0) ? -insertionPoint - 2 : insertionPoint;
         //return edge's index;
-        return (edgeIndex < edges.size()) ? edgeIndex : edgeIndex-1;
+        return (edgeIndex < edges.size()) ? edgeIndex : edgeIndex - 1;
     }
 
 }

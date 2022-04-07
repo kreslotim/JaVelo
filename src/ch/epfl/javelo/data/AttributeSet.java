@@ -13,9 +13,11 @@ public record AttributeSet(long bits) {
 
     /**
      * Compact AttributeSet constructor
+     *
      * @param bits represents content of a set of values, using one bit per possible value
+     * @throws IllegalArgumentException if last 2 bits carry some information
      */
-    public AttributeSet { // compact constructor
+    public AttributeSet {
         // The collection has 62 elements. Therefore, there cannot exist any values, corresponding to the last 2 bits
         Preconditions.checkArgument(bits >> 62 == 0b0);
     }

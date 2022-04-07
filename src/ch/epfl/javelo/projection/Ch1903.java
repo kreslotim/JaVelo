@@ -20,14 +20,13 @@ public final class Ch1903 {
      */
     public static double e(double lon, double lat) {
         double lambda1 = 0.0001 * (3600 * Math.toDegrees(lon) - 26782.5);
-        double phi1 = 0.0001 * (3600 * Math.toDegrees(lat) - 169028.66);  // Find a way to avoid attributes's duplicate
+        double phi1 = 0.0001 * (3600 * Math.toDegrees(lat) - 169028.66);
 
         return 2600072.37
                 + 211455.93 * lambda1
                 - 10938.51 * lambda1 * phi1
                 - 0.36 * lambda1 * phi1*phi1
                 - 44.54 * lambda1*lambda1*lambda1;
-
     }
 
     /**

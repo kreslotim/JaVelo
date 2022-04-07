@@ -14,10 +14,10 @@ public final class Functions {
     private Functions() {}
 
     /**
-     * Constant function
+     * Constant function that returns always a constant value y
      *
      * @param y constant value
-     * @return constant value y
+     * @return constant value y (always)
      */
     public static DoubleUnaryOperator constant(double y) {
         return new Constant(y);
@@ -25,10 +25,12 @@ public final class Functions {
 
     /**
      * Function obtained by linear interpolation between samples, separated by constant intervals, from 0 to xMax
-     * @throws IllegalArgumentException (samples.length < 2 || xMax <= 0)
-     * @param samples
-     * @param xMax
-     * @return
+     *
+     * @param samples array (collection) of elevations
+     * @param xMax maximal interval between samples
+     * @return sampled function of elevations
+     * @throws IllegalArgumentException if the array of sample has less than 2 elements,
+     * or if the interval has no length (xMax is negative or null)
      */
     public static DoubleUnaryOperator sampled(float[] samples, double xMax) {
         Preconditions.checkArgument(samples.length >= 2 && xMax > 0);

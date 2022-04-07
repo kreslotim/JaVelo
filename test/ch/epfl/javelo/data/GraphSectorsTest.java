@@ -1,236 +1,148 @@
 package ch.epfl.javelo.data;
 
 import ch.epfl.javelo.projection.PointCh;
-import ch.epfl.javelo.projection.SwissBounds;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.awt.*;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Comparator;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GraphSectorsTest {
+    private static final double SWISS_MIN_E = 2_485_000;
+    private static final double SWISS_MIN_N = 1_075_000;
+    private static final double SWISS_WIDTH = 349_000;
+    private static final double SWISS_HEIGHT = 221_000;
 
+    private static final int SUBDIVISIONS_PER_SIDE = 128;
+    private static final int SECTORS_COUNT = SUBDIVISIONS_PER_SIDE * SUBDIVISIONS_PER_SIDE;
+    private static final double SECTOR_WIDTH = SWISS_WIDTH / SUBDIVISIONS_PER_SIDE;
+    private static final double SECTOR_HEIGHT = SWISS_HEIGHT / SUBDIVISIONS_PER_SIDE;
+
+    private static final ByteBuffer SECTORS_BUFFER = createSectorsBuffer();
+
+    private static ByteBuffer createSectorsBuffer() {
+        ByteBuffer sectorsBuffer = ByteBuffer.allocate(SECTORS_COUNT * (Integer.BYTES + Short.BYTES));
+        for (int i = 0; i < SECTORS_COUNT; i += 1) {
+            sectorsBuffer.putInt(i);
+            sectorsBuffer.putShort((short) 1);
+        }
+        assert !sectorsBuffer.hasRemaining();
+        return sectorsBuffer.rewind().asReadOnlyBuffer();
+    }
 
     @Test
-    void GraphSectorWorksNormally(){
-        byte[] bufferId = new byte[128*128*6];
-        for (int i = 0; i<bufferId.length;++i){
-            bufferId[i]=(byte)i;
+    void graphSectorsSectorsInAreaWorksForSingleSector() {
+        var graphSectors = new GraphSectors(SECTORS_BUFFER);
+        for (int i = 0; i < SECTORS_COUNT; i += 1) {
+            var x = i % SUBDIVISIONS_PER_SIDE;
+            var y = i / SUBDIVISIONS_PER_SIDE;
+            var e = SWISS_MIN_E + (x + 0.5) * SECTOR_WIDTH;
+            var n = SWISS_MIN_N + (y + 0.5) * SECTOR_HEIGHT;
+            var sectors = graphSectors.sectorsInArea(new PointCh(e, n), 0.49 * SECTOR_HEIGHT);
+            assertEquals(List.of(new GraphSectors.Sector(i, i + 1)), sectors);
         }
+    }
 
-        ByteBuffer buffer = ByteBuffer.wrap(bufferId);
-        PointCh point = new PointCh(SwissBounds.MIN_E,SwissBounds.MIN_N);
-        GraphSectors sectors1 = new GraphSectors(buffer);
-        List<GraphSectors.Sector> expected1= new ArrayList<>();
-        expected1.add(new GraphSectors.Sector(buffer.getInt(0),buffer.getShort(4)+buffer.getInt(0)));
-        assertArrayEquals(expected1.toArray(),sectors1.sectorsInArea(point,1).toArray());
+    @Test
+    void graphSectorsSectorsInAreaWorksFor4NeighbouringSectors() {
+        var graphSectors = new GraphSectors(SECTORS_BUFFER);
+        for (int x = 1; x <= SUBDIVISIONS_PER_SIDE - 1; x += 1) {
+            for (int y = 1; y <= SUBDIVISIONS_PER_SIDE - 1; y += 1) {
+                var e = SWISS_MIN_E + x * SECTOR_WIDTH;
+                var n = SWISS_MIN_N + y * SECTOR_HEIGHT;
+                var p = new PointCh(e, n);
+                var sectors = graphSectors.sectorsInArea(p, SECTOR_HEIGHT / 2.0);
+                sectors.sort(Comparator.comparingInt(GraphSectors.Sector::startNodeId));
 
-        List<GraphSectors.Sector> expected2= new ArrayList<>();
-        GraphSectors sectors2 = new GraphSectors(buffer);
-        expected2.add(new GraphSectors.Sector(buffer.getInt(0),buffer.getShort(4)+buffer.getInt(0)));
-        expected2.add(new GraphSectors.Sector(buffer.getInt(6),buffer.getShort(10)+buffer.getInt(6)));
-        expected2.add(new GraphSectors.Sector(buffer.getInt(128*6),buffer.getShort(128*6+4)+buffer.getInt(128*6)));
-        expected2.add(new GraphSectors.Sector(buffer.getInt(129*6),buffer.getShort(129*6+4)+buffer.getInt(129*6)));
-        assertArrayEquals(expected2.toArray(), sectors2.sectorsInArea(point,2800).toArray());
+                var i1 = sectorIndex(x - 1, y - 1);
+                var i2 = sectorIndex(x, y - 1);
+                var i3 = sectorIndex(x - 1, y);
+                var i4 = sectorIndex(x, y);
+                var expectedSectors = List.of(
+                        new GraphSectors.Sector(i1, i1 + 1),
+                        new GraphSectors.Sector(i2, i2 + 1),
+                        new GraphSectors.Sector(i3, i3 + 1),
+                        new GraphSectors.Sector(i4, i4 + 1));
 
+                assertEquals(expectedSectors, sectors);
+            }
+        }
+    }
+
+    @Test
+    void graphSectorsSectorsInAreaWorksFor8NeighbouringSectors() {
+        var graphSectors = new GraphSectors(SECTORS_BUFFER);
+        for (int x = 1; x <= SUBDIVISIONS_PER_SIDE - 1; x += 1) {
+            for (int y = 2; y <= SUBDIVISIONS_PER_SIDE - 2; y += 1) {
+                var e = SWISS_MIN_E + x * SECTOR_WIDTH;
+                var n = SWISS_MIN_N + y * SECTOR_HEIGHT;
+                var p = new PointCh(e, n);
+                var sectors = graphSectors.sectorsInArea(p, SECTOR_HEIGHT * 1.1);
+                sectors.sort(Comparator.comparingInt(GraphSectors.Sector::startNodeId));
+
+                var i1 = sectorIndex(x - 1, y - 2);
+                var i2 = sectorIndex(x, y - 2);
+                var i3 = sectorIndex(x - 1, y - 1);
+                var i4 = sectorIndex(x, y - 1);
+                var i5 = sectorIndex(x - 1, y);
+                var i6 = sectorIndex(x, y);
+                var i7 = sectorIndex(x - 1, y + 1);
+                var i8 = sectorIndex(x, y + 1);
+                var expectedSectors = List.of(
+                        new GraphSectors.Sector(i1, i1 + 1),
+                        new GraphSectors.Sector(i2, i2 + 1),
+                        new GraphSectors.Sector(i3, i3 + 1),
+                        new GraphSectors.Sector(i4, i4 + 1),
+                        new GraphSectors.Sector(i5, i5 + 1),
+                        new GraphSectors.Sector(i6, i6 + 1),
+                        new GraphSectors.Sector(i7, i7 + 1),
+                        new GraphSectors.Sector(i8, i8 + 1));
+
+                assertEquals(expectedSectors, sectors);
+            }
+        }
+    }
+
+    private int sectorIndex(int x, int y) {
+        return y * SUBDIVISIONS_PER_SIDE + x;
+    }
+
+    @Test
+    void graphSectorsSectorsInAreaWorksForSectorsWithLargeNumberOfNodes() {
+        ByteBuffer sectorsBuffer = ByteBuffer.allocate(SECTORS_COUNT * (Integer.BYTES + Short.BYTES));
+        var maxSectorSize = 0xFFFF;
+        for (int i = 0; i < SECTORS_COUNT; i += 1) {
+            sectorsBuffer.putInt(i * maxSectorSize);
+            sectorsBuffer.putShort((short) maxSectorSize);
+        }
+        var readOnlySectorsBuffer = sectorsBuffer.rewind().asReadOnlyBuffer();
+        var graphSectors = new GraphSectors(readOnlySectorsBuffer);
+        var d = 100;
+        var e = SWISS_MIN_E + 2 * d;
+        var n = SWISS_MIN_N + 2 * d;
+        var sectors = graphSectors.sectorsInArea(new PointCh(e, n), d);
+        assertEquals(List.of(new GraphSectors.Sector(0, maxSectorSize)), sectors);
     }
 
 
     @Test
-    void SectorWorkOnMultipleKnowValues(){
-        ByteBuffer a = ByteBuffer.allocate(128*128*6);
-        for (int i = 0; i < 1600; i++)   {
-            a.putInt(i*6,i);
-            a.putShort(i*6+4,(short)i);
+    void graphSectorsSectorsInAreaWorksForAllOfThem() {
+        var graphSectors = new GraphSectors(SECTORS_BUFFER);
+        var e = SWISS_MIN_E + 0.5 * SWISS_WIDTH;
+        var n = SWISS_MIN_N + 0.5 * SWISS_HEIGHT;
+        var sectors = graphSectors.sectorsInArea(new PointCh(e, n), SWISS_WIDTH);
+        assertEquals(SECTORS_COUNT, sectors.size());
+        BitSet expectedSectors = new BitSet();
+        expectedSectors.set(0, SECTORS_COUNT);
+        for (GraphSectors.Sector sector : sectors) {
+            assertTrue(expectedSectors.get(sector.startNodeId()));
+            expectedSectors.clear(sector.startNodeId());
         }
-        GraphSectors ns = new GraphSectors(a);
-        List<GraphSectors.Sector> n = ns.sectorsInArea(new PointCh((SwissBounds.MIN_E+SwissBounds.MAX_E)/2, (SwissBounds.MIN_N+SwissBounds.MAX_N)/2), 1);
-        assertEquals(4,n.size());
-
+        assertEquals(0, expectedSectors.cardinality());
     }
-
-
-
-
-    @Test
-    void workOnMultipleKnowValuesSingleNode() {
-        ByteBuffer b = ByteBuffer.allocate(16384 * 6);     // Numbers of sectors
-        for (int i = 0; i < 16384; i++) {
-            b.putInt(i * 6, i);               // ID of Node
-            b.putShort(i * 6 + 4, (short) 1);  // Numbers of Node in this sectors
-        }
-        GraphSectors ns2 = new GraphSectors(b);
-        double avgE = (SwissBounds.MIN_E + SwissBounds.MAX_E) / 2;
-        double avgN = (SwissBounds.MIN_N + SwissBounds.MAX_N) / 2;
-        double offsetE = (SwissBounds.MAX_E-SwissBounds.MIN_E )/ 256 ; // given half the length of a rectangle
-        double offsetN = (SwissBounds.MAX_N-SwissBounds.MIN_N )/ 256;
-        // avgE = k * offsetE*2 => Intersection  => k = 128/2 for middle of the map
-        if (128 / 2 * offsetE * 2 == avgE) System.out.println("true");
-        if (128 / 2 * offsetN * 2 == avgN) System.out.println("true");
-        ArrayList<GraphSectors.Sector> test = new ArrayList<>();
-        test.add(new GraphSectors.Sector(128 * 64 + 64, 128*64+65));
-
-        double xIn = 64 + 0.5;
-        double yIn = 64 + 0.5;
-
-        assertEquals(15, ns2.sectorsInArea(new PointCh((SwissBounds.MIN_E + ((349_000 / 128) * xIn)), (SwissBounds.MIN_N + ((221_000 / 128)* yIn))), ((349_000 / 128)* 1)).size());
-
-        assertEquals(1, ns2.sectorsInArea(new PointCh(avgE + offsetE, avgN + offsetN), 1).size());
-        assertEquals(test, ns2.sectorsInArea(new PointCh(avgE + offsetE, avgN + offsetN), 1));
-        assertEquals(4, ns2.sectorsInArea(new PointCh(avgE, avgN), 1).size());   // 0 doesn't really matter just between [0,4]
-        assertEquals(9, ns2.sectorsInArea(new PointCh(SwissBounds.MIN_E + 11 * offsetE, SwissBounds.MIN_N + 11 * offsetN), (2799/2)).size()); // This should Work
-        assertEquals(15, ns2.sectorsInArea(new PointCh(avgE + offsetE, avgN + offsetN), (2727 )).size());
-        assertEquals(16384, ns2.sectorsInArea(new PointCh(avgE + offsetE, avgN + offsetN), (Integer.MAX_VALUE)).size());
-        assertEquals(16383, ns2.sectorsInArea(new PointCh(avgE + offsetE, avgN + offsetN), (Integer.MAX_VALUE)).get(16383).startNodeId());
-    }
-
-    @Test
-    void workOnMultipleKnowValuesSequenceOfNodes() {
-        ByteBuffer b = ByteBuffer.allocate(16384 * 6);     // Numbers of sectors
-        int counter = 1;
-        for (int i = 0; i < 16384; i++) {
-            if (counter == 5) counter = 1;
-            b.putInt(i * 6, i * i);                     // ID of Node
-            b.putShort(i * 6 + 4, (short) (i + 1));  // Numbers of Node in this sectors, using Un+1 = Un + n + 1
-            counter++;
-
-        }
-        GraphSectors ns2 = new GraphSectors(b);
-
-        double avgE = (SwissBounds.MIN_E + SwissBounds.MAX_E) / 2;
-        double avgN = (SwissBounds.MIN_N + SwissBounds.MAX_N) / 2;
-        double offsetE = (SwissBounds.MAX_E-SwissBounds.MIN_E )/ 256 ; // given half the length of a rectangle
-        double offsetN = (SwissBounds.MAX_N-SwissBounds.MIN_N )/ 256;
-
-        ArrayList<GraphSectors.Sector> test = new ArrayList<>();
-        test.add(new GraphSectors.Sector((128 * 64 + 64)*(128 * 64 + 64), (128 * 64 + 64)*(128 * 64 + 64) +(128 * 64 + 64)+1));
-        assertEquals(test, ns2.sectorsInArea(new PointCh(avgE + offsetE, avgN + offsetN), 1));
-
-        /*  Math are currently innacurate
-        test.add(new GraphSectors.Sector((128 * 63 + 63)*(128 * 63 + 63)+(128 * 64 + 64), (128 * 63 + 63)*(128 * 63 + 63) +(128 * 63 + 63)+1+(128 * 63 + 63)));
-        test.add(new GraphSectors.Sector((128 * 65 + 65)*(128 * 65 + 65)-(128 * 65 + 65), (128 * 65 + 65)*(128 * 65 + 65) +(128 * 65 + 65)+1-(128 * 65 + 65)));
-        assertEquals(test, ns2.sectorsInArea(new PointCh(avgE + offsetE, avgN + offsetN), 1740 / 2));
-        */
-        // Ina
-        assertEquals(9, ns2.sectorsInArea(new PointCh(SwissBounds.MIN_E + 11 * offsetE, SwissBounds.MIN_N + 11 * offsetN), (2799/2)).size()); // This should Work
-        assertEquals(15, ns2.sectorsInArea(new PointCh(avgE + offsetE, avgN + offsetN), (2727 )).size());
-        assertEquals(16384, ns2.sectorsInArea(new PointCh(avgE + offsetE, avgN + offsetN), (Integer.MAX_VALUE)).size());
-
-    }
-
-
-    @Test
-    void workOnLimitsCasesValue() {
-
-        // Triple Sectors MIN, MIN
-        ByteBuffer a = ByteBuffer.allocate(6 * 16384);    // Numbers of sectors
-        a.putInt(0, 0);                   // ID of Node
-        a.putShort(4, (short) 1);              // Numbers of Node in this sectors
-        a.putInt(6*1, 1);
-        a.putShort(6*1+4, (short) 1);
-        a.putInt(6*2, 2);
-        a.putShort(6*2+4, (short) 1);
-        a.putInt(6*3, 3);
-        a.putShort(6*3+4, (short) 1);
-        a.putInt(6*128, 2);
-        a.putShort(6*128+4, (short) 1);
-        a.putInt(6*129, 3);
-        a.putShort(6*129+4, (short) 1);
-
-        GraphSectors ns = new GraphSectors(a);
-        assertEquals(1, ns.sectorsInArea(new PointCh(SwissBounds.MIN_E, SwissBounds.MIN_N), 1).size());
-        assertEquals(4, ns.sectorsInArea(new PointCh(SwissBounds.MIN_E, SwissBounds.MIN_N), 2830).size()); //TODO Crash
-
-        ArrayList<GraphSectors.Sector> test = new ArrayList<>();
-        test.add(new GraphSectors.Sector(0, 1));
-        test.add(new GraphSectors.Sector(1, 2));
-        test.add(new GraphSectors.Sector(2, 3));
-        test.add(new GraphSectors.Sector(3, 4));  //TODO End Node of the last rectangle should be ?
-
-        assertEquals(test.get(0), ns.sectorsInArea(new PointCh(SwissBounds.MIN_E, SwissBounds.MIN_N), 1).get(0));
-        assertEquals(test, ns.sectorsInArea(new PointCh(SwissBounds.MIN_E, SwissBounds.MIN_N), 2730));
-
-
-        // Multiple Sectors MAX, MAX
-        ByteBuffer c = ByteBuffer.allocate(16384 * 6);     // Numbers of sectors
-        for (int i = 0; i < 16384; i++) {
-            c.putInt(i * 6, i*3);               // ID of Node
-            c.putShort(i * 6 + 4, (short) 3);  // Numbers of Node in this sectors
-        }
-
-
-        GraphSectors ns3 = new GraphSectors(c);
-        //assertEquals(3, ns3.sectorsInArea(new PointCh(SwissBounds.MAX_E, SwissBounds.MAX_N), 1).size()); // Unsure
-        //assertEquals(9 + 3, ns3.sectorsInArea(new PointCh(SwissBounds.MAX_E, SwissBounds.MAX_N), 2730).size()); // Unsure
-        //assertEquals(15 + 9 + 3, ns3.sectorsInArea(new PointCh(SwissBounds.MAX_E, SwissBounds.MAX_N), 2730 * 2).size()); // Unsure
-
-        ArrayList<GraphSectors.Sector> expected = new ArrayList<>();
-
-        expected.add(new GraphSectors.Sector(16382*3,16382*3 + 3));
-        expected.add(new GraphSectors.Sector(16383*3,16383*3 + 3));
-        expected.add(new GraphSectors.Sector(16384*3,16384*3));
-    }
-
-    @Test
-    public void sectorsInAreaTest(){
-
-        //Initialization of ByteBuffer.
-        ByteBuffer b = ByteBuffer.allocate(98304);
-        for (int i = 0; i < 16384; ++i){
-            b.putInt(i);
-            b.putShort((short)0);
-        }
-        GraphSectors gs = new GraphSectors(b);
-        // Every sector's first node's value is the index of the sector in the buffer of sectors. Every sector contains exactly 0 nodes.
-
-
-        //First test: we want to get only the sector #8256, located in the middle.
-        //For that we use the fact that the equality between record objects was modified so that each attribute gets compared instead of the references.
-        assertEquals(new GraphSectors.Sector(8256, 8256),gs.sectorsInArea(new PointCh(SwissBounds.MIN_E + 64*(2.7265625 * 1000),
-                SwissBounds.MIN_N + 64*(1.7265625 * 1000)), 0).get(0));
-
-
-        //Second test: we want to get only the sector in the top right corner (last one according to its index).
-        assertEquals(new GraphSectors.Sector(16383, 16383),gs.sectorsInArea(new PointCh(SwissBounds.MIN_E + 127.5*(2.7265625 * 1000),
-                SwissBounds.MIN_N + 127.5*(1.7265625 * 1000)), 0).get(0));
-
-
-        //Third test: multiple sectors in the area.
-        assertEquals(new GraphSectors.Sector(8127, 8127),gs.sectorsInArea(new PointCh(SwissBounds.MIN_E + 64*(2.7265625 * 1000),
-                SwissBounds.MIN_N + 64*(1.7265625 * 1000)), 300).get(0));
-        assertEquals(new GraphSectors.Sector(8128, 8128),gs.sectorsInArea(new PointCh(SwissBounds.MIN_E + 64*(2.7265625 * 1000),
-                SwissBounds.MIN_N + 64*(1.7265625 * 1000)), 300).get(1));
-        assertEquals(new GraphSectors.Sector(8255, 8255),gs.sectorsInArea(new PointCh(SwissBounds.MIN_E + 64*(2.7265625 * 1000),
-                SwissBounds.MIN_N + 64*(1.7265625 * 1000)), 300).get(2));
-        assertEquals(new GraphSectors.Sector(8256, 8256),gs.sectorsInArea(new PointCh(SwissBounds.MIN_E + 64*(2.7265625 * 1000),
-                SwissBounds.MIN_N + 64*(1.7265625 * 1000)), 300).get(3));
-
-
-        //Fourth test: what if the drawn square gets passed the borders defined by the class Swissbound ?
-        //If no error is thrown while using an absurdly high distance value (1000000000 meters), this may indicate that you treat this case appropriately.
-        gs.sectorsInArea(new PointCh(SwissBounds.MIN_E + 64*(2.7265625 * 1000), SwissBounds.MIN_N + 64*(1.7265625 * 1000)), 1000000000);
-        // We draw a square from the bottom left corner of the grid. We are supposed to list the sectors 0, 1, 128 and 129 without errors.
-        assertEquals(new GraphSectors.Sector(0, 0),gs.sectorsInArea(new PointCh(SwissBounds.MIN_E + 0.1*(2.7265625 * 1000),
-                SwissBounds.MIN_N + 0.1*(1.7265625 * 1000)), 3000).get(0));
-        assertEquals(new GraphSectors.Sector(1, 1),gs.sectorsInArea(new PointCh(SwissBounds.MIN_E + 0.1*(2.7265625 * 1000),
-                SwissBounds.MIN_N + 0.1*(1.7265625 * 1000)), 3000).get(1));
-        assertEquals(new GraphSectors.Sector(128, 128),gs.sectorsInArea(new PointCh(SwissBounds.MIN_E + 0.1*(2.7265625 * 1000),
-                SwissBounds.MIN_N + 0.1*(1.7265625 * 1000)), 3000).get(2));
-        assertEquals(new GraphSectors.Sector(129, 129),gs.sectorsInArea(new PointCh(SwissBounds.MIN_E + 0.1*(2.7265625 * 1000),
-                SwissBounds.MIN_N + 0.1*(1.7265625 * 1000)), 3000).get(3));
-
-        // Hope you found this test useful ! - Léo.
-
-
-        /* Additional test that is not based on the instructions. I wanted to verify that we could not input a negative value as a distance.
-        assertThrows(AssertionError.class, () -> {
-            gs.sectorsInArea(new PointCh(SwissBounds.MIN_E,SwissBounds.MIN_N),-1);
-        });
-         */
-    }
-
-
 }

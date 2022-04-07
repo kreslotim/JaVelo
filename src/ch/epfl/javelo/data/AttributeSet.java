@@ -18,7 +18,8 @@ public record AttributeSet(long bits) {
      * @throws IllegalArgumentException if last 2 bits carry some information
      */
     public AttributeSet {
-        // The collection has 62 elements. Therefore, there cannot exist any values, corresponding to the last 2 bits
+        // The collection has 62 elements.
+        // Therefore, there cannot exist any values, corresponding to the last 2 bits
         Preconditions.checkArgument(bits >> 62 == 0b0);
     }
 
@@ -51,24 +52,30 @@ public record AttributeSet(long bits) {
 
 
     /**
-     * Checks if the intersection of the set of attributes in AttributeSet (this), with an extern AttributeSet (that) is not empty
+     * Checks if the intersection of the set of attributes in AttributeSet (this),
+     * with an extern AttributeSet (that) is not empty
      *
      * @param that (type : AttributSet)
-     * @return true iff the intersection of the receiver set (this type AttritbuteSet) with the one passed as argument (that type AttritbuteSet) is not equal to 0.
+     * @return true iff the intersection of the receiver set (this type AttritbuteSet),
+     * with the one passed as argument (that type AttritbuteSet) is not equal to 0.
      */
     public boolean intersects(AttributeSet that) {
         return (that.bits & this.bits) != 0L;
     }
 
     /**
-     * @return a string consisting of the textual representation of the elements of the set enclosed in braces ({}) and separated by commas.
+     * @return a string consisting of the textual representation,
+     * of the elements of the set enclosed in braces ({}) and separated by commas.
      */
     @Override
     public String toString() {
         StringJoiner j = new StringJoiner(",", "{", "}");
         for (Attribute attribute : Attribute.ALL) {
             if (this.contains(attribute))
-                j.add(attribute.key() + "=" + attribute.value()); // must check if attributSet contains the i-th attribute. If this condition is true, than we add this key and the value of the attribute in the string with the syntaxe they ask us.
+                // must check if attributeSet contains the i-th attribute.
+                // If this condition is true, than we add this key and the value of the attribute in the string,
+                // with the syntax they ask us.
+                j.add(attribute.key() + "=" + attribute.value());
         }
         return j.toString();
     }

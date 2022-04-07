@@ -51,15 +51,16 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
      */
     public PointCh pointAt(double position) {
         return new PointCh(Math2.interpolate(fromPoint.e(), toPoint.e(), position / length),
-                // divide by length because we want to bring x between 0 and 1, where length is the length of a single edge.
+                // divide by length because we want to bring x between 0 and 1,
+                // where length is the length of a single edge.
                 Math2.interpolate(fromPoint.n(), toPoint.n(), position / length));
     }
 
     /**
-     * Return the altitude, in meters, at the given position (in meters), on the edge.
+     * Return the elevation, in meters, at the given position (in meters), on the edge.
      *
      * @param position the given position
-     * @return the altitude, in meters, at the given position on the edge
+     * @return the elevation, in meters, at the given position on the edge
      */
     public double elevationAt(double position) {
         return profile.applyAsDouble(position);

@@ -17,6 +17,7 @@ import java.util.List;
  */
 public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuffer elevations) {
 
+    /* Edge's attributes are distributed over 80 bits in total = 4 Bytes + 3 * 2 Bytes */
     private static final int EDGE_PITCH = Integer.BYTES + 3 * Short.BYTES;
     private static final int OFFSET_LENGTH = Integer.BYTES;
     private static final short OFFSET_ELEVATION_GAIN = OFFSET_LENGTH + Short.BYTES;

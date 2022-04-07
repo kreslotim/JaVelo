@@ -6,7 +6,7 @@ import ch.epfl.javelo.Preconditions;
 import java.util.Arrays;
 
 /**
- * A calculator along the profile, i.e. it contains the code to calculate the profile along of a given route
+ * A calculator along the profile, i.e. it contains calculates the profile along of a given route
  *
  * @author Tim Kreslo (310686)
  * @author Wei-En Hsieh (341271)

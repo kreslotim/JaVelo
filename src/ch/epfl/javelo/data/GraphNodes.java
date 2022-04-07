@@ -13,6 +13,7 @@ import java.nio.IntBuffer;
  */
 public record GraphNodes(IntBuffer buffer) {
 
+    /* Node's attributes are distributed over 96 bits in total = 12 Bytes = 3 Integers */
     private static final int OFFSET_E = 0;
     private static final int OFFSET_N = OFFSET_E + 1;
     private static final int OFFSET_OUT_EDGES = OFFSET_N + 1;
@@ -23,9 +24,7 @@ public record GraphNodes(IntBuffer buffer) {
      *
      * @return the total number of nodes
      */
-    public int count() {
-        return (buffer.capacity()) / 3;
-    }
+    public int count() { return (buffer.capacity()) / 3;}
 
 
     /**
@@ -34,9 +33,7 @@ public record GraphNodes(IntBuffer buffer) {
      * @param nodeId node's identity
      * @return the E (east) coordinate of the given node's identity
      */
-    public double nodeE(int nodeId) {
-        return Q28_4.asDouble(buffer.get(nodeId * NODE_INTS + OFFSET_E));
-    }
+    public double nodeE(int nodeId) { return Q28_4.asDouble(buffer.get(nodeId * NODE_INTS + OFFSET_E)); }
 
 
     /**
@@ -45,9 +42,7 @@ public record GraphNodes(IntBuffer buffer) {
      * @param nodeId node's identity
      * @return the N (north) coordinate of the given node's identity
      */
-    public double nodeN(int nodeId) {
-        return Q28_4.asDouble(buffer.get(nodeId * NODE_INTS + OFFSET_N));
-    }
+    public double nodeN(int nodeId) { return Q28_4.asDouble(buffer.get(nodeId * NODE_INTS + OFFSET_N)); }
 
 
     /**

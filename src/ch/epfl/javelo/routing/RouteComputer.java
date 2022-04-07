@@ -127,9 +127,6 @@ public final class RouteComputer {
         //The list contains inverted edges, in the reverse order -> order must be reversed for building path.
         Collections.reverse(edgesOfTheRoute);
 
-        SingleRoute finalRoute = new SingleRoute(edgesOfTheRoute);
-        System.out.println("Route's length: " + finalRoute.length() + " m");
-        System.out.println("Number of edges: " + edgesOfTheRoute.size());
-        return finalRoute;
+        return new SingleRoute(edgesOfTheRoute);
     }
 }

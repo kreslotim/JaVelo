@@ -4,8 +4,7 @@ import ch.epfl.javelo.projection.PointWebMercator;
 import javafx.geometry.Point2D;
 
 /**
- * MapViewParameters, a record
- * There exists four points (mapTopLeftPositionX, mapTopLeftPositionY) in a map.
+ * Basemap settings presented in the GUI
  *
  * @author Tim Kreslo (310686)
  * @author Wei-En Hsieh (341271)
@@ -13,24 +12,23 @@ import javafx.geometry.Point2D;
 public record MapViewParameters(int zoomLevel, double mapTopLeftPositionX, double mapTopLeftPositionY) {
 
     /**
-     * Returns the coordinates (x, y) of the top-left corner as a Point2D type object.
+     * Returns the coordinates of the top-left corner (Point2D)
      *
-     * @return the coordinates (x, y) of the top-left corner as a Point2D type object.
+     * @return top-left corner coords
      */
     public Point2D topLeft() {
         return new Point2D(mapTopLeftPositionX, mapTopLeftPositionY);
     }
 
     /**
-     * Returns an instance of MapViewParameters, whose coordinates aren't those of the top-left corner, identical to
-     * the receiver. The coordinates of an instance of MapViewParameters are passed as arguments to the method.
+     * Returns this (MapViewParameters) with new coordinates of top-left corner
      *
-     * @param minX the coordinate x of the instance of MapViewParameters
-     * @param minY the coordinate y of the instance of MapViewParameters
-     * @return an instance of MapViewParameters identical to the receiver.
+     * @param newUpLeftX new top-left X coordinate
+     * @param newUpLeftY new top-left Y coordinate
+     * @return this, with new top-left coordinates
      */
-    public MapViewParameters withMinXY(double minX, double minY) {
-        return new MapViewParameters(zoomLevel, minX, minY);
+    public MapViewParameters withMinXY(double newUpLeftX, double newUpLeftY) {
+        return new MapViewParameters(zoomLevel, newUpLeftX, newUpLeftY);
     }
 
     /*********************************************************************************************
@@ -40,35 +38,36 @@ public record MapViewParameters(int zoomLevel, double mapTopLeftPositionX, doubl
      *********************************************************************************************/
 
     /**
-     * Takes the x and y coordinates of a point as arguments, expressed relative to the top-left corner of the
-     * map portion displayed on the screen, and returns this point as an instance of PointWebMercator.
+     * Returns a point (PointWebMercator) with coordinates,
+     * expressed in relation to the top-left corner, of the map portion displayed on the screen.
      *
-     * @param x the coordinate x of a point
-     * @param y the coordinate y of a point
-     * @return an object of PointWebMercator where the object has relative coordinates to the coordinates
-     * of the top-left corner of the map portion.
+     * @param x coordinate X of the point
+     * @param y coordinate Y of the point
+     * @return point on map with coordinates X and Y.
      */
     public PointWebMercator pointAt(double x, double y) {
         return new PointWebMercator(mapTopLeftPositionX + x, mapTopLeftPositionY + y);
     }
 
     /**
-     * Returns the corresponding x position, expressed relative to the top-left corner of the map portion displayed
-     * on the screen.
+     * Returns the corresponding X position of the given point (PointWebMercator),
+     * expressed in relation to the top-left corner of the map portion,
+     * displayed on the screen.
      *
-     * @param pointWebMercator an object of PointWebMercator
-     * @return the corresponding x position relative to the top-left corner of the map portion.
+     * @param pointWebMercator a point on the map
+     * @return position X of the given point
      */
     public double viewX(PointWebMercator pointWebMercator) {
         return pointWebMercator.xAtZoomLevel(zoomLevel) - mapTopLeftPositionX; //todo : - mapTopLeftPositionX ?
     }
 
     /**
-     * Returns the corresponding y position, expressed relative to the top-left corner of the map portion displayed
-     * on the screen.
+     * Returns the corresponding Y position of the given point (PointWebMercator),
+     * expressed in relation to the top-left corner of the map portion,
+     * displayed on the screen.
      *
-     * @param pointWebMercator an object of PointWebMercator
-     * @return the corresponding y position relative to the top-left corner of the map portion.
+     * @param pointWebMercator a point on the map
+     * @return position Y of the given point
      */
     public double viewY(PointWebMercator pointWebMercator) {
         return pointWebMercator.yAtZoomLevel(zoomLevel) - mapTopLeftPositionY; //todo : - mapTopLeftPositionY ?

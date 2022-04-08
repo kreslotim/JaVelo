@@ -19,25 +19,27 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * The class GpxGenerator represents a route generator in GPX format.
+ * Route Generator in GPX format
+ *
+ * @author Tim Kreslo (310686)
+ * @author Wei-En Hsieh (341271)
  */
 public class GpxGenerator {
     /**
      * Default (not instantiable) GpxGenerator constructor
      */
-    private GpxGenerator() {
-    }
+    private GpxGenerator() {}
 
     /**
-     * Writes the corresponding GPX document to the file, throwing an exception on an I/O error.
+     * Writes the corresponding GPX document into the given file
      *
-     * @param fileName
-     * @param route
-     * @param profile
-     * @throws IOException if there is an I/O error.
+     * @param fileName name of the given file (to write in)
+     * @param route JaVelo route
+     * @param profileRoute route's profile
+     * @throws IOException if the expected file does not exist
      */
-    public static void writeGpx(String fileName, Route route, ElevationProfile profile) throws IOException {
-        Document doc = createGpx(route, profile);
+    public static void writeGpx(String fileName, Route route, ElevationProfile profileRoute) throws IOException {
+        Document doc = createGpx(route, profileRoute);
         Writer w = new FileWriter(fileName);
         try {
             Transformer transformer = TransformerFactory
@@ -52,11 +54,13 @@ public class GpxGenerator {
     }
 
     /**
-     * @param route
-     * @param profile
-     * @return
+     * Returns the corresponding GPX document, to the given Route and profile of the route.
+     *
+     * @param route JaVelo route
+     * @param profileRoute route's profile
+     * @return GPX document
      */
-    public static Document createGpx(Route route, ElevationProfile profile) {
+    public static Document createGpx(Route route, ElevationProfile profileRoute) {
 
         Document doc = newDocument(); // see below
 
@@ -97,7 +101,7 @@ public class GpxGenerator {
             rtePt.setAttribute("lat", String.format(Locale.ROOT, "%.5f", Math.toDegrees(pointChList.get(i).lat())));
             Element ele = doc.createElement("elevation");
             rtePt.appendChild(ele);
-            ele.setTextContent(String.format(Locale.ROOT, "%.2f", profile.elevationAt(position)));
+            ele.setTextContent(String.format(Locale.ROOT, "%.2f", profileRoute.elevationAt(position)));
 
             if (i < edgesList.size()) {
                 position += edgesList.get(i).length();

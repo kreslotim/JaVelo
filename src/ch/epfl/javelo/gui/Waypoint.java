@@ -3,9 +3,9 @@ package ch.epfl.javelo.gui;
 import ch.epfl.javelo.projection.PointCh;
 
 /**
- * Waypoint, a record representing a waypoint.
- * <p>
- * Waypoint does not have any public methods other than those defined automatically by Java for records.
+ * Waypoint on the map
+ *
+ * @author Tim Kreslo (310686)
+ * @author Wei-En Hsieh (341271)
  */
-public record Waypoint(PointCh pointCh, int nearestNodeId) {
-}
+public record Waypoint(PointCh positionWaypoint, int nearestNodeId) {}

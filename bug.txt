@@ -8,3 +8,5 @@ step4 ------------------------------------------------
 • dans ElevationProfile, si y'a une valeur negative ? piazza
 
 
+step7 ------------------------------------------------
+dans MapViewParameters : viewX et viewY : cf deux todo.

@@ -33,8 +33,7 @@ public record GraphNodes(IntBuffer buffer) {
      * @return the E (East) coordinate of the given node's identity
      */
     public double nodeE(int nodeId) { return Q28_4.asDouble(buffer.get(nodeId * NODE_INTS + OFFSET_E)); }
-
-
+    
     /**
      * Returns the North coordinate of the given node of the graph
      *
@@ -42,7 +41,6 @@ public record GraphNodes(IntBuffer buffer) {
      * @return the N (North) coordinate of the given node's identity
      */
     public double nodeN(int nodeId) { return Q28_4.asDouble(buffer.get(nodeId * NODE_INTS + OFFSET_N)); }
-
 
     /**
      * Returns the number of outgoing edges of the given node of the graph
@@ -54,7 +52,6 @@ public record GraphNodes(IntBuffer buffer) {
         int slice = buffer.get(nodeId * NODE_INTS + OFFSET_OUT_EDGES);
         return Bits.extractUnsigned(slice, 28, 4);
     }
-
 
     /**
      * Returns the identity of the edgeIndex-th edge that exits the given node's identity of the graph

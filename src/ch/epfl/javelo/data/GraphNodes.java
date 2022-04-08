@@ -6,7 +6,7 @@ import ch.epfl.javelo.Q28_4;
 import java.nio.IntBuffer;
 
 /**
- * Recorded class representing the array of all nodes of the JaVelo graph
+ * GraphNodes, a record representing the array of all nodes of the JaVelo graph.
  *
  * @author Timofey Kreslo (310686)
  * @author Wei-En Hsieh (341271)
@@ -26,27 +26,26 @@ public record GraphNodes(IntBuffer buffer) {
      */
     public int count() { return (buffer.capacity()) / 3;}
 
-
     /**
-     * Returns the east coordinate of the given node of the graph
+     * Returns the East coordinate of the given node of the graph
      *
      * @param nodeId node's identity
-     * @return the E (east) coordinate of the given node's identity
+     * @return the E (East) coordinate of the given node's identity
      */
     public double nodeE(int nodeId) { return Q28_4.asDouble(buffer.get(nodeId * NODE_INTS + OFFSET_E)); }
 
 
     /**
-     * Returns the north coordinate of the given node of the graph
+     * Returns the North coordinate of the given node of the graph
      *
      * @param nodeId node's identity
-     * @return the N (north) coordinate of the given node's identity
+     * @return the N (North) coordinate of the given node's identity
      */
     public double nodeN(int nodeId) { return Q28_4.asDouble(buffer.get(nodeId * NODE_INTS + OFFSET_N)); }
 
 
     /**
-     * Returns the number of edges outgoing of the given node of the graph
+     * Returns the number of outgoing edges of the given node of the graph
      *
      * @param nodeId node's identity
      * @return the number of edges exiting the given node's identity

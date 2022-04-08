@@ -1,17 +1,13 @@
 package ch.epfl.javelo.projection;
+
 /**
- * Switzerland bounds
+ * The class SwissBounds contains constants and methods related to the bounds of Switzerland.
  *
  * @author Tim Kreslo (310686)
  * @author Wei-En Hsieh (341271)
  */
 public final class SwissBounds {
-    /**
-     * Default (not instantiable) SwissBounds constructor
-     */
-    private SwissBounds() {}
-
-    /* Switzerland's bounds defined with swiss parameters E (east) & N (north) coordinates */
+    /* Switzerland's bounds defined with Swiss parameters E (East) & N (North) coordinates. */
     public static final double MIN_E = 2485000;
     public static final double MAX_E = 2834000;
     public static final double MIN_N = 1075000;
@@ -20,14 +16,21 @@ public final class SwissBounds {
     public static final double HEIGHT = MAX_N - MIN_N;
 
     /**
-     * Checks if E (east) and N (north) coordinates are inside Switzerland's bounds
+     * Default (not instantiable) SwissBounds constructor
+     */
+    private SwissBounds() {
+    }
+
+
+    /**
+     * Checks if a point (E, N) is in Switzerland's bounds,
+     * returns true iff (if and only if) the given E (East) and N (North) coordinates are within Switzerland's bounds.
      *
-     * @param e East coordinate
-     * @param n North coordinate
-     * @return (boolean) true if East and North coordinates are in bounds of Switzerland
+     * @param e the East coordinate
+     * @param n the North coordinate
+     * @return (boolean) true iff the East and North coordinates are in the bounds of Switzerland.
      */
     public static boolean containsEN(double e, double n) {
         return (e >= MIN_E) && (e <= MAX_E) && (n >= MIN_N) && (n <= MAX_N);
     }
-
 }

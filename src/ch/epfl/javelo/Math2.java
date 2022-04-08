@@ -1,25 +1,27 @@
 package ch.epfl.javelo;
 
 /**
- * Math upgrade
+ * The class Math2, a variation of the class Math, contains methods for performing some mathematical calculations.
  *
  * @author Tim Kreslo (310686)
  * @author Wei-En Hsieh (341271)
  */
 public final class Math2 {
     /**
-     * Default (non instantiable) Math2 constructor
+     * Default (non instantiable) Math2 constructor.
      */
-    private Math2() {}
+    private Math2() {
+    }
 
 
     /**
-     * Division round to ceiling
+     * Returns the integer part by excess of the division of x by y,
+     * throwing an exception if x is strictly negative or y is negative.
      *
      * @param x numerator
      * @param y denominator
-     * @return (int) ceiling division of x by y
-     * @throws IllegalArgumentException if x or y negative, or y is null
+     * @return the ceiling division of x by y and is equal to a mathematical integer.
+     * @throws IllegalArgumentException if x is strictly negative or y is negative
      */
     public static int ceilDiv(int x, int y) {
         Preconditions.checkArgument(!(x < 0 || y <= 0));
@@ -27,7 +29,8 @@ public final class Math2 {
     }
 
     /**
-     * Linear interpolation between two points
+     * Returns the y coordinate of the point on the line passing through (0,y0) and (1,y1) and given x coordinate,
+     * y is the linear interpolation between two points.
      *
      * @param y0 Vertical component of point 0
      * @param y1 Vertical component of point 1
@@ -40,13 +43,17 @@ public final class Math2 {
     }
 
     /**
-     * clamp of value v
+     * Limits the value v to the interval from the minimal value to the maximal value,
+     * where the minimal and maximal values are both mathematical integers.
+     * returning the minimal value if v is less than the minimal value, the maximal value if v is greater than
+     * the maximal value; otherwise, returns v,
+     * throwing an exception if the minimal value is (strictly) greater than the maximal value.
      *
-     * @param min minimal value
+     * @param min (int) minimal value
      * @param v   value
-     * @param max maximal value
+     * @param max (int) maximal value
      * @return v (int) limited to bounds
-     * @throws IllegalArgumentException if maximal value is smaller than minimal value
+     * @throws IllegalArgumentException if the minimal value is (strictly) greater than the maximal value
      */
     public static int clamp(int min, int v, int max) {
         Preconditions.checkArgument(max > min);
@@ -55,13 +62,17 @@ public final class Math2 {
     }
 
     /**
-     * Clamp of given value v
+     * Limits the value v to the interval from the minimal value to the maximal value,
+     * where the minimal and maximal values are both real numbers.
+     * returning the minimal value if v is less than the minimal value, the maximal value if v is greater than
+     * the maximal value; otherwise, returns v,
+     * throwing an exception if the minimal value is (strictly) greater than the maximal value.
      *
-     * @param min minimal value
+     * @param min (double) minimal value
      * @param v   value
-     * @param max maximal value
+     * @param max (double) maximal value
      * @return v (double) limited to bounds
-     * @throws IllegalArgumentException if maximal value is smaller than minimal value
+     * @throws IllegalArgumentException if the minimal value is (strictly) greater than the maximal value
      */
     public static double clamp(double min, double v, double max) {
         Preconditions.checkArgument(max > min);
@@ -70,69 +81,67 @@ public final class Math2 {
     }
 
     /**
-     * Hyperbolic arcsine function
+     * Returns the inverse hyperbolic sine of a value x.
      *
-     * @param x variable
-     * @return (double) hyperbolic arcsine of x
+     * @param x the given variable
+     * @return (double) returns the inverse hyperbolic sine of x
      */
     public static double asinh(double x) {
         return Math.log(x + Math.sqrt(1 + x * x));
     }
 
     /**
-     * Scalar product of two vectors
+     * Returns the scalar product of two vectors u (of components uX and uY) and v (of components vX and vY).
      *
-     * @param uX X component of vector U
-     * @param uY Y component of vector U
-     * @param vX X component of vector V
-     * @param vY Y component of vector V
-     * @return (double) dot product of U and V
+     * @param uX the x component of vector u
+     * @param uY the y component of vector u
+     * @param vX the x component of vector v
+     * @param vY the y component of vector v
+     * @return (double) the scalar product of two vectors u and v.
      */
     public static double dotProduct(double uX, double uY, double vX, double vY) {
         return uX * vX + uY * vY;
     }
 
     /**
-     * Squared norm of a vector U
+     * Returns the square norm of the vector u (of components uX and uY).
      *
-     * @param uX X component of vector U
-     * @param uY Y component of vector U
-     * @return (double) squared norm of vector U
+     * @param uX x component of vector u
+     * @param uY y component of vector u
+     * @return (double) the square norm of the vector u.
      */
     public static double squaredNorm(double uX, double uY) {
         return uX * uX + uY * uY;
     }
 
     /**
-     * Norm of vector U
+     * Returns the norm of the vector u (of components uX and uY).
      *
-     * @param uX X component of vector U
-     * @param uY Y component of vector U
-     * @return (double) norm of vector U
+     * @param uX x component of vector u
+     * @param uY y component of vector u
+     * @return (double) the norm of the vector u.
      */
     public static double norm(double uX, double uY) {
         return Math.sqrt(squaredNorm(uX, uY));
     }
 
     /**
-     * Length of projection of vector from A to P on vector from A to B
+     * Returns the length of the projection of the vector going from point A (of coordinates aX and aY)
+     * to point P (of coordinates pX and pY) on the vector going from point A to point B (of components bY and bY).
      *
-     * @param aX X component of point A
-     * @param aY Y component of point A
-     * @param bX X component of point B
-     * @param bY Y component of point B
-     * @param pX X component of point P
-     * @param pY Y component of point P
-     * @return (double) length of projection of vector from A to P on vector from A to B
+     * @param aX x component of point A
+     * @param aY y component of point A
+     * @param bX x component of point B
+     * @param bY y component of point B
+     * @param pX x component of point P
+     * @param pY y component of point P
+     * @return (double) the length of projection of vector from A to P on vector from A to B.
      */
     public static double projectionLength(double aX, double aY, double bX, double bY, double pX, double pY) {
         double uX = (pX - aX);
         double uY = (pY - aY);
         double vX = (bX - aX);
         double vY = (bY - aY);
-
         return (uX * vX + uY * vY) / norm(vX, vY);
     }
-
-
 }

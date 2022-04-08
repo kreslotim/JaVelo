@@ -13,16 +13,16 @@ import java.util.function.DoubleUnaryOperator;
  * @author Wei-En Hsieh (341271)
  */
 public final class ElevationProfile {
-    private final double length;
-    private final double minElevation;
-    private final double maxElevation;
-    private final double totalAscent;
-    private final double totalDescent;
-    private final DoubleUnaryOperator profile;
+    private final double length;               // length of the profile
+    private final double minElevation;         // minimum altitude of the profile
+    private final double maxElevation;         // maximum altitude of the profile
+    private final double totalAscent;          // total elevation gain of the profile
+    private final double totalDescent;         // total elevation loss of the profile
+    private final DoubleUnaryOperator profile; // profile
 
     /**
-     * Construct the profile of a route of length (in meters) and whose elevation samples, uniformly distributed along
-     * the route, are contained in elevationSamples
+     * Constructs the profile of a route of length (in meters) and whose elevation samples, uniformly distributed along
+     * the route, are contained in the elevation samples elevationSamples
      *
      * @param length           length in meters
      * @param elevationSamples the elevation samples, evenly distributed along the route, are contained in

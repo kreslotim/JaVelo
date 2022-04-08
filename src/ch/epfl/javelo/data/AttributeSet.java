@@ -55,7 +55,7 @@ public record AttributeSet(long bits) {
      * Checks if the intersection of the set of attributes in AttributeSet (this),
      * with another AttributeSet (that) is not empty
      *
-     * @param that (type : AttributSet)
+     * @param that (type : AttributeSet)
      * @return true iff the intersection of the receiver set (this, of type AttributeSet),
      * with the one passed as argument (that, of type AttributeSet) is not equal to 0.
      */

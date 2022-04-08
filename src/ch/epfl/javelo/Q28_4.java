@@ -14,7 +14,8 @@ public final class Q28_4 {
      * @return bit sequence in Q28.4 representation
      */
     public static int ofInt(int i) {return i << 4;}
-    // i must be bigger than or equal to -134217728 and smaller than or equal to 134217727 // otherwise we lose information!
+    // i must be bigger than or equal to -134217728 and smaller than or equal to 134217727
+    // otherwise we lose information.
 
     /**
      * Default (not instantiable) Q28_4 constructor

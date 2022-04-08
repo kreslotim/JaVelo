@@ -7,7 +7,7 @@ package ch.epfl.javelo;
  */
 public final class Preconditions {
     /**
-     * Default Preconditions constructor
+     * Default (non instantiable) Preconditions constructor
      */
     private Preconditions() {}
 
@@ -15,7 +15,7 @@ public final class Preconditions {
      * Checks validity of an input
      *
      * @param shouldBeTrue argument must be true
-     * @throws IllegalArgumentException if the argument is false
+     * @throws IllegalArgumentException if the given argument is false
      */
     public static void checkArgument(boolean shouldBeTrue) {
         if (!shouldBeTrue) throw new IllegalArgumentException();

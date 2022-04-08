@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * Immutable class representing a Singleroute (simple route) composed of edges,
- * linking starting and ending points without intermediate waypoints.
+ * linking starting and ending points, without intermediate waypoints.
  *
  * @author Tim Kreslo (310686)
  * @author Wei-En Hsieh (341271)
@@ -66,7 +66,7 @@ public final class SingleRoute implements Route {
 
 
     /**
-     * Returns the list of all the edges, of the (simple) route
+     * Returns the list of all the edges, composing the (simple) route
      *
      * @return all edges of the route
      */

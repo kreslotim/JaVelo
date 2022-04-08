@@ -72,8 +72,8 @@ public final class RouteComputer {
             if (currentNode == endNodeId) return computeRoute(startNodeId, endNodeId, predecessor);
 
             if (distance[currentNode] != Float.NEGATIVE_INFINITY) {
-                for (int E = 0; E < graph.nodeOutDegree(currentNode); E++) {
-                    edge = graph.nodeOutEdgeId(currentNode, E); // considering current edge
+                for (int currentEdge = 0; currentEdge < graph.nodeOutDegree(currentNode); currentEdge++) {
+                    edge = graph.nodeOutEdgeId(currentNode, currentEdge); // considering current edge
                     nTemp = graph.edgeTargetNodeId(edge);
 
                     totalDistance = distance[currentNode]
@@ -127,9 +127,6 @@ public final class RouteComputer {
         //The list contains inverted edges, in the reverse order -> order must be reversed for building path.
         Collections.reverse(edgesOfTheRoute);
 
-        SingleRoute finalRoute = new SingleRoute(edgesOfTheRoute);
-        System.out.println("Route's length: " + finalRoute.length() + " m");
-        System.out.println("Number of edges: " + edgesOfTheRoute.size());
-        return finalRoute;
+        return new SingleRoute(edgesOfTheRoute);
     }
 }

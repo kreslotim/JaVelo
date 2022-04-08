@@ -41,7 +41,7 @@ public record PointCh(double e, double n) {
      * @return (double) distance between received and target point on the map
      */
     public double distanceTo(PointCh that) {
-        //return Math.hypot(that.e - this.e, that.n - this.n); // returns hypothesis length
+        //return Math.hypot(that.e - this.e, that.n - this.n); // returns hypotenuse length
         return Math2.norm(that.e - this.e, that.n - this.n); // usage of Math2
     }
 

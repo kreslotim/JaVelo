@@ -8,7 +8,7 @@ package ch.epfl.javelo;
  */
 public final class Q28_4 {
     /**
-     * Default (not instantiable) Q28_4 constructor
+     * Default (not instantiable) Q28_4 constructor.
      */
     private Q28_4() {
     }

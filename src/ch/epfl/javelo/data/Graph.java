@@ -45,10 +45,10 @@ public final class Graph {
 
 
     /**
-     * Returns Javelo graph (Graph), obtained from the files located in the given directory
+     * Returns JaVelo graph (Graph), obtained from the files located in the given directory
      *
      * @param  basePath path to given directory (Path)
-     * @return Javelo graph (Graph)
+     * @return JaVelo graph (Graph)
      * @throws IOException if the expected file does not exist
      */
     public static Graph loadFrom(Path basePath) throws IOException { // basePath = file lausanne

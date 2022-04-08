@@ -8,12 +8,11 @@ package ch.epfl.javelo.projection;
  * @author Wei-En Hsieh (341271)
  */
 public final class Ch1903 {
+
     /**
      * Default (non instantiable) Ch1903 constructor
      */
-    private Ch1903() {
-    }
-
+    private Ch1903() {}
 
     /**
      * Returns the E (East) coordinate of the longitude and latitude point in the WGS84 system.

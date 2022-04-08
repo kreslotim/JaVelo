@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Immutable class representing a Singleroute (simple route) composed of edges,
+ * Immutable class representing a SingleRoute (simple route) composed of edges,
  * linking starting and ending points, without intermediate waypoints.
  *
  * @author Tim Kreslo (310686)
@@ -58,10 +58,10 @@ public final class SingleRoute implements Route {
      */
     @Override
     public double length() {
-        double lenghtOfEdge = 0;
+        double lengthOfEdge = 0;
 
-        for (Edge edge : edges) lenghtOfEdge += edge.length();
-        return lenghtOfEdge;
+        for (Edge edge : edges) lengthOfEdge += edge.length();
+        return lengthOfEdge;
     }
 
 

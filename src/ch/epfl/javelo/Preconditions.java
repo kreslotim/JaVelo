@@ -8,7 +8,7 @@ package ch.epfl.javelo;
  */
 public final class Preconditions {
     /**
-     * Default (non instantiable) Preconditions constructor
+     * Default (non instantiable) Preconditions constructor.
      */
     private Preconditions() {
     }

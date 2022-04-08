@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Immutable class representing a Multiroute (multiple routes) composed of segments,
- * that can be either Multiroutes or Singleroutes,
+ * Immutable class representing a MultiRoute (multiple routes) composed of segments,
+ * that can be either MultiRoutes or SingleRoutes,
  * linking starting and ending points, and may have intermediate waypoints.
  *
  * @author Tim Kreslo (310686)
@@ -41,7 +41,7 @@ public final class MultiRoute implements Route {
         int indexOfSegment = 0;
         double lengthTotal = 0;
         for (Route segment : segments) { // Use of recursion throughout each segment
-                                         // that can be either a Multiroute or a Singleroute
+                                         // that can be either a MultiRoute or a SingleRoute
             indexOfSegment = (pos > lengthTotal + segment.length())
                     ? indexOfSegment + segment.indexOfSegmentAt(segment.length()) + 1
                     : indexOfSegment + segment.indexOfSegmentAt(pos - lengthTotal);

@@ -51,7 +51,7 @@ public record PointWebMercator(double x, double y) {
      * Returns the coordinate x zoomed at a certain given level.
      *
      * @param zoomLevel Level of zoom
-     * @return the coordinate y zoomed at zoomLevel.
+     * @return the coordinate x zoomed at zoomLevel.
      */
     public double xAtZoomLevel(int zoomLevel) {
         return Math.scalb(x, 8 + zoomLevel);
@@ -86,7 +86,7 @@ public record PointWebMercator(double x, double y) {
     }
 
     /**
-     * returns the point (PointCh) with Swiss coordinates (E, N) located at the same position as
+     * Returns the point (PointCh) with Swiss coordinates (E, N) located at the same position as
      * the receiver point (this), or null if the point is not in Switzerland's bounds defined by SwissBounds.
      *
      * @return a point located at the same position as the receiver point (this).

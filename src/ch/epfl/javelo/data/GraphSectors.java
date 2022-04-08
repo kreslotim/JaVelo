@@ -74,5 +74,4 @@ public record GraphSectors(ByteBuffer buffer) {
      * Recorded class representing a sector, built with starting nodeID and ending nodeID
      */
     public record Sector(int startNodeId, int endNodeId) {}
-
 }

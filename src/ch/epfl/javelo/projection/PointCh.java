@@ -30,7 +30,6 @@ public record PointCh(double e, double n) {
      * @return (double) squared distance between received and target point on the map
      */
     public double squaredDistanceTo(PointCh that) {
-        //return Math.pow(distanceTo(that),2); // squaring distanceTo()
         return Math2.squaredNorm(that.e - this.e, that.n - this.n); // usage of Math2
     }
 
@@ -41,7 +40,6 @@ public record PointCh(double e, double n) {
      * @return (double) distance between received and target point on the map
      */
     public double distanceTo(PointCh that) {
-        //return Math.hypot(that.e - this.e, that.n - this.n); // returns hypotenuse length
         return Math2.norm(that.e - this.e, that.n - this.n); // usage of Math2
     }
 

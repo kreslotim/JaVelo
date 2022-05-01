@@ -109,10 +109,6 @@ public enum Attribute {
         return value;
     }
 
-    public String keyValue() {
-        return keyValue;
-    }
-
     @Override
     public String toString() {
         return keyValue;

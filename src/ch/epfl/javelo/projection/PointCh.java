@@ -40,11 +40,11 @@ public record PointCh(double e, double n) {
      * @return (double) distance between received and target point on the map
      */
     public double distanceTo(PointCh that) {
-        return Math2.norm(that.e - this.e, that.n - this.n); // usage of Math2
+        return Math.sqrt(squaredDistanceTo(that));
     }
 
     /**
-     * Computes longitude using East and North coordinates
+     * Computes longitude (given in WGS84 system) using East and North coordinates
      *
      * @return (double) longitude in radians
      */
@@ -53,7 +53,7 @@ public record PointCh(double e, double n) {
     }
 
     /**
-     * Computes latitude using East and North coordinates
+     * Computes latitude (given in WGS84 system) using East and North coordinates
      *
      * @return (double) latitude in radians
      */

@@ -20,6 +20,7 @@ public record GraphSectors(ByteBuffer buffer) {
     /* Sector's attributes are distributed over 48 bits in total = 4 Bytes + 2 Bytes */
     private final static int SECTOR_PITCH = Integer.BYTES + Short.BYTES;
     private final static int OFFSET_SECTORS_PER_LINE = 128;
+    private final static int OFFSET_MAX_SECTORS_PER_LINE = OFFSET_SECTORS_PER_LINE -1;
     private final static double sectorX = SwissBounds.WIDTH / 128.; // Horizontal component of a sector's dimensions
     private final static double sectorY = SwissBounds.HEIGHT / 128.; // Vertical component of a sector's dimensions
 
@@ -35,8 +36,8 @@ public record GraphSectors(ByteBuffer buffer) {
         ArrayList<Sector> sectorsInZone = new ArrayList<>();
 
         /*
-          Bounds of the square centered on the given point,
-          set to the bounds of Switzerland (maximum square's dimensions)
+          Bounds of the rectangle centered on the given point,
+          set to the bounds of Switzerland (maximum rectangle's dimensions)
          */
         double minE = Math2.clamp(SwissBounds.MIN_E, center.e() - distance, SwissBounds.MAX_E);
         double maxE = Math2.clamp(SwissBounds.MIN_E, center.e() + distance, SwissBounds.MAX_E);
@@ -48,10 +49,10 @@ public record GraphSectors(ByteBuffer buffer) {
           set between 0 and 127 (number of sectors per line/column -1, for reaching ID)
          */
         // distances in meters
-        int xMin = Math2.clamp(0, (int) Math.floor((minE - SwissBounds.MIN_E) / sectorX), 127);
-        int xMax = Math2.clamp(0, (int) Math.floor((maxE - SwissBounds.MIN_E) / sectorX), 127);
-        int yMin = Math2.clamp(0, (int) Math.floor((minN - SwissBounds.MIN_N) / sectorY), 127);
-        int yMax = Math2.clamp(0, (int) Math.floor((maxN - SwissBounds.MIN_N) / sectorY), 127);
+        int xMin = Math2.clamp(0, (int) Math.floor((minE - SwissBounds.MIN_E) / sectorX), OFFSET_MAX_SECTORS_PER_LINE);
+        int xMax = Math2.clamp(0, (int) Math.floor((maxE - SwissBounds.MIN_E) / sectorX), OFFSET_MAX_SECTORS_PER_LINE);
+        int yMin = Math2.clamp(0, (int) Math.floor((minN - SwissBounds.MIN_N) / sectorY), OFFSET_MAX_SECTORS_PER_LINE);
+        int yMax = Math2.clamp(0, (int) Math.floor((maxN - SwissBounds.MIN_N) / sectorY), OFFSET_MAX_SECTORS_PER_LINE);
 
         for (int y = yMin; y <= yMax; y++) {
             for (int x = xMin; x <= xMax; x++) {

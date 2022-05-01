@@ -9,6 +9,7 @@ import ch.epfl.javelo.Preconditions;
  * @author Wei-En Hsieh (341271)
  */
 public record PointWebMercator(double x, double y) {
+    private static final int PIXELS_SIDE = 8;
 
     /**
      * Compact PointWebMercator constructor,
@@ -32,8 +33,8 @@ public record PointWebMercator(double x, double y) {
      * @return Web Mercator point (between  0 and 1 (inclusive))
      */
     public static PointWebMercator of(int zoomLevel, double x, double y) {
-        double finalX = Math.scalb(x, -zoomLevel - 8);
-        double finalY = Math.scalb(y, -zoomLevel - 8);
+        double finalX = Math.scalb(x, -zoomLevel - PIXELS_SIDE);
+        double finalY = Math.scalb(y, -zoomLevel - PIXELS_SIDE);
         return new PointWebMercator(finalX, finalY);
     }
 
@@ -54,7 +55,7 @@ public record PointWebMercator(double x, double y) {
      * @return the coordinate x zoomed at zoomLevel.
      */
     public double xAtZoomLevel(int zoomLevel) {
-        return Math.scalb(x, 8 + zoomLevel);
+        return Math.scalb(x, PIXELS_SIDE + zoomLevel);
     }
 
     /**
@@ -64,7 +65,7 @@ public record PointWebMercator(double x, double y) {
      * @return the coordinate y zoomed at zoomLevel.
      */
     public double yAtZoomLevel(int zoomLevel) {
-        return Math.scalb(y, 8 + zoomLevel);
+        return Math.scalb(y, PIXELS_SIDE + zoomLevel);
     }
 
     /**
@@ -92,7 +93,9 @@ public record PointWebMercator(double x, double y) {
      * @return a point located at the same position as the receiver point (this).
      */
     public PointCh toPointCh() {
-        return (SwissBounds.containsEN(Ch1903.e(lon(), lat()), Ch1903.n(lon(), lat())) ?
-                new PointCh(Ch1903.e(lon(), lat()), Ch1903.n(lon(), lat())) : null);
+
+        double chE = Ch1903.e(lon(), lat());
+        double chN = Ch1903.n(lon(), lat());
+        return (SwissBounds.containsEN(chE, chN) ? new PointCh(chE, chN) : null);
     }
 }

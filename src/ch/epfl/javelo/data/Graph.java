@@ -56,7 +56,6 @@ public final class Graph {
         ByteBuffer edgesChannel = fileName(basePath, "edges.bin");
         ShortBuffer elevationsChannel = fileName(basePath, "elevations.bin").asShortBuffer();
         IntBuffer nodesChannel = fileName(basePath, "nodes.bin").asIntBuffer();// from graphNodes
-        IntBuffer nodesOsmidChannel = fileName(basePath, "nodes_osmid.bin").asIntBuffer();
         IntBuffer profileIdsChannel = fileName(basePath, "profile_ids.bin").asIntBuffer();
         ByteBuffer sectorsChannel = fileName(basePath, "sectors.bin");
 
@@ -153,7 +152,7 @@ public final class Graph {
 
                 actualDistance = point.squaredDistanceTo(targetPoint);
 
-                if (actualDistance < minDistance && actualDistance <= Math.pow(searchDistance, 2)) {
+                if (actualDistance < minDistance && actualDistance <= searchDistance * searchDistance) {
                     minDistance = actualDistance;
                     nearestNodeId = nodeId;
                 }

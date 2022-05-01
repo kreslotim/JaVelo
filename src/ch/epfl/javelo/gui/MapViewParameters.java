@@ -46,7 +46,7 @@ public record MapViewParameters(int zoomLevel, double mapTopLeftPositionX, doubl
      * @return point on map with coordinates X and Y.
      */
     public PointWebMercator pointAt(double x, double y) {
-        return new PointWebMercator(mapTopLeftPositionX + x, mapTopLeftPositionY + y);
+        return PointWebMercator.of(zoomLevel, mapTopLeftPositionX + x, mapTopLeftPositionY + y);
     }
 
     /**
@@ -58,7 +58,7 @@ public record MapViewParameters(int zoomLevel, double mapTopLeftPositionX, doubl
      * @return position X of the given point
      */
     public double viewX(PointWebMercator pointWebMercator) {
-        return pointWebMercator.xAtZoomLevel(zoomLevel) - mapTopLeftPositionX; //todo : - mapTopLeftPositionX ?
+        return pointWebMercator.xAtZoomLevel(zoomLevel) - mapTopLeftPositionX;
     }
 
     /**
@@ -70,6 +70,6 @@ public record MapViewParameters(int zoomLevel, double mapTopLeftPositionX, doubl
      * @return position Y of the given point
      */
     public double viewY(PointWebMercator pointWebMercator) {
-        return pointWebMercator.yAtZoomLevel(zoomLevel) - mapTopLeftPositionY; //todo : - mapTopLeftPositionY ?
+        return pointWebMercator.yAtZoomLevel(zoomLevel) - mapTopLeftPositionY;
     }
 }

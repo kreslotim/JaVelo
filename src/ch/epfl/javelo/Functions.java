@@ -13,8 +13,7 @@ public final class Functions {
     /**
      * Default (not instantiable) Functions constructor
      */
-    private Functions() {
-    }
+    private Functions() {}
 
 
     /**
@@ -78,7 +77,7 @@ public final class Functions {
                 return samples[samples.length - 1];
             } else {
                 double interval = xMax / (samples.length - 1);
-                int i = (int) Math.floor(x / interval);
+                int i = (int) (x / interval);
                 return Math2.interpolate(samples[i], samples[i + 1], (x - interval * i) / interval);
             }
         }

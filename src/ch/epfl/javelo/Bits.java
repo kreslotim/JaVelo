@@ -7,11 +7,12 @@ package ch.epfl.javelo;
  * @author Wei-En Hsieh (341271)
  */
 public final class Bits {
+    private final static int INT_BITS = Integer.SIZE; // 32 bits in an Integer
+
     /**
      * Default (not instantiable) Bits constructor
      */
-    private Bits() {
-    }
+    private Bits() {}
 
 
     /**
@@ -26,12 +27,11 @@ public final class Bits {
      * @throws IllegalArgumentException if the interval of extraction is not between 0 and 31(inclusive).
      */
     public static int extractSigned(int value, int start, int length) {
-        Preconditions.checkArgument(start >= 0 && start <= 31
-                && (start + length) >= 0 && (start + length) <= 32 && length > 0);
-        if (length == 32) return value;
+        Preconditions.checkArgument(start >= 0 && start <= INT_BITS-1
+                && (start + length) >= 0 && (start + length) <= INT_BITS && length > 0);
 
-        int i = value << 32 - (start + length);
-        return i >> 32 - length;
+        int i = value << INT_BITS - (start + length);
+        return i >> INT_BITS - length;
     }
 
     /**
@@ -48,9 +48,9 @@ public final class Bits {
      *                                  or if the interval of extraction (length) is equal to 32.
      */
     public static int extractUnsigned(int value, int start, int length) {
-        Preconditions.checkArgument(start >= 0 && start <= 31
-                && (start + length) >= 0 && (start + length) <= 32 && length > 0 && length < 32);
-        int i = value << 32 - (start + length);
-        return i >>> 32 - length;
+        Preconditions.checkArgument(start >= 0 && start <= INT_BITS-1
+                && (start + length) >= 0 && (start + length) <= INT_BITS && length > 0 && length < INT_BITS);
+        int i = value << INT_BITS - (start + length);
+        return i >>> INT_BITS - length;
     }
 }

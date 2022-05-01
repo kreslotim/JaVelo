@@ -46,8 +46,7 @@ public class GpxGenerator {
                     .newDefaultInstance()
                     .newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.transform(new DOMSource(doc),
-                    new StreamResult(w));
+            transformer.transform(new DOMSource(doc), new StreamResult(w));
         } catch (TransformerException transformerException) {
             throw new Error(transformerException);
         }
@@ -64,18 +63,15 @@ public class GpxGenerator {
 
         Document doc = newDocument(); // see below
 
-        Element root = doc
-                .createElementNS("http://www.topografix.com/GPX/1/1",
-                        "gpx");
+        Element root = doc.createElementNS("http://www.topografix.com/GPX/1/1", "gpx");
         doc.appendChild(root);
 
         root.setAttributeNS(
                 "http://www.w3.org/2001/XMLSchema-instance",
                 "xsi:schemaLocation",
-                "http://www.topografix.com/GPX/1/1 "
-                        + "http://www.topografix.com/GPX/1/1/gpx.xsd");
+                "http://www.topografix.com/GPX/1/1 " + "http://www.topografix.com/GPX/1/1/gpx.xsd");
         root.setAttribute("version", "1.1");
-        root.setAttribute("creato", "JaVelo");
+        root.setAttribute("creator", "JaVelo");
 
         Element metadata = doc.createElement("metadata");
         root.appendChild(metadata);
@@ -92,21 +88,26 @@ public class GpxGenerator {
         List<Edge> edgesList = route.edges();
         double position = 0;
 
+        int countNode = 0;
         // list de pointCh
         List<PointCh> pointChList = route.points();
         for (int i = 0; i < pointChList.size(); ++i) {
-            Element rtePt = doc.createElement("rtePt");
+            Element rtePt = doc.createElement("rtept");
             rte.appendChild(rtePt);
             rtePt.setAttribute("lon", String.format(Locale.ROOT, "%.5f", Math.toDegrees(pointChList.get(i).lon())));
             rtePt.setAttribute("lat", String.format(Locale.ROOT, "%.5f", Math.toDegrees(pointChList.get(i).lat())));
-            Element ele = doc.createElement("elevation");
+            Element ele = doc.createElement("ele");
             rtePt.appendChild(ele);
             ele.setTextContent(String.format(Locale.ROOT, "%.2f", profileRoute.elevationAt(position)));
 
             if (i < edgesList.size()) {
                 position += edgesList.get(i).length();
             }
+
+            countNode++;
         }
+
+        System.out.println("Nodes number : "+countNode);
         return doc;
     }
 

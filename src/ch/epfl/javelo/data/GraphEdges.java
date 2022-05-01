@@ -93,6 +93,15 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         float currentAltitude;
         float[] samples = new float[sampleNb];
 
+        // todo : les variables pour type2 et type3 :  //from here
+        // "Les différences (d'altitude par rapport à leur prédécesseur) sont ensuite empaquetées dans des valeurs de 16 bits, contenant chacune 2 (type 2) ou 4 (type 3) différences."
+        int altitudeDifference = (type == ProfileType.COMPRESSED_PROFILE_Q0_4) ? 2 : 4;
+        // todo : le code marche, mais c'est moche. J'utilise lequel ? :
+//        int extractSignedLength = (type == ProfileType.COMPRESSED_PROFILE_Q0_4) ? (int) OFFSET_OSM_ATTRIBUTES : OFFSET_LENGTH; // 8 : 4
+        int extractSignedLength = (type == ProfileType.COMPRESSED_PROFILE_Q0_4) ? Byte.SIZE : Byte.SIZE / 2; // 8 : 4
+        // raison : "les échantillons suivants sont représentés par la différence d'altitude par rapport à leur prédécesseur, représentée soit par une valeur de 8 bits au format Q4.4 (type 2), soit par une valeur de 4 bits au format Q0.4 (type 3)."
+        //todo : to here
+
         switch (type) {
             case NONEXISTENT_PROFILE:
                 return new float[]{};
@@ -103,35 +112,23 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
                 }
                 break;
 
-            case COMPRESSED_PROFILE_Q0_4:
+            case COMPRESSED_PROFILE_Q0_4, COMPRESSED_PROFILE_Q4_4:
                 samples[0] = Q28_4.asFloat(elevations.get(firstIndex));
                 currentAltitude = samples[0];
-                for (int i = 1; i <= Math.ceil((sampleNb - 1) / 2.0); ++i) {
-                    for (int j = 1; j >= 0; --j) {
-                        if (2 * i - j < sampleNb) {
+                for (int i = 1; i <= Math.ceil((sampleNb - 1) / (double) altitudeDifference); ++i) {
+                    for (int j = altitudeDifference - 1; j >= 0; --j) {
+                        if ((altitudeDifference * i - j) < sampleNb) {
                             currentAltitude += Q28_4.asFloat(Bits.extractSigned(elevations.get(firstIndex + i),
-                                    8 * j, 8));
-                            samples[2 * i - j] = currentAltitude;
-                        }
-                    }
-                }
-                break;
-
-            case COMPRESSED_PROFILE_Q4_4:
-                samples[0] = Q28_4.asFloat(elevations.get(firstIndex));
-                currentAltitude = samples[0];
-                for (int i = 1; i <= Math.ceil((sampleNb - 1) / 4.0); ++i) {
-                    for (int j = 3; j >= 0; --j) {
-                        if ((4 * i - j) < sampleNb) {
-                            currentAltitude += Q28_4.asFloat(Bits.extractSigned(elevations.get(firstIndex + i),
-                                    4 * j, 4));
-                            samples[4 * i - j] = currentAltitude;
+                                    extractSignedLength * j, extractSignedLength));
+                            samples[altitudeDifference * i - j] = currentAltitude;
                         }
                     }
                 }
                 break;
         }
-        return (isInverted(edgeId) ? flip(sampleNb, samples) : samples);
+        if (isInverted(edgeId)) flip(samples);
+
+        return samples;
     }
 
     /**
@@ -149,22 +146,15 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
      * Auxiliary (private) method that flips the order of elements inside given array of profile types,
      * if the edge is inverted.
      *
-     * @param sampleNb    the number of samples
      * @param profileType the array before flipping the order of elements
-     * @return the array after flipping the order of elements of the original array (tab)
      */
-    private float[] flip(int sampleNb, float[] profileType) {
-        // to flip the array :
-
-        for (int i = 0; i < sampleNb / 2; ++i) {
-            float tmp = profileType[i];
-            profileType[i] = profileType[profileType.length - i - 1];
-            profileType[profileType.length - i - 1] = tmp;
+    private void flip(float[] profileType) {
+        int tabInverted = profileType.length;
+        for (int i = 0; i < tabInverted / 2; ++i) {
+            float temp = profileType[i];
+            profileType[i] = profileType[tabInverted - i - 1];
+            profileType[tabInverted - i - 1] = temp;
         }
-
-        float[] tabInverted = new float[profileType.length];
-        System.arraycopy(profileType, 0, tabInverted, 0, profileType.length);
-        return tabInverted;
     }
 
     /**
@@ -177,7 +167,6 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         short s = edgesBuffer.getShort(edgeId * EDGE_PITCH + OFFSET_OSM_ATTRIBUTES);
         return Short.toUnsignedInt(s);
     }
-
 
     /**
      * Four profile types that can be used for the given edge's identity profile samples

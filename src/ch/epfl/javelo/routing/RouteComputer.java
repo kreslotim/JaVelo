@@ -5,6 +5,12 @@ import ch.epfl.javelo.data.Graph;
 
 import java.util.*;
 
+/**
+ * Class that computes the full Route.
+ *
+ * @author Tim Kreslo (310686)
+ * @author Wei-En Hsieh (341271)
+ */
 public final class RouteComputer {
     private final Graph graph;
     private final CostFunction costFunction;

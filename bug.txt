@@ -1,12 +1,2 @@
-step3 ------------------------------------------------
-• code ressemblant COMPRESSED_PROFILE_Q0_4, aka type2, COMPRESSED_PROFILE_Q4_4, aka type3, de profileSamples(...) dans GraphEdges : Optimisation := cree une methode pour modulariser et donc reduire la taille de profileSamples(...).
-• methode private flip(...) change to System.Copy.Arrays... pour l'optimisation du code qd on copie les valeurs d'un tableau.
-
-
-step4 ------------------------------------------------
-• les methodes de RoutePoint doivent etre public or private ? it can be public or final depending on what u wanna do with them.
-• dans ElevationProfile, si y'a une valeur negative ? piazza
-
-
-step7 ------------------------------------------------
-dans MapViewParameters : viewX et viewY : cf deux todo.
+step8 :
+BaseMapManager redrawNeeded et mapViewParameters sont pas finaux, alors qu'il faut !

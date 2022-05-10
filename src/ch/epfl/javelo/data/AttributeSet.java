@@ -22,7 +22,7 @@ public record AttributeSet(long bits) {
     public AttributeSet {
         // The collection has 62 elements.
         // Therefore, there cannot exist any values, corresponding to the two bits at the end of the 64-bit (long) value
-        Preconditions.checkArgument(bits >> 62 == 0b0);
+        Preconditions.checkArgument(bits >> Attribute.COUNT == 0b0);
     }
 
     /**
@@ -78,7 +78,7 @@ public record AttributeSet(long bits) {
             // check if attributeSet contains the i-th attribute :
             if (this.contains(attribute))
                 // if this condition is true, then we add this key and the value of the attribute in the string
-                j.add(attribute.key() + "=" + attribute.value());
+                j.add(attribute.toString());
         }
         return j.toString();
     }

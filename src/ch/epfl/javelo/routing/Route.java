@@ -6,6 +6,9 @@ import java.util.List;
 
 /**
  * Interface representing a Route
+ *
+ * @author Tim Kreslo (310686)
+ * @author Wei-En Hsieh (341271)
  */
 public interface Route {
 

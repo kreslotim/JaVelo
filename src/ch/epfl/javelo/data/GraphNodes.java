@@ -19,12 +19,16 @@ public record GraphNodes(IntBuffer buffer) {
     private static final int OFFSET_OUT_EDGES = OFFSET_N + 1;
     private static final int NODE_INTS = OFFSET_OUT_EDGES + 1;
 
+    private static final int OFFSET_EDGE_ID = 0;
+    private static final int EDGE_ID_BITS = 28;
+    private static final int OUT_EDGES_BITS = Integer.SIZE - EDGE_ID_BITS;
+
     /**
      * Counts the total number of nodes inside the GraphNodes buffer
      *
      * @return the total number of nodes
      */
-    public int count() { return (buffer.capacity()) / 3;}
+    public int count() { return (buffer.capacity()) / NODE_INTS;}
 
     /**
      * Returns the East coordinate of the given node of the graph
@@ -50,7 +54,7 @@ public record GraphNodes(IntBuffer buffer) {
      */
     public int outDegree(int nodeId) {
         int slice = buffer.get(nodeId * NODE_INTS + OFFSET_OUT_EDGES);
-        return Bits.extractUnsigned(slice, 28, 4);
+        return Bits.extractUnsigned(slice, EDGE_ID_BITS, OUT_EDGES_BITS);
     }
 
     /**
@@ -63,6 +67,6 @@ public record GraphNodes(IntBuffer buffer) {
     public int edgeId(int nodeId, int edgeIndex) {
         assert 0 <= edgeIndex && edgeIndex < outDegree(nodeId);
         int slice = buffer.get(nodeId * NODE_INTS + OFFSET_OUT_EDGES);
-        return Bits.extractUnsigned(slice, 0, 28) + edgeIndex;
+        return Bits.extractUnsigned(slice, OFFSET_EDGE_ID, EDGE_ID_BITS) + edgeIndex;
     }
 }

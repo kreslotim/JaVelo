@@ -5,6 +5,12 @@ import ch.epfl.javelo.data.Graph;
 
 import java.util.*;
 
+/**
+ * Class that computes the full Route
+ *
+ * @author Tim Kreslo (310686)
+ * @author Wei-En Hsieh (341271)
+ */
 public final class RouteComputer {
     private final Graph graph;
     private final CostFunction costFunction;
@@ -102,7 +108,7 @@ public final class RouteComputer {
      * @param startNodeId Starting node index
      * @param endNodeId   Ending node index
      * @param predecessor Array of preceding nodes
-     * @return Route, composed of a list of edges
+     * @return            Route, composed of a list of edges
      */
     private SingleRoute computeRoute(int startNodeId, int endNodeId, int[] predecessor) {
         List<Edge> edgesOfTheRoute = new ArrayList<>();

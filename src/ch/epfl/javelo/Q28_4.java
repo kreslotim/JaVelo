@@ -7,11 +7,12 @@ package ch.epfl.javelo;
  * @author Wei-En Hsieh (341271)
  */
 public final class Q28_4 {
+    private final static int SHIFT = 4;
+
     /**
      * Default (not instantiable) Q28_4 constructor.
      */
-    private Q28_4() {
-    }
+    private Q28_4() {}
 
 
     /**
@@ -23,7 +24,7 @@ public final class Q28_4 {
     public static int ofInt(int i) {
         // i must be greater than or equal to -134217728 and smaller than or equal to 134217727,
         // otherwise, we lose information.
-        return i << 4;
+        return i << SHIFT;
     }
 
     /**
@@ -33,7 +34,7 @@ public final class Q28_4 {
      * @return a (double) type value equal to the given Q28.4 value.
      */
     public static double asDouble(int q28_4) {
-        return Math.scalb((double) q28_4, -4);
+        return Math.scalb((double) q28_4, -SHIFT);
     }
 
     /**
@@ -43,6 +44,6 @@ public final class Q28_4 {
      * @return a (float) type value equal to the given Q28.4 value.
      */
     public static float asFloat(int q28_4) {
-        return (float) Math.scalb((double) q28_4, -4);
+        return Math.scalb((float) q28_4, -SHIFT);
     }
 }

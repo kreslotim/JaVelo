@@ -58,10 +58,7 @@ public final class SingleRoute implements Route {
      */
     @Override
     public double length() {
-        double lengthOfEdge = 0;
-
-        for (Edge edge : edges) lengthOfEdge += edge.length();
-        return lengthOfEdge;
+        return positionsTab[positionsTab.length-1];
     }
 
 
@@ -154,25 +151,17 @@ public final class SingleRoute implements Route {
      */
     @Override
     public RoutePoint pointClosestTo(PointCh point) {
-        double minDistance = Integer.MAX_VALUE;
         double posClosestToPoint;
-        double gapOnEdge = 0;
         double distanceToReference;
-        PointCh pointOnEdge = new PointCh(SwissBounds.MAX_E, SwissBounds.MAX_N);
+        PointCh pointOnEdge;
         RoutePoint nearestRoutePoint = RoutePoint.NONE;
 
         for (int i = 0; i < edges.size(); i++) {
 
-            posClosestToPoint = Math2.clamp(0, edges.get(i).positionClosestTo(point), edges.get(i).length());
-            PointCh pointOnEdgeTemp = edges.get(i).pointAt(posClosestToPoint);
-            distanceToReference = pointOnEdgeTemp.distanceTo(point);
-
-            if (distanceToReference <= minDistance) { //minimizing distance to reference
-                minDistance = distanceToReference;
-                gapOnEdge = posClosestToPoint;
-                pointOnEdge = pointOnEdgeTemp;
-            }
-            nearestRoutePoint = nearestRoutePoint.min(pointOnEdge, positionsTab[i] + gapOnEdge, minDistance);
+            posClosestToPoint = Math2.clamp(positionsTab[i],positionsTab[i] + edges.get(i).positionClosestTo(point), positionsTab[i + 1]);
+            pointOnEdge = pointAt(posClosestToPoint);
+            distanceToReference = pointOnEdge.distanceTo(point);
+            nearestRoutePoint = nearestRoutePoint.min(pointOnEdge, posClosestToPoint, distanceToReference);
         }
 
         return nearestRoutePoint;

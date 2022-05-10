@@ -14,11 +14,15 @@ public final class Ch1903 {
      */
     private Ch1903() {}
 
+    /*
+    * For the rest of the project, our coordinates will be defined in radians
+    */
+
     /**
      * Returns the E (East) coordinate of the longitude and latitude point in the WGS84 system.
      *
-     * @param lon longitude
-     * @param lat latitude
+     * @param lon longitude (given in WGS84 system)
+     * @param lat latitude (given in WGS84 system)
      * @return (double) the E (East) coordinate of the longitude and latitude point in the WGS84 system.
      */
     public static double e(double lon, double lat) {
@@ -34,8 +38,8 @@ public final class Ch1903 {
     /**
      * Returns the N (North) coordinate of the longitude and latitude point in the WGS84 system.
      *
-     * @param lon longitude
-     * @param lat latitude
+     * @param lon longitude (given in WGS84 system)
+     * @param lat latitude (given in WGS84 system)
      * @return (double) the N (North) coordinate of the longitude and latitude point in the WGS84 system.
      */
     public static double n(double lon, double lat) {

@@ -1,5 +1,11 @@
 package ch.epfl.javelo.routing;
 
+/**
+ * Interface representing the cost function, applied on the route
+ *
+ * @author Tim Kreslo (310686)
+ * @author Wei-En Hsieh (341271)
+ */
 public interface CostFunction {
 
     /**

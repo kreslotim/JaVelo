@@ -2,15 +2,12 @@ package ch.epfl.javelo;
 
 import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.gui.*;
-import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.routing.CityBikeCF;
 import ch.epfl.javelo.routing.CostFunction;
 import ch.epfl.javelo.routing.RouteComputer;
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -25,14 +22,16 @@ public final class Stage9Test extends Application {
     public void start(Stage primaryStage) throws Exception {
         Graph graph = Graph.loadFrom(Path.of("lausanne"));
         Path cacheBasePath = Path.of(".");
-        String tileServerHost = "tile.openstreetmap.org";
+        String tileServerHost3 = "tile.openstreetmap.org";
         String tileServerHost1 = "cartodb-basemaps-1.global.ssl.fastly.net/dark_all";
         String tileServerHost2 = "tile.memomaps.de/tilegen";
+        String tileServerHost = "c.tile-cyclosm.openstreetmap.fr/cyclosm";
+        // https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/19/271725/185422.png
 
         CostFunction cf = new CityBikeCF(graph);
         RouteComputer rc = new RouteComputer(graph, cf);
         RouteBean routeBean = new RouteBean(rc);
-        routeBean.setHighlightedPosition(1000);
+        routeBean.setHighlightedPositionProperty(1000);
 
         TileManager tileManager = new TileManager(cacheBasePath, tileServerHost);
 
@@ -55,8 +54,7 @@ public final class Stage9Test extends Application {
 
         RouteManager routeManager =
                 new RouteManager(routeBean,
-                        mapViewParametersP,
-                        errorConsumer);
+                        mapViewParametersP);
 
         StackPane mainPane =
                 new StackPane(baseMapManager.pane(),

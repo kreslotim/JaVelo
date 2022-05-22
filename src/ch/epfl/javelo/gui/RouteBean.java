@@ -1,9 +1,9 @@
 package ch.epfl.javelo.gui;
 
 import ch.epfl.javelo.routing.*;
+import javafx.beans.Observable;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.util.Pair;
 
@@ -13,19 +13,19 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Route Bean assembling properties relating to waypoints and the corresponding route.
+ * Route Bean assembling properties relating to waypoints and the corresponding route
  *
  * @author Tim Kreslo (310686)
  * @author Wei-En Hsieh (341271)
  */
 public final class RouteBean {
-    private final RouteComputer routeComputer; //TODO Must be final ?
-    private final ObjectProperty<Route> route = new SimpleObjectProperty<>();
-    private final DoubleProperty highlightedPosition = new SimpleDoubleProperty(); // modifiable from outside
-    private final ObservableList<Waypoint> waypoints = FXCollections.observableArrayList(); // modifiable from outside
-    private final ObjectProperty<ElevationProfile> elevationProfile = new SimpleObjectProperty<>();
-    private final Map<String, Route> cacheRoute = new LinkedHashMap<>(100);
+    private final RouteComputer routeComputer;
     private final List<Route> segments = new ArrayList<>();
+    private final Map<String, Route> cacheRoute = new LinkedHashMap<>(100);
+    private final ObjectProperty<Route> routeProperty = new SimpleObjectProperty<>();
+    private final ObservableList<Waypoint> waypoints = FXCollections.observableArrayList();
+    private final DoubleProperty highlightedPositionProperty = new SimpleDoubleProperty();
+    private final ObjectProperty<ElevationProfile> elevationProfileProperty = new SimpleObjectProperty<>();
 
     /**
      * Default RouteBean constructor
@@ -34,7 +34,7 @@ public final class RouteBean {
      */
     public RouteBean(RouteComputer routeComputer) {
         this.routeComputer = routeComputer;
-        waypoints.addListener((ListChangeListener<Waypoint>) o -> computeRoute());
+        waypoints.addListener((Observable o) -> computeRoute());
     }
 
     /**
@@ -42,41 +42,52 @@ public final class RouteBean {
      */
     private void computeRoute() {
         segments.clear();
-        route.setValue(null);
-        elevationProfile.setValue(null);
-        boolean routeIsNull = false;
 
         if (waypoints.size() > 1) {
 
+            boolean segmentIsNull = false;
             for (int i = 1; i < waypoints.size(); i++) {
 
-                Pair<Integer, Integer> pairNode = new Pair<>(waypoints.get(i - 1).nearestNodeId(), waypoints.get(i).nearestNodeId());
+                Pair<Integer, Integer> pairNode = new Pair<>(waypoints.get(i - 1).nearestNodeId(),
+                                                             waypoints.get(i).nearestNodeId());
 
                 if (cacheRoute.containsKey(pairNode.toString())) {
                     Route segment = cacheRoute.get(pairNode.toString());
                     segments.add(segment);
-                } else {
-                    Route segment = routeComputer.bestRouteBetween(pairNode.getKey(), pairNode.getValue());
+                }
+                else {
+
+                    Route segment = null;
+                    if (!pairNode.getKey().equals(pairNode.getValue())) {
+                        segment = routeComputer.bestRouteBetween(pairNode.getKey(), pairNode.getValue());
+                    }
+
                     if (segment == null) {
-                        routeIsNull = true;
-                        route.setValue(null);
+                        segmentIsNull = true;
                         break;
                     }
-                    segments.add(segment);
-                    cacheRoute.put(pairNode.toString(), segment);
+
+                    else {
+                        segments.add(segment);
+                        cacheRoute.put(pairNode.toString(), segment);
+                    }
                 }
             }
 
-            if (routeIsNull || segments.isEmpty()) {
-                //highlightedPosition.setValue(Double.NaN);
-                elevationProfile.setValue(null);
-                route.setValue(null);
+            if (segments.isEmpty() || segmentIsNull) {
+                elevationProfileProperty.set(null);
+                routeProperty.set(null);
             }
             else {
                 MultiRoute multiRoute = new MultiRoute(segments);
-                elevationProfile.setValue(ElevationProfileComputer.elevationProfile(multiRoute, 5));
-                route.setValue(multiRoute);
+                int MAX_STEP_LENGTH = 5;
+                elevationProfileProperty.set(ElevationProfileComputer.elevationProfile(multiRoute, MAX_STEP_LENGTH));
+                routeProperty.set(multiRoute);
             }
+        }
+        else {
+            routeProperty.set(null);
+            elevationProfileProperty.set(null);
         }
     }
 
@@ -96,7 +107,7 @@ public final class RouteBean {
      * @return double value of the highlighted position
      */
     public double highlightedPosition() {
-        return highlightedPosition.doubleValue();
+        return highlightedPositionProperty.get();
     }
 
     /**
@@ -105,7 +116,7 @@ public final class RouteBean {
      * @return highlighted position's property itself
      */
     public DoubleProperty highlightedPositionProperty() {
-        return highlightedPosition;
+        return highlightedPositionProperty;
     }
 
     /**
@@ -113,8 +124,8 @@ public final class RouteBean {
      *
      * @param highlightedPositionValue double value of the highlighted position
      */
-    public void setHighlightedPosition(double highlightedPositionValue) {
-        highlightedPosition.setValue(highlightedPositionValue);
+    public void setHighlightedPositionProperty(double highlightedPositionValue) {
+        highlightedPositionProperty.set(highlightedPositionValue);
     }
 
     /**
@@ -122,8 +133,8 @@ public final class RouteBean {
      *
      * @return route's property itself in read only mode
      */
-    public ReadOnlyObjectProperty<Route> route() {
-        return route;
+    public ReadOnlyObjectProperty<Route> routeProperty() {
+        return routeProperty;
     }
 
     /**
@@ -131,7 +142,18 @@ public final class RouteBean {
      *
      * @return elevation profile's property itself in read only mode
      */
-    public ReadOnlyObjectProperty<ElevationProfile> elevationProfile() {
-        return elevationProfile;
+    public ReadOnlyObjectProperty<ElevationProfile> elevationProfileProperty() {
+        return elevationProfileProperty;
+    }
+
+
+    public int indexOfNonEmptySegmentAt(double position) {
+        int index = routeProperty().get().indexOfSegmentAt(position);
+        for (int i = 0; i <= index; i += 1) {
+            int n1 = waypoints.get(i).nearestNodeId();
+            int n2 = waypoints.get(i + 1).nearestNodeId();
+            if (n1 == n2) index += 1;
+        }
+        return index;
     }
 }

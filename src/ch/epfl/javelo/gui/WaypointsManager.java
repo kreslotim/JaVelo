@@ -25,7 +25,7 @@ import java.util.function.Consumer;
  * @author Wei-En Hsieh (341271)
  */
 public final class WaypointsManager {
-    private final Graph routingGraph;
+    private final Graph graph;
     private final ObservableList<Waypoint> waypoints;
     private final ObjectProperty<MapViewParameters> mapViewParametersProperty;
     private final ObjectProperty<Point2D> point2DProperty = new SimpleObjectProperty<>();
@@ -39,15 +39,15 @@ public final class WaypointsManager {
     /**
      * Default WaypointsManager constructor
      *
-     * @param routingGraph              route network graph
+     * @param graph                     Route network graph
      * @param mapViewParametersProperty JavaFX property containing the parameters of the map displayed
-     * @param waypoints                 observable list of all waypoints
-     * @param errorConsumer             object for reporting errors
+     * @param waypoints                 Observable list of all waypoints
+     * @param errorConsumer             Object for reporting errors
      */
-    public WaypointsManager(Graph routingGraph, ObjectProperty<MapViewParameters> mapViewParametersProperty,
+    public WaypointsManager(Graph graph, ObjectProperty<MapViewParameters> mapViewParametersProperty,
                             ObservableList<Waypoint> waypoints, Consumer<String> errorConsumer) {
 
-        this.routingGraph = routingGraph;
+        this.graph = graph;
         this.waypoints = waypoints; //TODO must be immutable
         this.mapViewParametersProperty = mapViewParametersProperty;
         this.errorConsumer = errorConsumer;
@@ -55,18 +55,7 @@ public final class WaypointsManager {
         pane = new Pane();
         pane.setPickOnBounds(false);
 
-        mapViewParametersProperty.addListener((p,o,n) -> {  //property old new
-
-            for (Node marker : pane.getChildren()) {
-
-                PointWebMercator pointWebMercator = o.pointAt(marker.getLayoutX(), marker.getLayoutY());
-
-                marker.setLayoutX(n.viewX(pointWebMercator));
-                marker.setLayoutY(n.viewY(pointWebMercator));
-            }
-        });
-
-        waypoints.addListener((ListChangeListener<Waypoint>) o -> drawWaypoints());
+        setUpListeners();
 
         drawWaypoints();
     }
@@ -101,8 +90,8 @@ public final class WaypointsManager {
 
                 Point2D previousPoint = point2DProperty.get();
 
-                marker.setLayoutX(e.getSceneX() - previousPoint.getX());
-                marker.setLayoutY(e.getSceneY() - previousPoint.getY());
+                marker.setLayoutX(e.getSceneX()); //TODO Ok to use getScene ?
+                marker.setLayoutY(e.getSceneY());
 
             });
 
@@ -115,12 +104,12 @@ public final class WaypointsManager {
                 else {
 
                     PointCh newPointCh = mapViewParametersProperty.get().pointAt(
-                            e.getSceneX() - previousPoint.getX(),
-                            e.getSceneY() - previousPoint.getY())
+                            e.getSceneX(),
+                            e.getSceneY())
                             .toPointCh();
 
                     if (newPointCh != null) {
-                        int newNodeId = routingGraph.nodeClosestTo(newPointCh, SEARCH_DISTANCE);
+                        int newNodeId = graph.nodeClosestTo(newPointCh, SEARCH_DISTANCE);
                         if (newNodeId != -1) waypoints.set(indexI, new Waypoint(newPointCh, newNodeId));
                         else {
                             drawWaypoints();
@@ -162,9 +151,6 @@ public final class WaypointsManager {
         return new Group(contour, disk);
     }
 
-    private void handleEvents() {
-
-    }
 
     /**
      * Auxiliary (private) method adding a Waypoint on the map
@@ -181,13 +167,30 @@ public final class WaypointsManager {
         PointCh pointCh = p.toPointCh();
 
         if (pointCh != null) {
-            int nearestNodeId = routingGraph.nodeClosestTo(pointCh, SEARCH_DISTANCE);
+            int nearestNodeId = graph.nodeClosestTo(pointCh, SEARCH_DISTANCE);
 
             if (nearestNodeId == -1) { // if there's no nearestNodes
                 errorConsumer.accept("No route nearby !");
             } else { // if the nearestNode exists
+                //System.out.println("Adding a waypoint");
                 waypoints.add(new Waypoint(pointCh, nearestNodeId));
             }
         }
+    }
+
+    private void setUpListeners() {
+
+        mapViewParametersProperty.addListener((p,o,n) -> {
+
+            for (Node marker : pane.getChildren()) {
+
+                PointWebMercator pointWebMercator = o.pointAt(marker.getLayoutX(), marker.getLayoutY());
+
+                marker.setLayoutX(n.viewX(pointWebMercator));
+                marker.setLayoutY(n.viewY(pointWebMercator));
+            }
+        });
+
+        waypoints.addListener((ListChangeListener<Waypoint>) o -> drawWaypoints());
     }
 }

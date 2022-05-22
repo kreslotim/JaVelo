@@ -46,13 +46,14 @@ public final class TileManager {
 
         String zoomXY_PNG = String.format("%d/%d/%d.png",tileId.tileZoomLevel, tileId.tileX, tileId.tileY);
         String url = String.format("https://%s/%s",tileServerName, zoomXY_PNG);
+        String cache_zoomXY_PNG = String.format("%s/%s",pathToDisk, zoomXY_PNG);
         Path pathToImageDirectory = Path.of(String.format("%s/%d/%d",pathToDisk, tileId.tileZoomLevel, tileId.tileX));
 
         if (!cacheMemory.containsKey(tileId)) {
-            if (!Files.exists(Path.of(zoomXY_PNG))) {
-                transferFromServerToDisk(zoomXY_PNG, url, pathToImageDirectory);
+            if (!Files.exists(Path.of(cache_zoomXY_PNG))) {
+                transferFromServerToDisk(cache_zoomXY_PNG, url, pathToImageDirectory);
             }
-            transferFromDiskToCache(zoomXY_PNG, tileId);
+            transferFromDiskToCache(cache_zoomXY_PNG, tileId);
         }
         return cacheMemory.get(tileId);
     }
@@ -61,12 +62,12 @@ public final class TileManager {
     /**
      * Auxiliary (private) method, that transfers data from server (with given URL)
      *
-     * @param zoomXY_PNG (String) path to PNG file
+     * @param cache_zoomXY_PNG (String) path to PNG file
      * @param url (String) server's domain
      * @param pathToImageDirectory (Path) path to directory containing the PNG file
      * @throws IOException if the provided URL is not valid
      */
-    private void transferFromServerToDisk(String zoomXY_PNG, String url, Path pathToImageDirectory) throws IOException {
+    private void transferFromServerToDisk(String cache_zoomXY_PNG, String url, Path pathToImageDirectory) throws IOException {
         URL u = new URL(url);
         URLConnection c = u.openConnection();
         c.setRequestProperty("User-Agent", "JaVelo");
@@ -74,7 +75,7 @@ public final class TileManager {
 
         //stock to SSD disk
         try (InputStream i = c.getInputStream();
-             FileOutputStream fileOutputStream = new FileOutputStream(zoomXY_PNG)) {
+             FileOutputStream fileOutputStream = new FileOutputStream(cache_zoomXY_PNG)) {
             i.transferTo(fileOutputStream);
         }
     }
@@ -83,12 +84,12 @@ public final class TileManager {
     /**
      * Auxiliary (private) method, that transfers data from server (with given URL)
      *
-     * @param zoomXY_PNG (String) path to PNG file
+     * @param cache_zoomXY_PNG (String) path to PNG file
      * @param tileId (TileId) given tile's identity
      * @throws IOException if the provided path to directory is not valid
      */
-    private void transferFromDiskToCache(String zoomXY_PNG, TileId tileId) throws IOException {
-        try (FileInputStream fileInputStream = new FileInputStream(zoomXY_PNG)) {
+    private void transferFromDiskToCache(String cache_zoomXY_PNG, TileId tileId) throws IOException {
+        try (FileInputStream fileInputStream = new FileInputStream(cache_zoomXY_PNG)) {
 
             //stock to memory cache
             if (cacheMemory.size() >= MAX_ENTRIES) {  // memory cache must contain a maximum of 100 images

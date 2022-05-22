@@ -39,7 +39,7 @@ public final class ElevationProfileComputer {
 
         //case when there are only NaN values in the array elevationSamples : fill up the array elevationSamples with 0
         for (int i = 1; i < samplesNb; ++i) {
-            if (Float.isNaN(elevationSamples[0]) && Float.isNaN(elevationSamples[samplesNb - 1])) {
+            if (Float.isNaN(elevationSamples[0]) && Float.isNaN(elevationSamples[samplesNb - 1]) && Float.isNaN(elevationSamples[i])) {
                 Arrays.fill(elevationSamples, 0, samplesNb, 0f);
             }
         }

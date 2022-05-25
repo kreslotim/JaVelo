@@ -92,8 +92,6 @@ public final class RouteManager {
             polyline.getPoints().setAll(listPointsXY);
 
             polyline.setVisible(true);
-            circle.setVisible(true);
-
         }
         else {
             polyline.setVisible(false);

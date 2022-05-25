@@ -55,7 +55,7 @@ public final class WaypointsManager {
         pane = new Pane();
         pane.setPickOnBounds(false);
 
-        setUpListeners();
+        setupListeners();
 
         drawWaypoints(); // draw the waypoints once at the beginning
     }
@@ -82,31 +82,36 @@ public final class WaypointsManager {
             marker.getStyleClass().add("pin");
 
             marker.setOnMousePressed(e -> {
-                Point2D pressedPoint = new Point2D(e.getX(), e.getY());
+                Point2D pressedPoint = new Point2D(e.getSceneX(), e.getSceneY());
                 point2DProperty.set(pressedPoint);
             });
 
             marker.setOnMouseDragged(e -> {
 
                 Point2D previousPoint = point2DProperty.get();
+                Point2D newPoint = new Point2D(e.getSceneX(), e.getSceneY());
+                //if (point2DProperty.get() == null) point2DProperty.set(newPoint);
+                Point2D shiftPoint = newPoint.subtract(previousPoint);
 
-                marker.setLayoutX(e.getSceneX() ); //TODO Ok to use getScene ?
-                marker.setLayoutY(e.getSceneY() );
+                marker.setLayoutX(marker.getLayoutX() + shiftPoint.getX());
+                marker.setLayoutY(marker.getLayoutY() + shiftPoint.getY());
 
-
+                point2DProperty.set(newPoint);
             });
 
             int indexI = i; // syntax lambda
             marker.setOnMouseReleased(e -> {
 
                 Point2D previousPoint = point2DProperty.get();
+                Point2D newPoint = new Point2D(e.getSceneX(), e.getSceneY());
+                Point2D shiftPoint = newPoint.subtract(previousPoint);
 
                 if (e.isStillSincePress()) waypoints.remove(indexI);
                 else {
 
                     PointCh newPointCh = mapViewParametersProperty.get().pointAt(
-                            e.getSceneX(),
-                            e.getSceneY())
+                                    marker.getLayoutX() + shiftPoint.getX(),
+                                    marker.getLayoutY() + shiftPoint.getY())
                             .toPointCh();
 
                     if (newPointCh != null) {
@@ -179,7 +184,7 @@ public final class WaypointsManager {
         }
     }
 
-    private void setUpListeners() {
+    private void setupListeners() {
 
         mapViewParametersProperty.addListener((p,o,n) -> {
 

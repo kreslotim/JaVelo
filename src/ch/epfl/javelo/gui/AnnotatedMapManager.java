@@ -22,7 +22,6 @@ import java.util.function.Consumer;
 public final class AnnotatedMapManager {
     private static final int DISTANCE_BETWEEN_HIGHLIGHT_AND_MOUSE_IN_PIXELS = 15; // in pixels
     private final Pane mainPane;
-    private final ObjectProperty<MapViewParameters> mapViewParametersProperty;
     private final DoubleProperty mousePositionOnRouteProperty = new SimpleDoubleProperty();
     private final ObjectProperty<Point2D> currentMousePositionProperty = new SimpleObjectProperty<>();
 
@@ -35,12 +34,9 @@ public final class AnnotatedMapManager {
      * @param errorConsumer Object for reporting errors
      */
     public AnnotatedMapManager(Graph graph, TileManager tileManager,
-                               RouteBean routeBean, Consumer<String> errorConsumer) {
+                               RouteBean routeBean, Consumer<String> errorConsumer,
+                               ObjectProperty<MapViewParameters> mapViewParametersProperty) {
 
-        MapViewParameters mapViewParameters =
-                new MapViewParameters(12, 543200, 370650);
-
-        mapViewParametersProperty = new SimpleObjectProperty<>(mapViewParameters);
 
         WaypointsManager waypointsManager =
                 new WaypointsManager(graph, mapViewParametersProperty, routeBean.getWaypoints(), errorConsumer);
@@ -50,7 +46,6 @@ public final class AnnotatedMapManager {
         RouteManager routeManager = new RouteManager(routeBean, mapViewParametersProperty);
 
         mainPane = new StackPane(baseMapManager.pane(), routeManager.pane(), waypointsManager.pane());
-
 
         mainPane.getStylesheets().add("map.css");
 

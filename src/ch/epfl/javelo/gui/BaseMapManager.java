@@ -156,7 +156,7 @@ public final class BaseMapManager {
             int newUpLeftX = (int) (pointCursor.xAtZoomLevel(newZoom) - cursorX);
             int newUpLeftY = (int) (pointCursor.yAtZoomLevel(newZoom) - cursorY);
 
-            mapViewParametersProperty.setValue(new MapViewParameters(newZoom,
+            mapViewParametersProperty.set(new MapViewParameters(newZoom,
                     newUpLeftX,
                     newUpLeftY));
         });
@@ -167,7 +167,7 @@ public final class BaseMapManager {
 
         pane.setOnMousePressed(e -> {
             Point2D pressedPoint = new Point2D(e.getX(), e.getY());
-            point2DProperty.setValue(pressedPoint);
+            point2DProperty.set(pressedPoint);
         });
 
         pane.setOnMouseDragged(e -> {
@@ -184,8 +184,8 @@ public final class BaseMapManager {
 
             MapViewParameters newMapViewParameters = mapViewParameters.withMinXY(newUpLeftX, newUpLeftY);
 
-            mapViewParametersProperty.setValue(newMapViewParameters);
-            point2DProperty.setValue(newPoint);
+            mapViewParametersProperty.set(newMapViewParameters);
+            point2DProperty.set(newPoint);
         });
     }
 

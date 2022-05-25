@@ -27,6 +27,9 @@ import java.util.function.Consumer;
 public final class JaVelo extends Application {
     private final DoubleProperty highlightProperty = new SimpleDoubleProperty(Double.NaN);
     private final ObjectProperty<AnnotatedMapManager> annotatedMapManagerProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<MapViewParameters> mapViewParametersProperty = new SimpleObjectProperty<>(
+                    new MapViewParameters(12, 543200, 370650));
+
 
     /**
      * Default JaVelo constructor
@@ -57,6 +60,7 @@ public final class JaVelo extends Application {
         String tileServerHost = "tile.openstreetmap.org";
         TileManager tileManager = new TileManager(cacheBasePath, tileServerHost);
 
+
         CostFunction costFunction = new CityBikeCF(graph);
         RouteComputer routeComputer = new RouteComputer(graph, costFunction);
 
@@ -73,7 +77,7 @@ public final class JaVelo extends Application {
         Consumer<String> errorConsumer = errorManager::displayError;
 
         AnnotatedMapManager annotatedMapManager =
-                new AnnotatedMapManager(graph, tileManager, routeBean, errorConsumer);
+                new AnnotatedMapManager(graph, tileManager, routeBean, errorConsumer, mapViewParametersProperty);
 
         SplitPane splitPane = new SplitPane(annotatedMapManager.pane());
         StackPane stackPane = new StackPane(splitPane, errorManager.pane());
@@ -85,6 +89,7 @@ public final class JaVelo extends Application {
 
 
         annotatedMapManagerProperty.addListener((p,o,n) -> {
+
             splitPane.getItems().set(0,n.pane());
 
             //Necessary to put binding inside listener for updating the appropriate binding with the corresponding
@@ -95,7 +100,6 @@ public final class JaVelo extends Application {
                     .then(annotatedMapManagerProperty.get().mousePositionOnRouteProperty())
                     .otherwise(elevationProfileManager.mousePositionOnProfileProperty()));
         });
-
 
 
         highlightProperty.bind(elevationProfileManager.mousePositionOnProfileProperty());
@@ -156,7 +160,7 @@ public final class JaVelo extends Application {
                     "tile.openstreetmap.org");
 
             AnnotatedMapManager annotatedMapManager =
-                    new AnnotatedMapManager(graph, tileManager, routeBean, errorConsumer);
+                    new AnnotatedMapManager(graph, tileManager, routeBean, errorConsumer, mapViewParametersProperty);
 
             annotatedMapManagerProperty.set(annotatedMapManager);
 
@@ -169,7 +173,7 @@ public final class JaVelo extends Application {
                     "c.tile-cyclosm.openstreetmap.fr/cyclosm");
 
             AnnotatedMapManager annotatedMapManager =
-                    new AnnotatedMapManager(graph, tileManager, routeBean, errorConsumer);
+                    new AnnotatedMapManager(graph, tileManager, routeBean, errorConsumer, mapViewParametersProperty);
 
             annotatedMapManagerProperty.set(annotatedMapManager);
 
@@ -182,7 +186,7 @@ public final class JaVelo extends Application {
                     "cartodb-basemaps-1.global.ssl.fastly.net/dark_all");
 
             AnnotatedMapManager annotatedMapManager =
-                    new AnnotatedMapManager(graph, tileManager, routeBean, errorConsumer);
+                    new AnnotatedMapManager(graph, tileManager, routeBean, errorConsumer, mapViewParametersProperty);
 
             annotatedMapManagerProperty.set(annotatedMapManager);
 
@@ -195,7 +199,7 @@ public final class JaVelo extends Application {
                     "cartodb-basemaps-1.global.ssl.fastly.net/light_all");
 
             AnnotatedMapManager annotatedMapManager =
-                    new AnnotatedMapManager(graph, tileManager, routeBean, errorConsumer);
+                    new AnnotatedMapManager(graph, tileManager, routeBean, errorConsumer, mapViewParametersProperty);
 
             annotatedMapManagerProperty.set(annotatedMapManager);
 
@@ -207,7 +211,7 @@ public final class JaVelo extends Application {
                     "tile.osm.ch/osm-swiss-style"); //tile.osm.ch/switzerland
 
             AnnotatedMapManager annotatedMapManager =
-                    new AnnotatedMapManager(graph, tileManager, routeBean, errorConsumer);
+                    new AnnotatedMapManager(graph, tileManager, routeBean, errorConsumer, mapViewParametersProperty);
 
             annotatedMapManagerProperty.set(annotatedMapManager);
         });

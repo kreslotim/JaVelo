@@ -19,9 +19,10 @@ import java.util.Map;
  * @author Wei-En Hsieh (341271)
  */
 public final class RouteBean {
+    private final int MAX_ENTRIES = 100;
     private final RouteComputer routeComputer;
     private final List<Route> segments = new ArrayList<>();
-    private final Map<String, Route> cacheRoute = new LinkedHashMap<>(100);
+    private final Map<String, Route> cacheRoute = new LinkedHashMap<>(MAX_ENTRIES);
     private final ObjectProperty<Route> routeProperty = new SimpleObjectProperty<>();
     private final ObservableList<Waypoint> waypoints = FXCollections.observableArrayList();
     private final DoubleProperty highlightedPositionProperty = new SimpleDoubleProperty();
@@ -51,43 +52,43 @@ public final class RouteBean {
                 Pair<Integer, Integer> pairNode = new Pair<>(waypoints.get(i - 1).nearestNodeId(),
                                                              waypoints.get(i).nearestNodeId());
 
-                if (cacheRoute.containsKey(pairNode.toString())) {
-                    Route segment = cacheRoute.get(pairNode.toString());
+                if (cacheRoute.containsKey(pairNode.toString())) {       //if the segment has already been computed
+                    Route segment = cacheRoute.get(pairNode.toString()); //get it from the cache
                     segments.add(segment);
                 }
-                else {
-
-                    Route segment = null;
-                    if (!pairNode.getKey().equals(pairNode.getValue())) {
+                else {                                             //otherwise compute segment if it exists
+                                                                   //                     between two nodes
+                    Route segment = null;                          //The segment between two nodes does not exists
+                    if (!pairNode.getKey().equals(pairNode.getValue())) {          // if these two nodes are equal
                         segment = routeComputer.bestRouteBetween(pairNode.getKey(), pairNode.getValue());
                     }
 
-                    if (segment == null) {
-                        segmentIsNull = true;
-                        break;
+                    if (segment == null) {                         //if at least one segment composing the route
+                        segmentIsNull = true;                      //does not exist  -> the route must not exist
+                        break;                                     //                -> break the loop
                     }
 
                     else {
-                        segments.add(segment);
-                        cacheRoute.put(pairNode.toString(), segment);
+                        segments.add(segment);                        //otherwise continue building the route
+                        cacheRoute.put(pairNode.toString(), segment); //and save the computed segment into the cache
                     }
                 }
             }
 
-            if (segments.isEmpty() || segmentIsNull) {
-                elevationProfileProperty.set(null);
-                routeProperty.set(null);
+            if (segments.isEmpty() || segmentIsNull) {            //if the route does not exist,
+                elevationProfileProperty.set(null);               //or an empty segment has been found
+                routeProperty.set(null);                          // -> appropriate properties contain null object
             }
             else {
-                MultiRoute multiRoute = new MultiRoute(segments);
-                int MAX_STEP_LENGTH = 5;
+                MultiRoute multiRoute = new MultiRoute(segments); //otherwise build the route
+                int MAX_STEP_LENGTH = 5;                          //composed of existing segments
                 elevationProfileProperty.set(ElevationProfileComputer.elevationProfile(multiRoute, MAX_STEP_LENGTH));
                 routeProperty.set(multiRoute);
             }
         }
-        else {
-            routeProperty.set(null);
-            elevationProfileProperty.set(null);
+        else {                                                    //if there are less than 2 waypoints on the map
+            routeProperty.set(null);                              // -> no route can exist
+            elevationProfileProperty.set(null);                   // -> no elevation profile can exist
         }
     }
 

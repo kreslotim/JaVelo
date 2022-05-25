@@ -47,7 +47,8 @@ public final class ErrorManager {
 
         text.setText(errorMessage);
         sequentialTransition.stop();
+        vBox.setVisible(true);
         sequentialTransition.play();
-
+        sequentialTransition.setOnFinished(e -> vBox.setVisible(false));
     }
 }

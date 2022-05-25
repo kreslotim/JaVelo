@@ -57,7 +57,7 @@ public final class WaypointsManager {
 
         setUpListeners();
 
-        drawWaypoints();
+        drawWaypoints(); // draw the waypoints once at the beginning
     }
 
     /**
@@ -83,15 +83,16 @@ public final class WaypointsManager {
 
             marker.setOnMousePressed(e -> {
                 Point2D pressedPoint = new Point2D(e.getX(), e.getY());
-                point2DProperty.setValue(pressedPoint);
+                point2DProperty.set(pressedPoint);
             });
 
             marker.setOnMouseDragged(e -> {
 
                 Point2D previousPoint = point2DProperty.get();
 
-                marker.setLayoutX(e.getSceneX()); //TODO Ok to use getScene ?
-                marker.setLayoutY(e.getSceneY());
+                marker.setLayoutX(e.getSceneX() ); //TODO Ok to use getScene ?
+                marker.setLayoutY(e.getSceneY() );
+
 
             });
 
@@ -113,7 +114,7 @@ public final class WaypointsManager {
                         if (newNodeId != -1) waypoints.set(indexI, new Waypoint(newPointCh, newNodeId));
                         else {
                             drawWaypoints();
-                            errorConsumer.accept("No route nearby !");
+                            errorConsumer.accept("Aucune route à proximité !");
                         }
                     }
                     else drawWaypoints();
@@ -170,7 +171,7 @@ public final class WaypointsManager {
             int nearestNodeId = graph.nodeClosestTo(pointCh, SEARCH_DISTANCE);
 
             if (nearestNodeId == -1) { // if there's no nearestNodes
-                errorConsumer.accept("No route nearby !");
+                errorConsumer.accept("Aucune route à proximité !");
             } else { // if the nearestNode exists
                 //System.out.println("Adding a waypoint");
                 waypoints.add(new Waypoint(pointCh, nearestNodeId));

@@ -108,7 +108,7 @@ public final class ElevationProfile {
      * which is not necessarily between 0 and the length of the profile;
      * the first sample is returned when the position is negative, the last when it is greater than the length
      *
-     * @param position the given position on the route
+     * @param  position the given position on the route
      * @return the profile's altitude at the given position
      */
     public double elevationAt(double position) {

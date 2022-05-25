@@ -40,6 +40,7 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
      * @return the position (in meters) along the edge, that is the closest to the given point
      */
     public double positionClosestTo(PointCh point) {
+        if (point == null) return 0;
         return Math2.projectionLength(fromPoint.e(), fromPoint.n(), toPoint.e(), toPoint.n(), point.e(), point.n());
     }
 
@@ -50,6 +51,7 @@ public record Edge(int fromNodeId, int toNodeId, PointCh fromPoint, PointCh toPo
      * @return the point at the given position on the edge.
      */
     public PointCh pointAt(double position) {
+        if (length == 0) return fromPoint;
         return new PointCh(Math2.interpolate(fromPoint.e(), toPoint.e(), position / length),
                 // divide by length because we want to bring x between 0 and 1,
                 // where length is the length of a single edge.

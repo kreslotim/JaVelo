@@ -27,7 +27,7 @@ public final class TileManager {
     /**
      * Default TileManager constructor
      *
-     * @param pathToDisk       path to the directory containing the disk cache (SSD Disk)
+     * @param pathToDisk     Path to the directory containing the disk cache (SSD Disk)
      * @param tileServerName Server's name of the tile
      */
     public TileManager(Path pathToDisk, String tileServerName) {
@@ -39,7 +39,7 @@ public final class TileManager {
     /**
      * Returns the Image corresponding to the given tile identity.
      *
-     * @param tileId tile's identity
+     * @param  tileId tile's identity
      * @return image corresponding to the tile's identity.
      */
     public Image imageForTileAt(TileId tileId) throws IOException {
@@ -62,10 +62,10 @@ public final class TileManager {
     /**
      * Auxiliary (private) method, that transfers data from server (with given URL)
      *
-     * @param cache_zoomXY_PNG (String) path to PNG file
-     * @param url (String) server's domain
+     * @param cache_zoomXY_PNG     (String) path to PNG file
+     * @param url                  (String) server's domain
      * @param pathToImageDirectory (Path) path to directory containing the PNG file
-     * @throws IOException if the provided URL is not valid
+     * @throws IOException         if the provided URL is not valid
      */
     private void transferFromServerToDisk(String cache_zoomXY_PNG, String url, Path pathToImageDirectory) throws IOException {
         URL u = new URL(url);
@@ -85,8 +85,8 @@ public final class TileManager {
      * Auxiliary (private) method, that transfers data from server (with given URL)
      *
      * @param cache_zoomXY_PNG (String) path to PNG file
-     * @param tileId (TileId) given tile's identity
-     * @throws IOException if the provided path to directory is not valid
+     * @param tileId           (TileId) given tile's identity
+     * @throws IOException     if the provided path to directory is not valid
      */
     private void transferFromDiskToCache(String cache_zoomXY_PNG, TileId tileId) throws IOException {
         try (FileInputStream fileInputStream = new FileInputStream(cache_zoomXY_PNG)) {
@@ -111,8 +111,8 @@ public final class TileManager {
          * Compact TileId constructor that checks if the given tileId's arguments are valid
          *
          * @param tileZoomLevel Zoom level for a given tileId
-         * @param tileX Index X of the given tileId
-         * @param tileY index Y of the given tileId
+         * @param tileX         Index X of the given tileId
+         * @param tileY         Index Y of the given tileId
          */
         public TileId {
             if (!isValid(tileZoomLevel, tileX, tileY)) throw new IllegalArgumentException();

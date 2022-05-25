@@ -24,8 +24,8 @@ public final class Stage9Test extends Application {
         Path cacheBasePath = Path.of(".");
         String tileServerHost3 = "tile.openstreetmap.org";
         String tileServerHost1 = "cartodb-basemaps-1.global.ssl.fastly.net/dark_all";
-        String tileServerHost2 = "tile.memomaps.de/tilegen";
-        String tileServerHost = "c.tile-cyclosm.openstreetmap.fr/cyclosm";
+        String tileServerHost = "tile.memomaps.de/tilegen";
+        String tileServerHost2 = "c.tile-cyclosm.openstreetmap.fr/cyclosm";
         // https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/19/271725/185422.png
 
         CostFunction cf = new CityBikeCF(graph);

@@ -26,10 +26,8 @@ public final class BaseMapManager {
     private final SimpleLongProperty minScrollTime = new SimpleLongProperty();
     private final ObjectProperty<MapViewParameters> mapViewParametersProperty;
     private final ObjectProperty<Point2D> point2DProperty = new SimpleObjectProperty<>();
-
     private final Canvas canvas;
     private final Pane pane;
-    private MapViewParameters mapViewParameters;
 
 
     /**
@@ -70,7 +68,7 @@ public final class BaseMapManager {
 
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
-        mapViewParameters = mapViewParametersProperty.get();
+        MapViewParameters mapViewParameters = mapViewParametersProperty.get();
 
         double mapViewTopLeftX = mapViewParameters.mapTopLeftPositionX(); // in pixels
         double mapViewTopLeftY = mapViewParameters.mapTopLeftPositionY(); // in pixels
@@ -125,8 +123,8 @@ public final class BaseMapManager {
         canvas.heightProperty().addListener(o -> redrawOnNextPulse());
 
         canvas.sceneProperty().addListener((p, oldS, newS) -> {
-            assert oldS == null;
-            newS.addPreLayoutPulseListener(this::redrawIfNeeded);
+                assert oldS == null;
+                if (newS != null) newS.addPreLayoutPulseListener(this::redrawIfNeeded);
         });
 
         mapViewParametersProperty.addListener((property, oldS, newS) -> redrawOnNextPulse());
@@ -140,7 +138,7 @@ public final class BaseMapManager {
 
         pane.setOnScroll(e -> {
 
-            mapViewParameters = mapViewParametersProperty.get();
+            MapViewParameters mapViewParameters = mapViewParametersProperty.get();
 
             if (e.getDeltaY() == 0d) return;
             long currentTime = System.currentTimeMillis();
@@ -174,7 +172,7 @@ public final class BaseMapManager {
 
         pane.setOnMouseDragged(e -> {
 
-            mapViewParameters = mapViewParametersProperty.get();
+            MapViewParameters mapViewParameters = mapViewParametersProperty.get();
 
             Point2D previousPoint = point2DProperty.get();
             Point2D newPoint = new Point2D(e.getX(), e.getY());

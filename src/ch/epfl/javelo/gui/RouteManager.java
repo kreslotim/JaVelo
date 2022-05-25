@@ -29,6 +29,7 @@ public final class RouteManager {
     private final List<Double> listPointsXY = new ArrayList<>();
     private final Polyline polyline;
     private final Circle circle;
+    private final int DISK_RADIUS = 5;
     private final int HIGHLIGHT_OFFSET = 1;
 
     /**
@@ -50,7 +51,6 @@ public final class RouteManager {
 
         polyline.setId("route");
         circle.setId("highlight");
-        int DISK_RADIUS = 5;
         circle.setRadius(DISK_RADIUS);
 
 
@@ -100,6 +100,7 @@ public final class RouteManager {
             circle.setVisible(false);
         }
     }
+
 
     /**
      * Auxiliary (private) method repositioning the highlight Disk

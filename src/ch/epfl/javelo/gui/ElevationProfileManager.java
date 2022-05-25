@@ -122,11 +122,12 @@ public final class ElevationProfileManager {
 
             double worldPositionX = screenToWorldProperty.get().transform(x,0).getX();
 
-            double y = worldToScreenProperty.get().transform(worldPositionX,
+            double y = worldToScreenProperty.get().transform(0,
                     elevationProfileProperty.get().elevationAt(worldPositionX)).getY();
 
             //System.out.println("x: "+x); //TODO Ok if NaN at the beginning ?
             //System.out.println("y: "+y);
+            //System.out.println(worldToScreenProperty.get());
 
             profilesList.add((double)x);
             profilesList.add(y);
@@ -152,14 +153,14 @@ public final class ElevationProfileManager {
 
             Affine affine = new Affine();
 
-            affine.prependTranslation(-rectangleProperty.get().getMinX(), -rectangleProperty.get().getMinY());
+            affine.prependTranslation(-rectangleProperty.get().getMinX(), -rectangleProperty.get().getMaxY());
 
             double scaleFactorX = elevationProfileProperty.get().length() / rectangleProperty.get().getWidth();
-            double scaleFactorY = (elevationProfileProperty.get().minElevation()
-                    - elevationProfileProperty.get().maxElevation()) / rectangleProperty.get().getHeight();
+            double scaleFactorY = (elevationProfileProperty.get().maxElevation()
+                    - elevationProfileProperty.get().minElevation()) / rectangleProperty.get().getHeight();
 
-            affine.prependScale(scaleFactorX, scaleFactorY);
-            affine.prependTranslation(0, elevationProfileProperty.get().maxElevation());
+            affine.prependScale(scaleFactorX, -scaleFactorY);
+            affine.prependTranslation(0, elevationProfileProperty.get().minElevation());
 
             screenToWorldProperty.set(affine);
 
@@ -323,10 +324,10 @@ public final class ElevationProfileManager {
      * Auxiliary (private) method setting up the route statistics, presented at the bottom of the panel
      */
     private void setupStats() {
-        stats.textProperty().set(String.format("Length : %.1f km" +
-                                          "     Ascent : %.0f m" +
-                                          "     Descent : %.0f m" +
-                                          "     Elevation : from %.0f m to %.0f m",
+        stats.textProperty().set(String.format("Longueur : %.1f km" +
+                                          "     Montée : %.0f m" +
+                                          "     Descente : %.0f m" +
+                                          "     Altitude : de %.0f m à %.0f m",
                 elevationProfileProperty.get().length() / KILOMETER, elevationProfileProperty.get().totalAscent(),
                 elevationProfileProperty.get().totalDescent(), elevationProfileProperty.get().minElevation(),
                 elevationProfileProperty.get().maxElevation()));
@@ -341,21 +342,23 @@ public final class ElevationProfileManager {
     private void installListenersAndEventHandler() {
 
         elevationProfileProperty.addListener((p,o,n) -> {
-
             if (n != null) {
                 setupTransformations();
                 drawPolygone();
                 setupGrid();
                 setupStats();
             }
-
         });
 
         rectangleProperty.addListener((p,o,n) -> setupTransformations());
 
         worldToScreenProperty.addListener((p,o,n) -> {
-            drawPolygone();
-            setupGrid();
+
+            if (rectangleProperty.get() != null) {
+                drawPolygone();
+                setupGrid();
+            }
+
         });
 
 

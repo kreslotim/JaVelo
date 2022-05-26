@@ -12,7 +12,6 @@ import javafx.scene.Group;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -132,22 +131,14 @@ public final class ElevationProfileManager {
 
         Rectangle2D rectangle = rectangleProperty.get();
 
-        for (int x = (int) rectangle.getMinX(); x <= rectangle.getMaxX(); x++) { //TODO go until 589, OK ?
+        for (int x = (int) rectangle.getMinX(); x <= rectangle.getMaxX(); x++) {
 
             double worldPositionX = screenToWorldProperty.get().transform(x,0).getX();
 
             double y = worldToScreenProperty.get().transform(0,
                     elevationProfileProperty.get().elevationAt(worldPositionX)).getY();
 
-            //System.out.println("x: "+x); //TODO Ok if NaN at the beginning ?
-            //System.out.println(worldToScreenProperty.get());
-
-
             double colorFactor = Math2.clamp(0.0, Double.isNaN(y) ? 0 : y, 255.0);
-
-            //System.out.println(colorFactor);
-
-            //polygon.setStyle("-fx-fill: hsb(" + colorFactor + ", 100%, 100%, 0.5);");
 
             profilesList.add((double)x);
             profilesList.add(y);
@@ -166,7 +157,6 @@ public final class ElevationProfileManager {
         profilesList.add(rectangle.getMaxY()); // last Y
 
         polygon.getPoints().setAll(profilesList);
-
     }
 
 
@@ -175,18 +165,21 @@ public final class ElevationProfileManager {
      */
     private void setupTransformations() {
 
-        if (elevationProfileProperty.get() != null) {
+        ElevationProfile elevationProfile = elevationProfileProperty.get();
+        Rectangle2D rectangle = rectangleProperty.get();
+
+        if (elevationProfile != null) {
 
             Affine affine = new Affine();
 
-            affine.prependTranslation(-rectangleProperty.get().getMinX(), -rectangleProperty.get().getMaxY());
+            affine.prependTranslation(-rectangle.getMinX(), -rectangle.getMaxY());
 
-            double scaleFactorX = elevationProfileProperty.get().length() / rectangleProperty.get().getWidth();
-            double scaleFactorY = (elevationProfileProperty.get().maxElevation()
-                    - elevationProfileProperty.get().minElevation()) / rectangleProperty.get().getHeight();
+            double scaleFactorX = elevationProfile.length() / rectangle.getWidth();
+            double scaleFactorY = (elevationProfile.maxElevation()
+                    - elevationProfile.minElevation()) / rectangle.getHeight();
 
             affine.prependScale(scaleFactorX, -scaleFactorY);
-            affine.prependTranslation(0, elevationProfileProperty.get().minElevation());
+            affine.prependTranslation(0, elevationProfile.minElevation());
 
             screenToWorldProperty.set(affine);
 
@@ -204,14 +197,14 @@ public final class ElevationProfileManager {
 
         highlightLine.layoutXProperty().bind(Bindings.createDoubleBinding(() -> worldToScreenProperty.get()
                         .transform(highlightProperty.get(), 0).getX(),
-                highlightProperty, worldToScreenProperty)); //TODO OK to use .get() property everytime ?
+                highlightProperty, worldToScreenProperty));
 
 
         highlightLine.startYProperty().bind(Bindings.select(rectangleProperty, "minY"));
 
         highlightLine.endYProperty().bind(Bindings.select(rectangleProperty, "maxY"));
 
-        highlightLine.visibleProperty().bind(highlightProperty.greaterThanOrEqualTo(0)); //TODO mouseProperty ?
+        highlightLine.visibleProperty().bind(highlightProperty.greaterThanOrEqualTo(0));
 
 
     }
@@ -349,13 +342,15 @@ public final class ElevationProfileManager {
      * Auxiliary (private) method setting up the route statistics, presented at the bottom of the panel
      */
     private void setupStats() {
+        ElevationProfile elevationProfile = elevationProfileProperty.get();
+
         stats.textProperty().set(String.format("Longueur : %.1f km" +
-                                          "     Montée : %.0f m" +
-                                          "     Descente : %.0f m" +
-                                          "     Altitude : de %.0f m à %.0f m",
-                elevationProfileProperty.get().length() / KILOMETER, elevationProfileProperty.get().totalAscent(),
-                elevationProfileProperty.get().totalDescent(), elevationProfileProperty.get().minElevation(),
-                elevationProfileProperty.get().maxElevation()));
+                        "     Montée : %.0f m" +
+                        "     Descente : %.0f m" +
+                        "     Altitude : de %.0f m à %.0f m",
+                elevationProfile.length() / KILOMETER, elevationProfile.totalAscent(),
+                elevationProfile.totalDescent(), elevationProfile.minElevation(),
+                elevationProfile.maxElevation()));
     }
 
 

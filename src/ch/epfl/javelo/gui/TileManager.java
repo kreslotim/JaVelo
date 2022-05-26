@@ -23,6 +23,7 @@ public final class TileManager {
     private final Map<TileId, Image> cacheMemory = new LinkedHashMap<>(MAX_ENTRIES);
     private final String tileServerName;
     private final Path pathToDisk;
+    private static final int POSITIVE_BIT = 1;
 
     /**
      * Default TileManager constructor
@@ -67,7 +68,9 @@ public final class TileManager {
      * @param pathToImageDirectory (Path) path to directory containing the PNG file
      * @throws IOException         if the provided URL is not valid
      */
-    private void transferFromServerToDisk(String cache_zoomXY_PNG, String url, Path pathToImageDirectory) throws IOException {
+    private void transferFromServerToDisk(String cache_zoomXY_PNG,
+                                          String url,
+                                          Path pathToImageDirectory) throws IOException {
         URL u = new URL(url);
         URLConnection c = u.openConnection();
         c.setRequestProperty("User-Agent", "JaVelo");
@@ -127,8 +130,8 @@ public final class TileManager {
          * @return true iff the given Tile's id is valid.
          */
         public static boolean isValid(int tileZoomLevel, int tileX, int tileY) {
-            return  (0 <= tileX && tileX <= (1 << tileZoomLevel)) &&
-                    (0 <= tileY && tileY <= (1 << tileZoomLevel)); // 2^tileZoomLevel
+            return  (0 <= tileX && tileX <= (POSITIVE_BIT << tileZoomLevel)) &&
+                    (0 <= tileY && tileY <= (POSITIVE_BIT << tileZoomLevel)); // 2^tileZoomLevel
         }
     }
 }

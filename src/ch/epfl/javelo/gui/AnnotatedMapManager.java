@@ -4,6 +4,7 @@ import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.PointWebMercator;
+import ch.epfl.javelo.routing.Route;
 import ch.epfl.javelo.routing.RoutePoint;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -21,9 +22,13 @@ import java.util.function.Consumer;
  */
 public final class AnnotatedMapManager {
     private static final int DISTANCE_BETWEEN_HIGHLIGHT_AND_MOUSE_IN_PIXELS = 15; // in pixels
+    private final Graph graph;
     private final Pane mainPane;
+    private final TileManager tileManager;
+    private final RouteBean routeBean;
     private final DoubleProperty mousePositionOnRouteProperty = new SimpleDoubleProperty();
     private final ObjectProperty<Point2D> currentMousePositionProperty = new SimpleObjectProperty<>();
+    private final ObjectProperty<MapViewParameters> mapViewParametersProperty;
 
     /**
      * Default AnnotatedMapManager constructor
@@ -36,7 +41,10 @@ public final class AnnotatedMapManager {
     public AnnotatedMapManager(Graph graph, TileManager tileManager,
                                RouteBean routeBean, Consumer<String> errorConsumer,
                                ObjectProperty<MapViewParameters> mapViewParametersProperty) {
-
+        this.graph = graph;
+        this.tileManager = tileManager;
+        this.routeBean = routeBean;
+        this.mapViewParametersProperty = mapViewParametersProperty;
 
         WaypointsManager waypointsManager =
                 new WaypointsManager(graph, mapViewParametersProperty, routeBean.getWaypoints(), errorConsumer);
@@ -49,45 +57,7 @@ public final class AnnotatedMapManager {
 
         mainPane.getStylesheets().add("map.css");
 
-        mousePositionOnRouteProperty.bind(Bindings.createDoubleBinding(() -> {
-
-            if (routeBean.routeProperty().get() == null || currentMousePositionProperty.get() == null) {
-                return Double.NaN;
-            }
-            else {
-
-                PointCh currentMousePoint = mapViewParametersProperty.get()
-                        .pointAt(currentMousePositionProperty.get().getX(),
-                                currentMousePositionProperty.get().getY()).toPointCh();
-
-                if (currentMousePoint == null) return Double.NaN;
-                RoutePoint nearestRoutePoint = routeBean.routeProperty().get().pointClosestTo(currentMousePoint);
-
-                PointCh mousePoint = nearestRoutePoint.point();
-
-                PointWebMercator mouseWebMercator = PointWebMercator.ofPointCh(mousePoint);
-
-
-                double xScreenDelta = currentMousePositionProperty.get().getX()
-                        - mapViewParametersProperty.get().viewX(mouseWebMercator);
-                double yScreenDelta = currentMousePositionProperty.get().getY()
-                        - mapViewParametersProperty.get().viewY(mouseWebMercator);
-
-                double distanceToRoute = Math2.norm(xScreenDelta, yScreenDelta);
-
-                return (distanceToRoute <= DISTANCE_BETWEEN_HIGHLIGHT_AND_MOUSE_IN_PIXELS)
-                        ? nearestRoutePoint.position()
-                        : Double.NaN;
-            }
-        }, mapViewParametersProperty, routeBean.routeProperty(), currentMousePositionProperty));
-
-
-        mainPane.setOnMouseMoved(e -> {
-            Point2D mousePoint = new Point2D(e.getX(), e.getY());
-            currentMousePositionProperty.set(mousePoint);
-        });
-
-        mainPane.setOnMouseExited(e -> currentMousePositionProperty.set(null));
+        setupBindingsAndEventHandler();
 
     }
 
@@ -111,6 +81,55 @@ public final class AnnotatedMapManager {
      */
     public ReadOnlyDoubleProperty mousePositionOnRouteProperty() {
         return mousePositionOnRouteProperty;
+    }
+
+
+    /**
+     * Auxiliary (private) method binding the property containing the mouse's position along the route
+     * to a double value, and setting up the event handlers implemented on the main pane,
+     * containing the "annotated map"
+     */
+    private void setupBindingsAndEventHandler() {
+        mousePositionOnRouteProperty.bind(Bindings.createDoubleBinding(() -> {
+
+            Point2D currentMousePosition = currentMousePositionProperty.get();
+            MapViewParameters mapViewParameters = mapViewParametersProperty.get();
+            Route route = routeBean.routeProperty().get();
+
+            if (route == null || currentMousePosition == null) {
+                return Double.NaN;
+            }
+
+            PointCh currentMousePointCh = mapViewParameters
+                    .pointAt(currentMousePosition.getX(),
+                            currentMousePosition.getY()).toPointCh();
+
+            if (currentMousePointCh == null) return Double.NaN;
+            RoutePoint nearestRoutePoint = route.pointClosestTo(currentMousePointCh);
+
+            PointCh mousePoint = nearestRoutePoint.point();
+
+            PointWebMercator mouseWebMercator = PointWebMercator.ofPointCh(mousePoint);
+
+            double xScreenDelta = currentMousePosition.getX() - mapViewParameters.viewX(mouseWebMercator);
+            double yScreenDelta = currentMousePosition.getY() - mapViewParameters.viewY(mouseWebMercator);
+
+            double distanceToRoute = Math2.norm(xScreenDelta, yScreenDelta);
+
+            return (distanceToRoute <= DISTANCE_BETWEEN_HIGHLIGHT_AND_MOUSE_IN_PIXELS)
+                    ? nearestRoutePoint.position()
+                    : Double.NaN;
+
+
+        }, mapViewParametersProperty, routeBean.routeProperty(), currentMousePositionProperty));
+
+
+        mainPane.setOnMouseMoved(e -> {
+            Point2D mousePoint = new Point2D(e.getX(), e.getY());
+            currentMousePositionProperty.set(mousePoint);
+        });
+
+        mainPane.setOnMouseExited(e -> currentMousePositionProperty.set(null));
     }
 
 }

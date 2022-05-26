@@ -48,7 +48,7 @@ public final class WaypointsManager {
                             ObservableList<Waypoint> waypoints, Consumer<String> errorConsumer) {
 
         this.graph = graph;
-        this.waypoints = waypoints; //TODO must be immutable
+        this.waypoints = waypoints;
         this.mapViewParametersProperty = mapViewParametersProperty;
         this.errorConsumer = errorConsumer;
 
@@ -90,7 +90,6 @@ public final class WaypointsManager {
 
                 Point2D previousPoint = point2DProperty.get();
                 Point2D newPoint = new Point2D(e.getSceneX(), e.getSceneY());
-                //if (point2DProperty.get() == null) point2DProperty.set(newPoint);
                 Point2D shiftPoint = newPoint.subtract(previousPoint);
 
                 marker.setLayoutX(marker.getLayoutX() + shiftPoint.getX());
@@ -178,7 +177,6 @@ public final class WaypointsManager {
             if (nearestNodeId == -1) { // if there's no nearestNodes
                 errorConsumer.accept("Aucune route à proximité !");
             } else { // if the nearestNode exists
-                //System.out.println("Adding a waypoint");
                 waypoints.add(new Waypoint(pointCh, nearestNodeId));
             }
         }

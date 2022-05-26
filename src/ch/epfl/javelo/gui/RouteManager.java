@@ -4,17 +4,14 @@ package ch.epfl.javelo.gui;
 import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.PointWebMercator;
 import ch.epfl.javelo.routing.Route;
-import ch.epfl.javelo.routing.RoutePoint;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polyline;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 
 
 /**
@@ -120,25 +117,25 @@ public final class RouteManager {
      * Auxiliary (private) method repositioning the highlight Disk
      *
      * @param route current route
-     * @param mvp parameters of the map displayed (MapViewParameters)
+     * @param mapViewParameters parameters of the map displayed (MapViewParameters)
      */
-    private void repositionHighlight(Route route, MapViewParameters mvp) {
+    private void repositionHighlight(Route route, MapViewParameters mapViewParameters) {
 
         PointCh pointOnLine = route.pointAt(routeBean.highlightedPosition());
 
-        circle.setLayoutX(mvp.viewX(PointWebMercator.ofPointCh(pointOnLine)));
-        circle.setLayoutY(mvp.viewY(PointWebMercator.ofPointCh(pointOnLine)));
+        circle.setLayoutX(mapViewParameters.viewX(PointWebMercator.ofPointCh(pointOnLine)));
+        circle.setLayoutY(mapViewParameters.viewY(PointWebMercator.ofPointCh(pointOnLine)));
     }
 
 
     /**
      * Auxiliary (private) method repositioning the route, represented by a JavaFX polyline
      *
-     * @param mvp parameters of the map displayed (MapViewParameters)
+     * @param mapViewParameters parameters of the map displayed (MapViewParameters)
      */
-    private void repositionPolyLine(MapViewParameters mvp) {
-        polyline.setLayoutX(-mvp.mapTopLeftPositionX());
-        polyline.setLayoutY(-mvp.mapTopLeftPositionY());
+    private void repositionPolyLine(MapViewParameters mapViewParameters) {
+        polyline.setLayoutX(-mapViewParameters.mapTopLeftPositionX());
+        polyline.setLayoutY(-mapViewParameters.mapTopLeftPositionY());
     }
 
 
@@ -154,11 +151,11 @@ public final class RouteManager {
         this.routeBean.highlightedPositionProperty().addListener((p,o,n) -> {
 
             Route route = routeBean.routeProperty().get();
-            MapViewParameters mvp = mapViewParametersProperty.get();
+            MapViewParameters mapViewParameters = mapViewParametersProperty.get();
 
             circle.setVisible(!Double.isNaN(n.doubleValue()));
 
-            if (route != null) repositionHighlight(route, mvp);
+            if (route != null) repositionHighlight(route, mapViewParameters);
         });
 
         this.mapViewParametersProperty.addListener((p,o,n) -> {
@@ -175,11 +172,11 @@ public final class RouteManager {
         circle.setOnMouseClicked(e -> {
 
             Route route = routeBean.routeProperty().get();
-            MapViewParameters mvp = mapViewParametersProperty.get();
+            MapViewParameters mapViewParameters = mapViewParametersProperty.get();
 
             int highlightIndex = routeBean.indexOfNonEmptySegmentAt(routeBean.highlightedPosition()) + HIGHLIGHT_OFFSET;
             Point2D cursor = circle.localToParent(e.getX(), e.getY());
-            PointCh highlightPoint = mvp.pointAt(cursor.getX(), cursor.getY()).toPointCh();
+            PointCh highlightPoint = mapViewParameters.pointAt(cursor.getX(), cursor.getY()).toPointCh();
             int closestNodeToHighlight = route.nodeClosestTo(routeBean.highlightedPosition());
             waypointList.add(highlightIndex, new Waypoint(highlightPoint, closestNodeToHighlight));
 

@@ -20,7 +20,7 @@ import java.io.IOException;
  * @author Wei-En Hsieh (341271)
  */
 public final class BaseMapManager {
-    private boolean redrawNeeded; //TODO ok if not final ?
+    private boolean redrawNeeded;
     private final TileManager tileManager;
     private final WaypointsManager waypointsManager;
     private final SimpleLongProperty minScrollTime = new SimpleLongProperty();

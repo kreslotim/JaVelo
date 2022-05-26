@@ -94,7 +94,7 @@ public final class RouteBean {
 
 
     /**
-     * public getter of the waypoints list
+     * Public getter of the waypoints list
      *
      * @return observable list of all waypoints
      */
@@ -103,7 +103,7 @@ public final class RouteBean {
     }
 
     /**
-     * public getter of highlighted position
+     * Public getter of highlighted position
      *
      * @return double value of the highlighted position
      */
@@ -112,7 +112,7 @@ public final class RouteBean {
     }
 
     /**
-     * public getter of the highlighted position's property
+     * Public getter of the highlighted position's property
      *
      * @return highlighted position's property itself
      */
@@ -121,7 +121,7 @@ public final class RouteBean {
     }
 
     /**
-     * public setter for highlighted position
+     * Public setter for highlighted position
      *
      * @param highlightedPositionValue double value of the highlighted position
      */
@@ -130,7 +130,7 @@ public final class RouteBean {
     }
 
     /**
-     * public getter of the route's property
+     * Public getter of the route's property
      *
      * @return route's property itself in read only mode
      */
@@ -139,7 +139,7 @@ public final class RouteBean {
     }
 
     /**
-     * public getter of the elevation profile's property
+     * Public getter of the elevation profile's property
      *
      * @return elevation profile's property itself in read only mode
      */
@@ -148,6 +148,13 @@ public final class RouteBean {
     }
 
 
+    /**
+     * Returns the index of the segment containing the given position along the route,
+     * ignoring empty segments
+     *
+     * @param  position (double) position along the route
+     * @return index of the segment on the route
+     */
     public int indexOfNonEmptySegmentAt(double position) {
         int index = routeProperty().get().indexOfSegmentAt(position);
         for (int i = 0; i <= index; i += 1) {

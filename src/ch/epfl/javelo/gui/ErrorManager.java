@@ -43,7 +43,7 @@ public final class ErrorManager {
 
     public void displayError(String errorMessage) {
 
-        java.awt.Toolkit.getDefaultToolkit().beep();
+        //java.awt.Toolkit.getDefaultToolkit().beep();
 
         text.setText(errorMessage);
         sequentialTransition.stop();

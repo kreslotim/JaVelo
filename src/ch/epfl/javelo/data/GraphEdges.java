@@ -108,7 +108,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
                 break;
 
             case COMPRESSED_PROFILE_Q0_4, COMPRESSED_PROFILE_Q4_4:
-                samples[0] = Q28_4.asFloat(elevations.get(firstIndex));
+                samples[0] = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(firstIndex)));
                 currentAltitude = samples[0];
                 for (int i = 1; i <= Math.ceil((sampleNb - 1) / (double) altitudeDifference); ++i) {
                     for (int j = altitudeDifference - 1; j >= 0; --j) {

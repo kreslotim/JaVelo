@@ -34,7 +34,7 @@ public final class ElevationProfileComputer {
         // create the array :
         float[] elevationSamples = new float[samplesNb];
         for (int i = 0; i < samplesNb; ++i) {
-            elevationSamples[i] = (float) Math.abs(route.elevationAt(distBetweenTwoProfiles * i));
+            elevationSamples[i] = (float) route.elevationAt(distBetweenTwoProfiles * i);
         }
 
         //case when there are only NaN values in the array elevationSamples : fill up the array elevationSamples with 0

@@ -4,6 +4,7 @@ package ch.epfl.javelo.gui;
 import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.PointWebMercator;
 import ch.epfl.javelo.routing.Route;
+import ch.epfl.javelo.routing.RoutePoint;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Point2D;
@@ -13,6 +14,7 @@ import javafx.scene.shape.Polyline;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 
 /**
@@ -87,9 +89,23 @@ public final class RouteManager {
                 listPointsXY.add(PointWebMercator.ofPointCh(pointCh).xAtZoomLevel(mapViewParameters.zoomLevel()));
                 listPointsXY.add(PointWebMercator.ofPointCh(pointCh).yAtZoomLevel(mapViewParameters.zoomLevel()));
             }
+
             repositionPolyLine(mapViewParameters);
             repositionHighlight(route, mapViewParameters);
             polyline.getPoints().setAll(listPointsXY);
+
+
+            polyline.setStyle("-fx-stroke: linear-gradient(hsb(0,100%,100%,0.5) 0%," +
+                    " rgba(255,154,0,0.7) 10%," +
+                    " rgba(208,222,33,0.7) 20%," +
+                    " rgba(79,220,74,0.7) 30%," +
+                    " rgba(63,218,216,0.7) 40%," +
+                    " rgba(47,201,226,0.7) 50%," +
+                    " rgba(28,127,238,0.7) 60%," +
+                    " rgba(95,21,242,0.7) 70%," +
+                    " rgba(186,12,248,0.7) 80%," +
+                    " rgba(251,7,217,0.7) 90%);");
+
 
             polyline.setVisible(true);
         }

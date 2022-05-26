@@ -1,5 +1,6 @@
 package ch.epfl.javelo.gui;
 
+import ch.epfl.javelo.Math2;
 import ch.epfl.javelo.routing.ElevationProfile;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -11,6 +12,7 @@ import javafx.scene.Group;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -77,7 +79,17 @@ public final class ElevationProfileManager {
         VBox vBox = new VBox(stats);
         vBox.setId("profile_data");
         grid.setId("grid");
-        polygon.setId("profile");
+        polygon.setStyle("-fx-fill: linear-gradient(to bottom , rgba(255,0,0,0.5) 0%," +
+                " rgba(255,154,0,0.5) 10%," +
+                " rgba(208,222,33,0.5) 20%," +
+                " rgba(79,220,74,0.5) 30%," +
+                " rgba(63,218,216,0.5) 40%," +
+                " rgba(47,201,226,0.5) 50%," +
+                " rgba(28,127,238,0.5) 60%," +
+                " rgba(95,21,242,0.5) 70%," +
+                " rgba(186,12,248,0.5) 80%," +
+                " rgba(251,7,217,0.5) 90%);");
+
         mainPane = new BorderPane(pane, null, null, vBox, null);
         mainPane.getStylesheets().add("elevation_profile.css");
 
@@ -116,6 +128,8 @@ public final class ElevationProfileManager {
 
         profilesList.clear();
 
+        ElevationProfile elevationProfile = elevationProfileProperty.get();
+
         Rectangle2D rectangle = rectangleProperty.get();
 
         for (int x = (int) rectangle.getMinX(); x <= rectangle.getMaxX(); x++) { //TODO go until 589, OK ?
@@ -126,11 +140,23 @@ public final class ElevationProfileManager {
                     elevationProfileProperty.get().elevationAt(worldPositionX)).getY();
 
             //System.out.println("x: "+x); //TODO Ok if NaN at the beginning ?
-            //System.out.println("y: "+y);
             //System.out.println(worldToScreenProperty.get());
+
+
+            double colorFactor = Math2.clamp(0.0, Double.isNaN(y) ? 0 : y, 255.0);
+
+            //System.out.println(colorFactor);
+
+            //polygon.setStyle("-fx-fill: hsb(" + colorFactor + ", 100%, 100%, 0.5);");
 
             profilesList.add((double)x);
             profilesList.add(y);
+
+            double minElevationColor = elevationProfile.minElevation();
+            double maxElevationColor = elevationProfile.maxElevation();
+
+            //polygon.setStyle("-fx-fill: linear-gradient(to top , rgba(255,0,0,1) 0%, rgba(255,154,0,1) 10%, rgba(208,222,33,1) 20%, rgba(79,220,74,1) 30%, rgba(63,218,216,1) 40%, rgba(47,201,226,1) 50%, rgba(28,127,238,1) 60%, rgba(95,21,242,1) 70%, rgba(186,12,248,1) 80%, rgba(251,7,217,1) 90%);");
+
         }
 
         profilesList.add(rectangle.getMaxX()); // first X
@@ -247,7 +273,6 @@ public final class ElevationProfileManager {
 
             grid.getElements().add(moveTo);
             grid.getElements().add(lineTo);
-
 
 
             //LABELING

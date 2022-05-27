@@ -1,6 +1,4 @@
 package ch.epfl.javelo.gui;
-
-
 import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.projection.PointCh;
 import ch.epfl.javelo.projection.PointWebMercator;
@@ -13,7 +11,6 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.SVGPath;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -25,16 +22,16 @@ import java.util.function.Consumer;
  * @author Wei-En Hsieh (341271)
  */
 public final class WaypointsManager {
+    private final Pane pane;
     private final Graph graph;
     private final ObservableList<Waypoint> waypoints;
     private final ObjectProperty<MapViewParameters> mapViewParametersProperty;
     private final ObjectProperty<Point2D> point2DProperty = new SimpleObjectProperty<>();
     private final Consumer<String> errorConsumer;
-
-    private final Pane pane;
     private final List<Node> markersList = new ArrayList<>();
-
     private final static int SEARCH_DISTANCE = 1000/2;
+    private final static int ZERO = 0;
+    private final static int ONE = 1;
 
     /**
      * Default WaypointsManager constructor
@@ -48,16 +45,16 @@ public final class WaypointsManager {
                             ObservableList<Waypoint> waypoints, Consumer<String> errorConsumer) {
 
         this.graph = graph;
-        this.waypoints = waypoints; //TODO must be immutable
+        this.waypoints = waypoints;
         this.mapViewParametersProperty = mapViewParametersProperty;
         this.errorConsumer = errorConsumer;
 
         pane = new Pane();
         pane.setPickOnBounds(false);
 
-        setUpListeners();
+        setupListeners();
 
-        drawWaypoints();
+        drawWaypoints(); // draw the waypoints once at the beginning
     }
 
     /**
@@ -76,44 +73,50 @@ public final class WaypointsManager {
         MapViewParameters mapViewParameters = mapViewParametersProperty.get();
         markersList.clear();
 
-        for (int i = 0; i < waypoints.size(); i++) {
+        for (int i = ZERO; i < waypoints.size(); i++) {
 
             Group marker = createMarker();
             marker.getStyleClass().add("pin");
 
-            marker.setOnMousePressed(e -> {
-                Point2D pressedPoint = new Point2D(e.getX(), e.getY());
-                point2DProperty.setValue(pressedPoint);
+            marker.setOnMousePressed(e -> {  // For each marker we install the following event handlers
+
+                Point2D pressedPoint = new Point2D(e.getSceneX(), e.getSceneY());
+                point2DProperty.set(pressedPoint);
             });
 
             marker.setOnMouseDragged(e -> {
 
                 Point2D previousPoint = point2DProperty.get();
+                Point2D newPoint = new Point2D(e.getSceneX(), e.getSceneY());
+                Point2D shiftPoint = newPoint.subtract(previousPoint);
 
-                marker.setLayoutX(e.getSceneX()); //TODO Ok to use getScene ?
-                marker.setLayoutY(e.getSceneY());
+                marker.setLayoutX(marker.getLayoutX() + shiftPoint.getX());
+                marker.setLayoutY(marker.getLayoutY() + shiftPoint.getY());
 
+                point2DProperty.set(newPoint);
             });
 
             int indexI = i; // syntax lambda
             marker.setOnMouseReleased(e -> {
 
                 Point2D previousPoint = point2DProperty.get();
+                Point2D newPoint = new Point2D(e.getSceneX(), e.getSceneY());
+                Point2D shiftPoint = newPoint.subtract(previousPoint);
 
                 if (e.isStillSincePress()) waypoints.remove(indexI);
                 else {
 
                     PointCh newPointCh = mapViewParametersProperty.get().pointAt(
-                            e.getSceneX(),
-                            e.getSceneY())
+                                    marker.getLayoutX() + shiftPoint.getX(),
+                                    marker.getLayoutY() + shiftPoint.getY())
                             .toPointCh();
 
                     if (newPointCh != null) {
                         int newNodeId = graph.nodeClosestTo(newPointCh, SEARCH_DISTANCE);
-                        if (newNodeId != -1) waypoints.set(indexI, new Waypoint(newPointCh, newNodeId));
+                        if (newNodeId != -ONE) waypoints.set(indexI, new Waypoint(newPointCh, newNodeId));
                         else {
                             drawWaypoints();
-                            errorConsumer.accept("No route nearby !");
+                            errorConsumer.accept("Aucune route à proximité !");
                         }
                     }
                     else drawWaypoints();
@@ -125,8 +128,8 @@ public final class WaypointsManager {
             marker.setLayoutX(mapViewParameters.viewX(waypointWebMercator));
             marker.setLayoutY(mapViewParameters.viewY(waypointWebMercator));
 
-            if (waypoints.indexOf(currentWaypoint) == 0) marker.getStyleClass().add("first");
-            else if (waypoints.indexOf(currentWaypoint) == waypoints.size()-1) marker.getStyleClass().add("last");
+            if (waypoints.indexOf(currentWaypoint) == ZERO) marker.getStyleClass().add("first");
+            else if (waypoints.indexOf(currentWaypoint) == waypoints.size() - ONE) marker.getStyleClass().add("last");
             else marker.getStyleClass().add("middle");
 
             markersList.add(marker);
@@ -169,16 +172,19 @@ public final class WaypointsManager {
         if (pointCh != null) {
             int nearestNodeId = graph.nodeClosestTo(pointCh, SEARCH_DISTANCE);
 
-            if (nearestNodeId == -1) { // if there's no nearestNodes
-                errorConsumer.accept("No route nearby !");
+            if (nearestNodeId == -ONE) { // if there's no nearestNodes
+                errorConsumer.accept("Aucune route à proximité !");
             } else { // if the nearestNode exists
-                //System.out.println("Adding a waypoint");
                 waypoints.add(new Waypoint(pointCh, nearestNodeId));
             }
         }
     }
 
-    private void setUpListeners() {
+
+    /**
+     * Auxiliary (private) method setting up listeners
+     */
+    private void setupListeners() {
 
         mapViewParametersProperty.addListener((p,o,n) -> {
 

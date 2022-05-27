@@ -20,16 +20,19 @@ import java.io.IOException;
  * @author Wei-En Hsieh (341271)
  */
 public final class BaseMapManager {
-    private boolean redrawNeeded; //TODO ok if not final ?
+    private final Pane pane;
+    private final Canvas canvas;
     private final TileManager tileManager;
     private final WaypointsManager waypointsManager;
     private final SimpleLongProperty minScrollTime = new SimpleLongProperty();
     private final ObjectProperty<MapViewParameters> mapViewParametersProperty;
     private final ObjectProperty<Point2D> point2DProperty = new SimpleObjectProperty<>();
-
-    private final Canvas canvas;
-    private final Pane pane;
-    private MapViewParameters mapViewParameters;
+    private final static int ZERO = 0;
+    private final static int MIN_ZOOM_VALUE = 8;
+    private final static int MAX_ZOOM_VALUE = 19;
+    private final static int TILE_SIDE_PIXELS = 256;
+    private final static int MIN_SCROLL_TIME_OFFSET = 200;
+    private boolean redrawNeeded;
 
 
     /**
@@ -49,7 +52,7 @@ public final class BaseMapManager {
         pane = new Pane();
         canvas = new Canvas();
 
-        setUpListenersPaneAndCanvas();
+        setupListenersPaneAndCanvas();
         setupEventHandler();
     }
 
@@ -70,17 +73,16 @@ public final class BaseMapManager {
 
         GraphicsContext graphicsContext = canvas.getGraphicsContext2D();
 
-        mapViewParameters = mapViewParametersProperty.get();
+        MapViewParameters mapViewParameters = mapViewParametersProperty.get();
 
         double mapViewTopLeftX = mapViewParameters.mapTopLeftPositionX(); // in pixels
         double mapViewTopLeftY = mapViewParameters.mapTopLeftPositionY(); // in pixels
         int zoom = mapViewParameters.zoomLevel();
 
-        int TILE_SIDE_PIXELS = 256;
-        int xStart = (int) (mapViewTopLeftX / TILE_SIDE_PIXELS);                      // starting index X
-        int yStart = (int) (mapViewTopLeftY / TILE_SIDE_PIXELS);                      // starting index Y
-        int xEnd = (int) ((mapViewTopLeftX + canvas.getWidth()) / TILE_SIDE_PIXELS);  // ending index X
-        int yEnd = (int) ((mapViewTopLeftY + canvas.getHeight()) / TILE_SIDE_PIXELS); // ending index Y
+        int xStart = (int) (mapViewTopLeftX / TILE_SIDE_PIXELS);                        // starting index X
+        int yStart = (int) (mapViewTopLeftY / TILE_SIDE_PIXELS);                        // starting index Y
+        int xEnd =   (int) ((mapViewTopLeftX + canvas.getWidth()) / TILE_SIDE_PIXELS);  // ending index X
+        int yEnd =   (int) ((mapViewTopLeftY + canvas.getHeight()) / TILE_SIDE_PIXELS); // ending index Y
 
         for (int y = yStart; y <= yEnd; y++) {
             for (int x = xStart; x <= xEnd; x++) {
@@ -115,7 +117,7 @@ public final class BaseMapManager {
      * Auxiliary (private) method setting up Pane and Canvas properties, binding them together,
      * install implemented listeners, and attaching the canvas to the pane.
      */
-    private void setUpListenersPaneAndCanvas() {
+    private void setupListenersPaneAndCanvas() {
         pane.getChildren().add(canvas);
 
         canvas.widthProperty().bind(pane.widthProperty());
@@ -126,7 +128,7 @@ public final class BaseMapManager {
 
         canvas.sceneProperty().addListener((p, oldS, newS) -> {
             assert oldS == null;
-            newS.addPreLayoutPulseListener(this::redrawIfNeeded);
+            if (newS != null) newS.addPreLayoutPulseListener(this::redrawIfNeeded);
         });
 
         mapViewParametersProperty.addListener((property, oldS, newS) -> redrawOnNextPulse());
@@ -134,21 +136,21 @@ public final class BaseMapManager {
 
 
     /**
-     * Auxiliary (private) method setting up the event handlers, implemented on the pane
+     * Auxiliary (private) method setting up the event handlers, implemented on the pane containing the base map
      */
     private void setupEventHandler() {
 
         pane.setOnScroll(e -> {
 
-            mapViewParameters = mapViewParametersProperty.get();
+            MapViewParameters mapViewParameters = mapViewParametersProperty.get();
 
-            if (e.getDeltaY() == 0d) return;
+            if (e.getDeltaY() == ZERO) return;
             long currentTime = System.currentTimeMillis();
             if (currentTime < minScrollTime.get()) return;
-            minScrollTime.set(currentTime + 200);
+            minScrollTime.set(currentTime + MIN_SCROLL_TIME_OFFSET);
             int zoomDelta = (int) Math.signum(e.getDeltaY());
 
-            int newZoom = Math2.clamp(8, (mapViewParameters.zoomLevel() + zoomDelta), 19);
+            int newZoom = Math2.clamp(MIN_ZOOM_VALUE, (mapViewParameters.zoomLevel() + zoomDelta), MAX_ZOOM_VALUE);
 
             double cursorX = e.getX();
             double cursorY = e.getY();
@@ -158,7 +160,7 @@ public final class BaseMapManager {
             int newUpLeftX = (int) (pointCursor.xAtZoomLevel(newZoom) - cursorX);
             int newUpLeftY = (int) (pointCursor.yAtZoomLevel(newZoom) - cursorY);
 
-            mapViewParametersProperty.setValue(new MapViewParameters(newZoom,
+            mapViewParametersProperty.set(new MapViewParameters(newZoom,
                     newUpLeftX,
                     newUpLeftY));
         });
@@ -169,12 +171,12 @@ public final class BaseMapManager {
 
         pane.setOnMousePressed(e -> {
             Point2D pressedPoint = new Point2D(e.getX(), e.getY());
-            point2DProperty.setValue(pressedPoint);
+            point2DProperty.set(pressedPoint);
         });
 
         pane.setOnMouseDragged(e -> {
 
-            mapViewParameters = mapViewParametersProperty.get();
+            MapViewParameters mapViewParameters = mapViewParametersProperty.get();
 
             Point2D previousPoint = point2DProperty.get();
             Point2D newPoint = new Point2D(e.getX(), e.getY());
@@ -186,8 +188,8 @@ public final class BaseMapManager {
 
             MapViewParameters newMapViewParameters = mapViewParameters.withMinXY(newUpLeftX, newUpLeftY);
 
-            mapViewParametersProperty.setValue(newMapViewParameters);
-            point2DProperty.setValue(newPoint);
+            mapViewParametersProperty.set(newMapViewParameters);
+            point2DProperty.set(newPoint);
         });
     }
 

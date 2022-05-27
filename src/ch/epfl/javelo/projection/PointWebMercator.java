@@ -93,7 +93,6 @@ public record PointWebMercator(double x, double y) {
      * @return a point located at the same position as the receiver point (this).
      */
     public PointCh toPointCh() {
-
         double chE = Ch1903.e(lon(), lat());
         double chN = Ch1903.n(lon(), lat());
         return (SwissBounds.containsEN(chE, chN) ? new PointCh(chE, chN) : null);

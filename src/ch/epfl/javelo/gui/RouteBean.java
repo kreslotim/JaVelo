@@ -19,9 +19,13 @@ import java.util.Map;
  * @author Wei-En Hsieh (341271)
  */
 public final class RouteBean {
+    private final static int ZERO = 0;
+    private final static int ONE = 1;
+    private final static int MAX_ENTRIES = 100;
+    private final static int MAX_STEP_LENGTH = 5;
     private final RouteComputer routeComputer;
     private final List<Route> segments = new ArrayList<>();
-    private final Map<String, Route> cacheRoute = new LinkedHashMap<>(100);
+    private final Map<String, Route> cacheRoute = new LinkedHashMap<>(MAX_ENTRIES);
     private final ObjectProperty<Route> routeProperty = new SimpleObjectProperty<>();
     private final ObservableList<Waypoint> waypoints = FXCollections.observableArrayList();
     private final DoubleProperty highlightedPositionProperty = new SimpleDoubleProperty();
@@ -43,57 +47,57 @@ public final class RouteBean {
     private void computeRoute() {
         segments.clear();
 
-        if (waypoints.size() > 1) {
+        if (waypoints.size() > ONE) {
 
             boolean segmentIsNull = false;
-            for (int i = 1; i < waypoints.size(); i++) {
+            for (int i = ONE; i < waypoints.size(); i++) {
 
-                Pair<Integer, Integer> pairNode = new Pair<>(waypoints.get(i - 1).nearestNodeId(),
+                Pair<Integer, Integer> pairNode = new Pair<>(waypoints.get(i - ONE).nearestNodeId(),
                                                              waypoints.get(i).nearestNodeId());
 
-                if (cacheRoute.containsKey(pairNode.toString())) {
-                    Route segment = cacheRoute.get(pairNode.toString());
+                if (cacheRoute.containsKey(pairNode.toString())) {       //if the segment has already been computed
+                    Route segment = cacheRoute.get(pairNode.toString()); //get it from the cache
                     segments.add(segment);
                 }
-                else {
-
-                    Route segment = null;
-                    if (!pairNode.getKey().equals(pairNode.getValue())) {
+                else {                                             //otherwise compute segment if it exists
+                                                                   //                     between two nodes
+                    Route segment = null;                          //The segment between two nodes does not exists
+                    if (!pairNode.getKey().equals(pairNode.getValue())) {          // if these two nodes are equal
                         segment = routeComputer.bestRouteBetween(pairNode.getKey(), pairNode.getValue());
                     }
 
-                    if (segment == null) {
-                        segmentIsNull = true;
-                        break;
+                    if (segment == null) {                         //if at least one segment composing the route
+                        segmentIsNull = true;                      //does not exist  -> the route must not exist
+                        break;                                     //                -> break the loop
                     }
 
                     else {
-                        segments.add(segment);
-                        cacheRoute.put(pairNode.toString(), segment);
+                        segments.add(segment);                        //otherwise continue building the route
+                        cacheRoute.put(pairNode.toString(), segment); //and save the computed segment into the cache
                     }
                 }
             }
 
-            if (segments.isEmpty() || segmentIsNull) {
-                elevationProfileProperty.set(null);
-                routeProperty.set(null);
+            if (segments.isEmpty() || segmentIsNull) {            //if the route does not exist,
+                elevationProfileProperty.set(null);               //or an empty segment has been found
+                routeProperty.set(null);                          // -> appropriate properties contain null object
             }
             else {
-                MultiRoute multiRoute = new MultiRoute(segments);
-                int MAX_STEP_LENGTH = 5;
+                MultiRoute multiRoute = new MultiRoute(segments); //otherwise build the route
+                                                                  //composed of existing segments
                 elevationProfileProperty.set(ElevationProfileComputer.elevationProfile(multiRoute, MAX_STEP_LENGTH));
                 routeProperty.set(multiRoute);
             }
         }
-        else {
-            routeProperty.set(null);
-            elevationProfileProperty.set(null);
+        else {                                                    //if there are less than 2 waypoints on the map
+            routeProperty.set(null);                              // -> no route can exist
+            elevationProfileProperty.set(null);                   // -> no elevation profile can exist
         }
     }
 
 
     /**
-     * public getter of the waypoints list
+     * Public getter of the waypoints list
      *
      * @return observable list of all waypoints
      */
@@ -102,7 +106,7 @@ public final class RouteBean {
     }
 
     /**
-     * public getter of highlighted position
+     * Public getter of highlighted position
      *
      * @return double value of the highlighted position
      */
@@ -111,7 +115,7 @@ public final class RouteBean {
     }
 
     /**
-     * public getter of the highlighted position's property
+     * Public getter of the highlighted position's property
      *
      * @return highlighted position's property itself
      */
@@ -120,7 +124,7 @@ public final class RouteBean {
     }
 
     /**
-     * public setter for highlighted position
+     * Public setter for highlighted position
      *
      * @param highlightedPositionValue double value of the highlighted position
      */
@@ -129,7 +133,7 @@ public final class RouteBean {
     }
 
     /**
-     * public getter of the route's property
+     * Public getter of the route's property
      *
      * @return route's property itself in read only mode
      */
@@ -138,7 +142,7 @@ public final class RouteBean {
     }
 
     /**
-     * public getter of the elevation profile's property
+     * Public getter of the elevation profile's property
      *
      * @return elevation profile's property itself in read only mode
      */
@@ -147,12 +151,19 @@ public final class RouteBean {
     }
 
 
+    /**
+     * Returns the index of the segment containing the given position along the route,
+     * ignoring empty segments
+     *
+     * @param  position (double) position along the route
+     * @return index of the segment on the route
+     */
     public int indexOfNonEmptySegmentAt(double position) {
         int index = routeProperty().get().indexOfSegmentAt(position);
-        for (int i = 0; i <= index; i += 1) {
+        for (int i = ZERO; i <= index; i += ONE) {
             int n1 = waypoints.get(i).nearestNodeId();
-            int n2 = waypoints.get(i + 1).nearestNodeId();
-            if (n1 == n2) index += 1;
+            int n2 = waypoints.get(i + ONE).nearestNodeId();
+            if (n1 == n2) index += ONE;
         }
         return index;
     }

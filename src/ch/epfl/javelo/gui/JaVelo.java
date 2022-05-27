@@ -28,11 +28,15 @@ import java.util.function.Consumer;
  */
 public final class JaVelo extends Application {
     private final DoubleProperty highlightProperty = new SimpleDoubleProperty(Double.NaN);
+    private final static int ZERO = 0;
+    private final static int MIN_SCENE_WIDTH = 800;
+    private final static int MIN_SCENE_HEIGHT = 600;
+    private final static int ELEVATION_PANE_INDEX = 1;
 
     /**
      * Default JaVelo constructor
      */
-    public JaVelo() {} //TODO Should we assign attributes inside the main class ?
+    public JaVelo() {}
 
     /**
      * Main method that launches the JaVelo application
@@ -67,21 +71,23 @@ public final class JaVelo extends Application {
         SplitPane.setResizableWithParent(elevationPane,false);
 
         ErrorManager errorManager = new ErrorManager();
+
         Consumer<String> errorConsumer = errorManager::displayError;
 
         AnnotatedMapManager annotatedMapManager =
                 new AnnotatedMapManager(graph, tileManager, routeBean, errorConsumer);
 
-        StackPane stackPane = new StackPane(annotatedMapManager.pane(), errorManager.pane());
-        SplitPane mainPane = new SplitPane(stackPane);
+        SplitPane splitPane = new SplitPane(annotatedMapManager.pane());
+        StackPane stackPane = new StackPane(splitPane, errorManager.pane());
 
+        errorManager.pane().setVisible(false);
 
-        /***********************************************************************************************************
-         *                                        BINDINGS & LISTENERS                                             *
-         ***********************************************************************************************************/
+        /*************************************************************************************************************
+         *                                         BINDINGS & LISTENERS                                              *
+         *************************************************************************************************************/
 
         routeBean.highlightedPositionProperty().bind(Bindings
-                .when(annotatedMapManager.mousePositionOnRouteProperty().greaterThanOrEqualTo(0))
+                .when(annotatedMapManager.mousePositionOnRouteProperty().greaterThanOrEqualTo(ZERO))
                 .then(annotatedMapManager.mousePositionOnRouteProperty())
                 .otherwise(elevationProfileManager.mousePositionOnProfileProperty()));
 
@@ -90,8 +96,8 @@ public final class JaVelo extends Application {
 
         routeBean.elevationProfileProperty().addListener((p,o,n) -> {
 
-            if      (o == null && n != null) mainPane.getItems().add(1, elevationPane);
-            else if (o != null && n == null) mainPane.getItems().remove(1);
+            if      (o == null && n != null) splitPane.getItems().add(ELEVATION_PANE_INDEX, elevationPane);
+            else if (o != null && n == null) splitPane.getItems().remove(ELEVATION_PANE_INDEX);
 
         });
 
@@ -100,14 +106,14 @@ public final class JaVelo extends Application {
          *                                           PRIMARY STAGE                                                   *
          *************************************************************************************************************/
 
-        mainPane.setOrientation(Orientation.VERTICAL);
+        splitPane.setOrientation(Orientation.VERTICAL);
         MenuBar menuBar = displayMenuBar(routeBean);
         menuBar.setUseSystemMenuBar(true);
-        BorderPane rootPane = new BorderPane(mainPane, menuBar, null, null, null);
+        BorderPane rootPane = new BorderPane(stackPane, menuBar, null, null, null);
 
         primaryStage.setTitle("JaVelo");
-        primaryStage.setMinWidth(800);
-        primaryStage.setMinHeight(600);
+        primaryStage.setMinWidth(MIN_SCENE_WIDTH);
+        primaryStage.setMinHeight(MIN_SCENE_HEIGHT);
         Scene scene = new Scene(rootPane);
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -118,13 +124,13 @@ public final class JaVelo extends Application {
      * and allows to export an existing route in GPX format
      *
      * @param  routeBean Route's Bean (JavaFX)
-     * @return MenuBar - the bar (at the top of the application) containing the "File" button,
+     * @return MenuBar - the bar (at the top of the application) containing the "Fichier" button,
      * allowing to export an existing route in GPX format
      */
     private MenuBar displayMenuBar(RouteBean routeBean) {
 
-        Menu menu = new Menu("File");
-        MenuItem menuItem = new MenuItem("Export GPX");
+        Menu menu = new Menu("Fichier");
+        MenuItem menuItem = new MenuItem("Exporter GPX");
 
         menuItem.disableProperty().bind(routeBean.routeProperty().isNull());
 
@@ -138,7 +144,6 @@ public final class JaVelo extends Application {
         });
 
         menu.getItems().add(menuItem);
-        MenuBar menuBar = new MenuBar(menu);
-        return menuBar;
+        return new MenuBar(menu);
     }
 }

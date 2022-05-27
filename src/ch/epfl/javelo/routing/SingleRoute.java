@@ -158,7 +158,10 @@ public final class SingleRoute implements Route {
 
         for (int i = 0; i < edges.size(); i++) {
 
-            posClosestToPoint = Math2.clamp(positionsTab[i],positionsTab[i] + edges.get(i).positionClosestTo(point), positionsTab[i + 1]);
+            posClosestToPoint = Math2.clamp(positionsTab[i],
+                    positionsTab[i] + edges.get(i).positionClosestTo(point),
+                       positionsTab[i + 1]);
+
             pointOnEdge = pointAt(posClosestToPoint);
             distanceToReference = pointOnEdge.distanceTo(point);
             nearestRoutePoint = nearestRoutePoint.min(pointOnEdge, posClosestToPoint, distanceToReference);

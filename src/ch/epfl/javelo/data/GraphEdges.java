@@ -93,14 +93,9 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
         float currentAltitude;
         float[] samples = new float[sampleNb];
 
-        // todo : les variables pour type2 et type3 :  //from here
-        // "Les différences (d'altitude par rapport à leur prédécesseur) sont ensuite empaquetées dans des valeurs de 16 bits, contenant chacune 2 (type 2) ou 4 (type 3) différences."
         int altitudeDifference = (type == ProfileType.COMPRESSED_PROFILE_Q0_4) ? 2 : 4;
-        // todo : le code marche, mais c'est moche. J'utilise lequel ? :
-//        int extractSignedLength = (type == ProfileType.COMPRESSED_PROFILE_Q0_4) ? (int) OFFSET_OSM_ATTRIBUTES : OFFSET_LENGTH; // 8 : 4
-        int extractSignedLength = (type == ProfileType.COMPRESSED_PROFILE_Q0_4) ? Byte.SIZE : Byte.SIZE / 2; // 8 : 4
-        // raison : "les échantillons suivants sont représentés par la différence d'altitude par rapport à leur prédécesseur, représentée soit par une valeur de 8 bits au format Q4.4 (type 2), soit par une valeur de 4 bits au format Q0.4 (type 3)."
-        //todo : to here
+
+        int extractSignedLength = (type == ProfileType.COMPRESSED_PROFILE_Q0_4) ? Byte.SIZE : Byte.SIZE / 2;
 
         switch (type) {
             case NONEXISTENT_PROFILE:
@@ -113,7 +108,7 @@ public record GraphEdges(ByteBuffer edgesBuffer, IntBuffer profileIds, ShortBuff
                 break;
 
             case COMPRESSED_PROFILE_Q0_4, COMPRESSED_PROFILE_Q4_4:
-                samples[0] = Q28_4.asFloat(elevations.get(firstIndex));
+                samples[0] = Q28_4.asFloat(Short.toUnsignedInt(elevations.get(firstIndex)));
                 currentAltitude = samples[0];
                 for (int i = 1; i <= Math.ceil((sampleNb - 1) / (double) altitudeDifference); ++i) {
                     for (int j = altitudeDifference - 1; j >= 0; --j) {

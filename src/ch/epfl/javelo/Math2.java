@@ -56,7 +56,7 @@ public final class Math2 {
      * @throws IllegalArgumentException if the minimal value is (strictly) greater than the maximal value
      */
     public static int clamp(int min, int v, int max) {
-        Preconditions.checkArgument(max > min);
+        Preconditions.checkArgument(max >= min);
         if (v < min) return min;
         return Math.min(v, max);
     }
@@ -75,7 +75,7 @@ public final class Math2 {
      * @throws IllegalArgumentException if the minimal value is (strictly) greater than the maximal value
      */
     public static double clamp(double min, double v, double max) {
-        Preconditions.checkArgument(max > min);
+        Preconditions.checkArgument(max >= min);
         if (v < min) return min;
         return Math.min(v, max);
     }

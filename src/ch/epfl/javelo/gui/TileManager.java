@@ -19,7 +19,9 @@ import java.util.Map;
  * @author Wei-En Hsieh (341271)
  */
 public final class TileManager {
-    private final int MAX_ENTRIES = 100;
+    private final static  int ZERO = 0;
+    private final static int POSITIVE_BIT = 1;
+    private final static int MAX_ENTRIES = 100;
     private final Map<TileId, Image> cacheMemory = new LinkedHashMap<>(MAX_ENTRIES);
     private final String tileServerName;
     private final Path pathToDisk;
@@ -27,7 +29,7 @@ public final class TileManager {
     /**
      * Default TileManager constructor
      *
-     * @param pathToDisk       path to the directory containing the disk cache (SSD Disk)
+     * @param pathToDisk     Path to the directory containing the disk cache (SSD Disk)
      * @param tileServerName Server's name of the tile
      */
     public TileManager(Path pathToDisk, String tileServerName) {
@@ -39,7 +41,7 @@ public final class TileManager {
     /**
      * Returns the Image corresponding to the given tile identity.
      *
-     * @param tileId tile's identity
+     * @param  tileId tile's identity
      * @return image corresponding to the tile's identity.
      */
     public Image imageForTileAt(TileId tileId) throws IOException {
@@ -62,12 +64,14 @@ public final class TileManager {
     /**
      * Auxiliary (private) method, that transfers data from server (with given URL)
      *
-     * @param cache_zoomXY_PNG (String) path to PNG file
-     * @param url (String) server's domain
+     * @param cache_zoomXY_PNG     (String) path to PNG file
+     * @param url                  (String) server's domain
      * @param pathToImageDirectory (Path) path to directory containing the PNG file
-     * @throws IOException if the provided URL is not valid
+     * @throws IOException         if the provided URL is not valid
      */
-    private void transferFromServerToDisk(String cache_zoomXY_PNG, String url, Path pathToImageDirectory) throws IOException {
+    private void transferFromServerToDisk(String cache_zoomXY_PNG,
+                                          String url,
+                                          Path pathToImageDirectory) throws IOException {
         URL u = new URL(url);
         URLConnection c = u.openConnection();
         c.setRequestProperty("User-Agent", "JaVelo");
@@ -85,8 +89,8 @@ public final class TileManager {
      * Auxiliary (private) method, that transfers data from server (with given URL)
      *
      * @param cache_zoomXY_PNG (String) path to PNG file
-     * @param tileId (TileId) given tile's identity
-     * @throws IOException if the provided path to directory is not valid
+     * @param tileId           (TileId) given tile's identity
+     * @throws IOException     if the provided path to directory is not valid
      */
     private void transferFromDiskToCache(String cache_zoomXY_PNG, TileId tileId) throws IOException {
         try (FileInputStream fileInputStream = new FileInputStream(cache_zoomXY_PNG)) {
@@ -111,8 +115,8 @@ public final class TileManager {
          * Compact TileId constructor that checks if the given tileId's arguments are valid
          *
          * @param tileZoomLevel Zoom level for a given tileId
-         * @param tileX Index X of the given tileId
-         * @param tileY index Y of the given tileId
+         * @param tileX         Index X of the given tileId
+         * @param tileY         Index Y of the given tileId
          */
         public TileId {
             if (!isValid(tileZoomLevel, tileX, tileY)) throw new IllegalArgumentException();
@@ -127,8 +131,8 @@ public final class TileManager {
          * @return true iff the given Tile's id is valid.
          */
         public static boolean isValid(int tileZoomLevel, int tileX, int tileY) {
-            return  (0 <= tileX && tileX <= (1 << tileZoomLevel)) &&
-                    (0 <= tileY && tileY <= (1 << tileZoomLevel)); // 2^tileZoomLevel
+            return  (ZERO <= tileX && tileX <= (POSITIVE_BIT << tileZoomLevel)) &&
+                    (ZERO <= tileY && tileY <= (POSITIVE_BIT << tileZoomLevel)); // 2^tileZoomLevel
         }
     }
 }

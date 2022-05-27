@@ -19,7 +19,6 @@ import java.util.Map;
  * @author Wei-En Hsieh (341271)
  */
 public final class TileManager {
-    private final static  int ZERO = 0;
     private final static int POSITIVE_BIT = 1;
     private final static int MAX_ENTRIES = 100;
     private final Map<TileId, Image> cacheMemory = new LinkedHashMap<>(MAX_ENTRIES);
@@ -131,8 +130,8 @@ public final class TileManager {
          * @return true iff the given Tile's id is valid.
          */
         public static boolean isValid(int tileZoomLevel, int tileX, int tileY) {
-            return  (ZERO <= tileX && tileX <= (POSITIVE_BIT << tileZoomLevel)) &&
-                    (ZERO <= tileY && tileY <= (POSITIVE_BIT << tileZoomLevel)); // 2^tileZoomLevel
+            return  (0 <= tileX && tileX <= (POSITIVE_BIT << tileZoomLevel)) &&
+                    (0 <= tileY && tileY <= (POSITIVE_BIT << tileZoomLevel)); // 2^tileZoomLevel
         }
     }
 }

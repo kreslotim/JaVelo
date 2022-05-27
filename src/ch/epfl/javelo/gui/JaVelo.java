@@ -1,5 +1,4 @@
 package ch.epfl.javelo.gui;
-
 import ch.epfl.javelo.data.Graph;
 import ch.epfl.javelo.routing.*;
 import javafx.application.Application;
@@ -17,6 +16,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
@@ -28,7 +28,6 @@ import java.util.function.Consumer;
  */
 public final class JaVelo extends Application {
     private final DoubleProperty highlightProperty = new SimpleDoubleProperty(Double.NaN);
-    private final static int ZERO = 0;
     private final static int MIN_SCENE_WIDTH = 800;
     private final static int MIN_SCENE_HEIGHT = 600;
     private final static int ELEVATION_PANE_INDEX = 1;
@@ -87,7 +86,7 @@ public final class JaVelo extends Application {
          *************************************************************************************************************/
 
         routeBean.highlightedPositionProperty().bind(Bindings
-                .when(annotatedMapManager.mousePositionOnRouteProperty().greaterThanOrEqualTo(ZERO))
+                .when(annotatedMapManager.mousePositionOnRouteProperty().greaterThanOrEqualTo(0))
                 .then(annotatedMapManager.mousePositionOnRouteProperty())
                 .otherwise(elevationProfileManager.mousePositionOnProfileProperty()));
 
@@ -139,7 +138,7 @@ public final class JaVelo extends Application {
                     GpxGenerator.writeGpx("javelo.gpx", routeBean.routeProperty().get(),
                                                      routeBean.elevationProfileProperty().get());
                 } catch (IOException exception) {
-                    exception.printStackTrace();
+                    throw new UncheckedIOException(exception);
                 }
         });
 

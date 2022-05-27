@@ -33,10 +33,6 @@ public final class ElevationProfileManager {
     private final Polygon polygon;
     private final Line highlightLine;
     private final BorderPane mainPane;
-    private final static int ZERO = 0;
-    private final static int ONE = 1;
-    private final static int TWO = 2;
-    private final static int TEN = 10;
     private final static int KILOMETER = 1000;
     private final static int VERTICAL_SPACING = 25;
     private final static int HORIZONTAL_SPACING = 50;
@@ -71,7 +67,7 @@ public final class ElevationProfileManager {
         stats = new Text();
         labels = new Group();
         polygon = new Polygon();
-        highlightLine = new Line(ZERO, ZERO, ZERO, ZERO);
+        highlightLine = new Line(0, 0, 0, 0);
         pane = new Pane(grid, labels, polygon, highlightLine);
 
         bindRectangle();
@@ -124,20 +120,20 @@ public final class ElevationProfileManager {
 
         for (int x = (int) rectangle.getMinX(); x <= rectangle.getMaxX(); x++) {
 
-            double worldPositionX = screenToWorldProperty.get().transform(x,ZERO).getX();
+            double worldPositionX = screenToWorldProperty.get().transform(x,0).getX();
 
-            double y = worldToScreenProperty.get().transform(ZERO,
+            double y = worldToScreenProperty.get().transform(0,
                     elevationProfileProperty.get().elevationAt(worldPositionX)).getY();
 
             profilesList.add((double)x);
             profilesList.add(y);
         }
 
-        profilesList.add(rectangle.getMaxX()); // first X
-        profilesList.add(rectangle.getMaxY()); // first Y
-
-        profilesList.add(rectangle.getMinX()); // last X
+        profilesList.add(rectangle.getMaxX()); // last X
         profilesList.add(rectangle.getMaxY()); // last Y
+
+        profilesList.add(rectangle.getMinX()); // first X
+        profilesList.add(rectangle.getMaxY()); // first Y
 
         polygon.getPoints().setAll(profilesList);
 
@@ -163,7 +159,7 @@ public final class ElevationProfileManager {
                     - elevationProfile.minElevation()) / rectangle.getHeight();
 
             affine.prependScale(scaleFactorX, -scaleFactorY);
-            affine.prependTranslation(ZERO, elevationProfile.minElevation());
+            affine.prependTranslation(0, elevationProfile.minElevation());
 
             screenToWorldProperty.set(affine);
 
@@ -180,7 +176,7 @@ public final class ElevationProfileManager {
 
 
         highlightLine.layoutXProperty().bind(Bindings.createDoubleBinding(() -> worldToScreenProperty.get()
-                        .transform(highlightProperty.get(), ZERO).getX(),
+                        .transform(highlightProperty.get(), 0).getX(),
                 highlightProperty, worldToScreenProperty));
 
 
@@ -188,7 +184,7 @@ public final class ElevationProfileManager {
 
         highlightLine.endYProperty().bind(Bindings.select(rectangleProperty, "maxY"));
 
-        highlightLine.visibleProperty().bind(highlightProperty.greaterThanOrEqualTo(ZERO));
+        highlightLine.visibleProperty().bind(highlightProperty.greaterThanOrEqualTo(0));
 
 
     }
@@ -207,8 +203,8 @@ public final class ElevationProfileManager {
                     double width = pane.getWidth() - INSETS.getLeft() - INSETS.getRight();
                     double height = pane.getHeight() - INSETS.getBottom() - INSETS.getTop();
 
-                    if (width < ZERO) width = ZERO;
-                    if (height < ZERO) height = ZERO;
+                    if (width < 0) width = 0.0;
+                    if (height < 0) height = 0.0;
 
                     return new Rectangle2D(minX, minY, width, height);
                 },
@@ -230,16 +226,16 @@ public final class ElevationProfileManager {
         Transform worldToScreenTransform = worldToScreenProperty.get();
 
         //CHOOSING RELEVANT HORIZONTAL STEP
-        int horizontalStepChosen = POS_STEPS[POS_STEPS.length - ONE];
+        int horizontalStepChosen = POS_STEPS[POS_STEPS.length - 1];
         for (int horizontalStep : POS_STEPS) {
-            if (worldToScreenTransform.deltaTransform(horizontalStep, ZERO).getX() >= HORIZONTAL_SPACING) {
+            if (worldToScreenTransform.deltaTransform(horizontalStep, 0).getX() >= HORIZONTAL_SPACING) {
                 horizontalStepChosen = horizontalStep;
                 break;
             }
         }
 
         //BUILD VERTICAL LINES
-        for (int step = ZERO; step < elevationProfile.length(); step += horizontalStepChosen) {
+        for (int step = 0; step < elevationProfile.length(); step += horizontalStepChosen) {
 
             Point2D startLinePoint = worldToScreenTransform.transform(step, elevationProfile.minElevation());
             Point2D endLinePoint = worldToScreenTransform.transform(step, elevationProfile.maxElevation());
@@ -257,9 +253,9 @@ public final class ElevationProfileManager {
         }
 
         //CHOOSING RELEVANT VERTICAL STEP
-        int verticalStepChosen = ELE_STEPS[ELE_STEPS.length - ONE];
+        int verticalStepChosen = ELE_STEPS[ELE_STEPS.length - 1];
         for (int verticalStep : ELE_STEPS) {
-            if (worldToScreenTransform.deltaTransform(ZERO, -verticalStep).getY() >= VERTICAL_SPACING) {
+            if (worldToScreenTransform.deltaTransform(0, -verticalStep).getY() >= VERTICAL_SPACING) {
                 verticalStepChosen = verticalStep;
                 break;
             }
@@ -272,7 +268,7 @@ public final class ElevationProfileManager {
         //BUILD HORIZONTAL LINES
         for (int step = initialElevation; step < elevationProfile.maxElevation(); step += verticalStepChosen) {
 
-            Point2D startLinePoint = worldToScreenTransform.transform(ZERO, step);
+            Point2D startLinePoint = worldToScreenTransform.transform(0, step);
             Point2D endLinePoint = worldToScreenTransform.transform(elevationProfile.length(), step);
 
             MoveTo moveTo = new MoveTo(startLinePoint.getX(), startLinePoint.getY());
@@ -300,17 +296,17 @@ public final class ElevationProfileManager {
     private void setLabels(int step, Point2D startLinePoint, String axis) {
 
         Text label = new Text(String.valueOf(step));
-        label.setFont(Font.font("Avenir", TEN));
+        label.setFont(Font.font("Avenir", 10));
 
         double displayPositionOffset;
         if (axis.equals("horizontal")) {
             label.setText(String.valueOf(step/KILOMETER));
             label.setTextOrigin(VPos.TOP);
-            displayPositionOffset = label.prefWidth(ZERO) / TWO;
+            displayPositionOffset = label.prefWidth(0) / 2;
         }
         else { // if axis is vertical
             label.setTextOrigin(VPos.CENTER);
-            displayPositionOffset = label.prefWidth(ZERO) + TWO;
+            displayPositionOffset = label.prefWidth(0) + 2;
         }
 
 

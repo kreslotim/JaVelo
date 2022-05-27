@@ -19,8 +19,6 @@ import java.util.Map;
  * @author Wei-En Hsieh (341271)
  */
 public final class RouteBean {
-    private final static int ZERO = 0;
-    private final static int ONE = 1;
     private final static int MAX_ENTRIES = 100;
     private final static int MAX_STEP_LENGTH = 5;
     private final RouteComputer routeComputer;
@@ -47,12 +45,12 @@ public final class RouteBean {
     private void computeRoute() {
         segments.clear();
 
-        if (waypoints.size() > ONE) {
+        if (waypoints.size() > 1) {
 
             boolean segmentIsNull = false;
-            for (int i = ONE; i < waypoints.size(); i++) {
+            for (int i = 1; i < waypoints.size(); i++) {
 
-                Pair<Integer, Integer> pairNode = new Pair<>(waypoints.get(i - ONE).nearestNodeId(),
+                Pair<Integer, Integer> pairNode = new Pair<>(waypoints.get(i - 1).nearestNodeId(),
                                                              waypoints.get(i).nearestNodeId());
 
                 if (cacheRoute.containsKey(pairNode.toString())) {       //if the segment has already been computed
@@ -160,10 +158,10 @@ public final class RouteBean {
      */
     public int indexOfNonEmptySegmentAt(double position) {
         int index = routeProperty().get().indexOfSegmentAt(position);
-        for (int i = ZERO; i <= index; i += ONE) {
+        for (int i = 0; i <= index; i += 1) {
             int n1 = waypoints.get(i).nearestNodeId();
-            int n2 = waypoints.get(i + ONE).nearestNodeId();
-            if (n1 == n2) index += ONE;
+            int n2 = waypoints.get(i + 1).nearestNodeId();
+            if (n1 == n2) index += 1;
         }
         return index;
     }

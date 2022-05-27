@@ -30,8 +30,7 @@ public final class WaypointsManager {
     private final Consumer<String> errorConsumer;
     private final List<Node> markersList = new ArrayList<>();
     private final static int SEARCH_DISTANCE = 1000/2;
-    private final static int ZERO = 0;
-    private final static int ONE = 1;
+
 
     /**
      * Default WaypointsManager constructor
@@ -73,7 +72,7 @@ public final class WaypointsManager {
         MapViewParameters mapViewParameters = mapViewParametersProperty.get();
         markersList.clear();
 
-        for (int i = ZERO; i < waypoints.size(); i++) {
+        for (int i = 0; i < waypoints.size(); i++) {
 
             Group marker = createMarker();
             marker.getStyleClass().add("pin");
@@ -113,7 +112,7 @@ public final class WaypointsManager {
 
                     if (newPointCh != null) {
                         int newNodeId = graph.nodeClosestTo(newPointCh, SEARCH_DISTANCE);
-                        if (newNodeId != -ONE) waypoints.set(indexI, new Waypoint(newPointCh, newNodeId));
+                        if (newNodeId != -1) waypoints.set(indexI, new Waypoint(newPointCh, newNodeId));
                         else {
                             drawWaypoints();
                             errorConsumer.accept("Aucune route à proximité !");
@@ -128,8 +127,8 @@ public final class WaypointsManager {
             marker.setLayoutX(mapViewParameters.viewX(waypointWebMercator));
             marker.setLayoutY(mapViewParameters.viewY(waypointWebMercator));
 
-            if (waypoints.indexOf(currentWaypoint) == ZERO) marker.getStyleClass().add("first");
-            else if (waypoints.indexOf(currentWaypoint) == waypoints.size() - ONE) marker.getStyleClass().add("last");
+            if (waypoints.indexOf(currentWaypoint) == 0) marker.getStyleClass().add("first");
+            else if (waypoints.indexOf(currentWaypoint) == waypoints.size() - 1) marker.getStyleClass().add("last");
             else marker.getStyleClass().add("middle");
 
             markersList.add(marker);
@@ -172,7 +171,7 @@ public final class WaypointsManager {
         if (pointCh != null) {
             int nearestNodeId = graph.nodeClosestTo(pointCh, SEARCH_DISTANCE);
 
-            if (nearestNodeId == -ONE) { // if there's no nearestNodes
+            if (nearestNodeId == -1) { // if there's no nearestNodes
                 errorConsumer.accept("Aucune route à proximité !");
             } else { // if the nearestNode exists
                 waypoints.add(new Waypoint(pointCh, nearestNodeId));

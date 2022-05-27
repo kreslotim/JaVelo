@@ -33,7 +33,7 @@ public final class AnnotatedMapManager {
     private final static int INITIAL_ZOOM_LEVEL = 12;
     private final static int INITIAL_MAP_TOP_LEFT_POSITION_X = 543200;
     private final static int INITIAL_MAP_TOP_LEFT_POSITION_Y = 370650;
-    private final MapViewParameters MAP_VIEW_PARAMETERS =
+    private final static MapViewParameters INITIAL_MAP_VIEW_PARAMETERS =
             new MapViewParameters(INITIAL_ZOOM_LEVEL, INITIAL_MAP_TOP_LEFT_POSITION_X, INITIAL_MAP_TOP_LEFT_POSITION_Y);
 
     /**
@@ -51,7 +51,7 @@ public final class AnnotatedMapManager {
         this.routeBean = routeBean;
         this.errorConsumer = errorConsumer;
 
-        mapViewParametersProperty = new SimpleObjectProperty<>(MAP_VIEW_PARAMETERS);
+        mapViewParametersProperty = new SimpleObjectProperty<>(INITIAL_MAP_VIEW_PARAMETERS);
 
         mainPane = buildStackPane();
 

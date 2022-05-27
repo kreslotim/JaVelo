@@ -27,7 +27,6 @@ public final class BaseMapManager {
     private final SimpleLongProperty minScrollTime = new SimpleLongProperty();
     private final ObjectProperty<MapViewParameters> mapViewParametersProperty;
     private final ObjectProperty<Point2D> point2DProperty = new SimpleObjectProperty<>();
-    private final static int ZERO = 0;
     private final static int MIN_ZOOM_VALUE = 8;
     private final static int MAX_ZOOM_VALUE = 19;
     private final static int TILE_SIDE_PIXELS = 256;
@@ -144,7 +143,7 @@ public final class BaseMapManager {
 
             MapViewParameters mapViewParameters = mapViewParametersProperty.get();
 
-            if (e.getDeltaY() == ZERO) return;
+            if (e.getDeltaY() == 0) return;
             long currentTime = System.currentTimeMillis();
             if (currentTime < minScrollTime.get()) return;
             minScrollTime.set(currentTime + MIN_SCROLL_TIME_OFFSET);

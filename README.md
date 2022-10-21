@@ -13,7 +13,8 @@ En plus du fonctionnement standart de JaVelo, notre projet offrira les extension
 ### Fonds de carte
 
 L’utilisateur a la possibilité de changer le fond de la carte, au moyen des boutons prévus à cet effet, qui se trouvent dans le menu « Fonds de carte », dans la bar de menu en haut de l’application.
-Les fonds proposés sont les suivants : 
+Les fonds proposés sont les suivants :
+
     • OpenStreetMap (Fond standart)
     • Cycle-OSM (Fond avec les routes cyclables)
     • Dark Layer (Fond sombre, pour les cyclistes sensibles à la luminosité)

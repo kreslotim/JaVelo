@@ -1,6 +1,6 @@
 # JaVelo
 
-## RAPPORT D’AMÉLIORATIONS APPORTÉES AU PROJET
+RAPPORT D’AMÉLIORATIONS APPORTÉES AU PROJET
 
 En plus du fonctionnement standart de JaVelo, notre projet offrira les extensions suivantes: 
 

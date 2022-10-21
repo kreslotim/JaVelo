@@ -9,8 +9,8 @@ En plus du fonctionnement standart de JaVelo, notre projet offrira les extension
     • Coloriage de la ligne représentant l'itinéraire, ainsi que le polygone représentant le profil d’élévations en fonction de l’élévation locale, en couleurs de l’arc-en-ciel.
     • L’ajout de l’éléphant rose qui accompagne le cycliste durant le trajet, en changeant sa direction (gauche-droite) en fonction du mouvement de la souris.
 
-Point de vue de l'utilisateur :
-Fonds de carte
+## Point de vue de l'utilisateur :
+### Fonds de carte
 
 L’utilisateur a la possibilité de changer le fond de la carte, au moyen des boutons prévus à cet effet, qui se trouvent dans le menu « Fonds de carte », dans la bar de menu en haut de l’application.
 Les fonds proposés sont les suivants : 
@@ -20,7 +20,7 @@ Les fonds proposés sont les suivants :
     • Light Layer (Fond clair, pour observer clairement la forme du trajet)
     • Swiss Style (Fond adapté au territoire de la Suisse)
                                                                                                                                           
-Itinéraire
+### Itinéraire
 
 L’utilisateur a la possibilité de supprimer tous les points de passages (Waypoints)
 présents sur la carte en un coup, ou d’inverser l’itinéraire en inversant l’ordre des points de passages constituants la route, au moyen des boutons prévus à cet effet, qui se trouvent dans le menu « Itinéraire » , dans la bar de menu en haut de l’application.
@@ -28,20 +28,20 @@ présents sur la carte en un coup, ou d’inverser l’itinéraire en inversant 
 
 
                                                                                                                                               
-Coloriage
+### Coloriage
 
 La ligne représentant l’itinéraire et le polygone représentant le profil d’élévations sont coloriés en couleurs de l’arc-en-ciel, au moyen d’un dégradé linéaire.
 Les couleurs sont réparties en fonction de l’élévation : du bas vers le haut, plus l’élévation est grande, plus la longueur d’onde correspondant à sa couleur est élevée : du violet (400 nm) au rouge (700 nm).
                                                                                                                                 
 
-Éléphant Rose
+### Éléphant Rose
 
 Lors du survol de la souris près de l’itinéraire, l’utilisateur a la possibilité d’admirer un très joyeux éléphant rose accompagnant le cycliste solitaire, vers sa destination. En effet, si le cycliste décide de rebrousser chemin, l’éléphant rose dévoué changera de direction également, en suivant son compagnon.
                                                                                                                                   
 
 
 # Mise en œuvre en Java 
-Fonds de carte
+### Fonds de carte
 
 Afin de pouvoir changer les fonds de carte, JaVelo est maintenant muni d’une propriété ObjectProperty contenant la carte annotée AnnotatedMapManager.
 Chaque bouton de type MenuItem dans le menu « Fonds de carte » s’occupe de créer un nouveau TileManager, prenant en argument le chemin vers le cache contenant les tuiles OSM du serveur correspondant, et le nom du serveur utilisé.
@@ -50,16 +50,16 @@ Finalement, afin que le binding se refasse à chaque changement de la carte anno
 L’instance de MapViewParameters est déplacée de AnnotatedMapManager vers JaVelo, et stockée dans une propriété, afin que le changement de fond ne provoque pas un recentrage de la carte sur Lausanne.
 
 
-Itinéraire
+### Itinéraire
 
 Les boutons de type MenuItem dans le menu « Itinéraire » s’occupent chacun respectivement de supprimer les waypoints au moyen de la méthode clear() appelée sur la liste observable des waypoints obtenue grâce au getteur de RouteBean, et inverser l’itinéraire en inversant la liste observable des waypoints, obtenue grâce au getteur de RouteBean, au moyen de la méthode reverse() de Collections.
 
-Coloriage
+### Coloriage
 
 Le coloriage de la ligne d’itinéraire et du profil d’élévations se fait au moyen du dégradé linéaire en CSS (linear-gradient). Le style correspondant est ajouté à la polyligne au moyen de setStyle(-fx-stroke : linear-gradient(…)), dans la classe RouteManager.
 La même procédure est appliquée sur le polygone représentant le profil d’élévations avec le dégradé linéaire dessiné du haut en bas, pour faire correspondre la couleur appropriée à l’élévation correspondante, dans la classe ElevationProfileManager.
 
-Éléphant Rose
+### Éléphant Rose
 
 Le nœud JavaFX de type Circle qui représente la position mise en évidence est maintenant un disque muni d’une image PNG, stockée dans un répertoire à la racine du projet.
 Trois attributs sont rajouté dans la classe RouteManager, de type :

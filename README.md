@@ -38,9 +38,8 @@ Les couleurs sont réparties en fonction de l’élévation : du bas vers le ha
 Lors du survol de la souris près de l’itinéraire, l’utilisateur a la possibilité d’admirer un très joyeux éléphant rose accompagnant le cycliste solitaire, vers sa destination. En effet, si le cycliste décide de rebrousser chemin, l’éléphant rose dévoué changera de direction également, en suivant son compagnon.
                                                                                                                                   
 
-# JaVelo
 
-Mise en œuvre en Java : 
+# Mise en œuvre en Java 
 Fonds de carte
 
 Afin de pouvoir changer les fonds de carte, JaVelo est maintenant muni d’une propriété ObjectProperty contenant la carte annotée AnnotatedMapManager.

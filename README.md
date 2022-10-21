@@ -2,6 +2,7 @@
 
 RAPPORT D’AMÉLIORATIONS APPORTÉES AU PROJET
 En plus du fonctionnement standart de JaVelo, notre projet offrira les extensions suivantes: 
+
     • Le choix du fond de carte (parmis les 5 proposés)
     • Possibilité de supprimer tous les points de passages présents sur la carte,
       ainsi que inverser l’itinéraire.
